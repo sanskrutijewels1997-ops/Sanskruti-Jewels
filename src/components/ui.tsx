@@ -26,12 +26,22 @@ export function Field({
   children: React.ReactNode;
   className?: string;
 }) {
+  // The hint sits outside the <label> so it isn't read as part of the field's name.
+  const hintId = React.useId();
   return (
-    <label className={`block ${className}`}>
-      <span className="mb-1.5 block text-xs font-medium text-ink-2">{label}</span>
-      {children}
-      {hint && <span className="mt-1 block text-[11px] text-ink-3">{hint}</span>}
-    </label>
+    <div className={className}>
+      <label className="block">
+        <span className="mb-1.5 block text-xs font-medium text-ink-2">{label}</span>
+        {hint && React.isValidElement<{ 'aria-describedby'?: string }>(children)
+          ? React.cloneElement(children, { 'aria-describedby': hintId })
+          : children}
+      </label>
+      {hint && (
+        <span id={hintId} className="mt-1 block text-[11px] text-ink-3">
+          {hint}
+        </span>
+      )}
+    </div>
   );
 }
 

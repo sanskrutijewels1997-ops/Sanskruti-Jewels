@@ -1,0 +1,155 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'claude/**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 22
+
+jobs:
+  checks:
+    name: Lint, typecheck, unit tests & build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit & component tests (with coverage thresholds)
+        run: npm run test:coverage
+
+      - name: Coverage summary
+        if: always() && hashFiles('coverage/coverage-summary.json') != ''
+        run: node scripts/coverage-summary.mjs >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        if: always() && hashFiles('coverage/**') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14
+
+      - name: Generated SQL is up to date
+        run: |
+          npm run seed:sql
+          git diff --exit-code -- supabase/ || {
+            echo "::error::supabase/seed.sql or setup.sql is stale. Run 'npm run seed:sql' and commit the result."
+            exit 1
+          }
+
+      - name: Production build
+        run: npm run build
+
+  e2e:
+    name: End-to-end (demo mode)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      - name: Playwright (desktop + mobile)
+        run: npx playwright test
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-demo
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+  database:
+    name: Database, security rules & e2e on Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+
+      - name: Start Supabase (applies migrations + seed)
+        run: npx supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,supavisor,mailpit,postgres-meta
+
+      - name: Export Supabase connection details
+        run: |
+          npx supabase status -o env > .supabase.env
+          set -a; . ./.supabase.env; set +a
+          {
+            echo "SUPABASE_URL=$API_URL"
+            echo "SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+            echo "DB_URL=$DB_URL"
+          } >> "$GITHUB_ENV"
+
+      - name: setup.sql applies cleanly and is re-runnable
+        run: |
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/setup.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/setup.sql
+          test "$(psql "$DB_URL" -tAc 'select count(*) from public.products')" -ge 38
+
+      - name: Security rules & Supabase adapter tests
+        run: npm run test:db
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Build app against Supabase and serve it
+        run: |
+          npx tsx tests/db/create-e2e-users.ts
+          VITE_SUPABASE_URL="$SUPABASE_URL" VITE_SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" npx vite build --outDir dist-supabase
+          npx vite preview --outDir dist-supabase --port 4180 --strictPort &
+          timeout 60 bash -c 'until curl -sf http://localhost:4180 > /dev/null; do sleep 1; done'
+
+      - name: Playwright against Supabase
+        env:
+          E2E_BASE_URL: http://localhost:4180
+          E2E_ADMIN_EMAIL: e2e-admin@test.local
+          E2E_ADMIN_PASSWORD: password123
+          E2E_CUSTOMER_EMAIL: e2e-customer@test.local
+          E2E_CUSTOMER_PASSWORD: password123
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-supabase
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+      - name: Stop Supabase
+        if: always()
+        run: npx supabase stop --no-backup

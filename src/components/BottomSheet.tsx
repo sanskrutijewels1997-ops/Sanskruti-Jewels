@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AnimatePresence, motion, useDragControls } from 'framer-motion';
+import { AnimatePresence, motion, useDragControls, useIsPresent } from 'framer-motion';
 import { XIcon } from 'lucide-react';
 import { pushBackHandler } from '../lib/native';
 
@@ -49,14 +49,7 @@ export function BottomSheet({
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 sm:items-center sm:p-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease }}
-          onClick={onClose}
-        >
+        <Backdrop onClose={onClose}>
           <motion.div
             role="dialog"
             aria-modal="true"
@@ -102,8 +95,29 @@ export function BottomSheet({
             </div>
             {footer && <div className="shrink-0 border-t border-line bg-surface px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">{footer}</div>}
           </motion.div>
-        </motion.div>
+        </Backdrop>
       )}
     </AnimatePresence>
+  );
+}
+
+/**
+ * Dimmed backdrop. While it fades out after closing it must not swallow taps meant for
+ * the page underneath (e.g. tapping a product right after picking a sort order).
+ */
+function Backdrop({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
+  const isPresent = useIsPresent();
+  return (
+    <motion.div
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 sm:items-center sm:p-6"
+      style={{ pointerEvents: isPresent ? 'auto' : 'none' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease }}
+      onClick={onClose}
+    >
+      {children}
+    </motion.div>
   );
 }

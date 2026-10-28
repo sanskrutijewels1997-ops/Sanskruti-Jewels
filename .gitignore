@@ -36,3 +36,8 @@ supabase/.temp
 android/app/build
 ios/App/Pods
 ios/App/build
+coverage
+playwright-report
+test-results
+.supabase.env
+dist-supabase

@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Outlet, RouterProvider, createBrowserRouter, type RouteObject } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
@@ -31,11 +31,14 @@ const AdminTaxonomy = lazy(() => import('./pages/admin/AdminTaxonomy').then((m) 
 const AdminEnquiries = lazy(() => import('./pages/admin/AdminEnquiries').then((m) => ({ default: m.AdminEnquiries })));
 const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers').then((m) => ({ default: m.AdminCustomers })));
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { staleTime: 60_000, refetchOnWindowFocus: false, retry: 1 }
-  }
-});
+export const createQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { staleTime: 60_000, refetchOnWindowFocus: false, retry: 1 }
+    }
+  });
+
+const queryClient = createQueryClient();
 
 const customer = (el: React.ReactNode) => <RequireAuth>{el}</RequireAuth>;
 const admin = (el: React.ReactNode) => (
@@ -55,7 +58,8 @@ function Root() {
   );
 }
 
-const router = createBrowserRouter([
+/** Route table, exported so tests can mount it in a memory router. */
+export const routes: RouteObject[] = [
   {
     element: <Root />,
     children: [
@@ -95,12 +99,23 @@ const router = createBrowserRouter([
       }
     ]
   }
-]);
+];
+
+/** Opt in to React Router v7 behaviour now (also silences the upgrade warnings). */
+export const routerFuture = {
+  v7_relativeSplatPath: true,
+  v7_fetcherPersist: true,
+  v7_normalizeFormMethod: true,
+  v7_partialHydration: true,
+  v7_skipActionErrorRevalidation: true
+} as const;
+
+const router = createBrowserRouter(routes, { future: routerFuture });
 
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </QueryClientProvider>
   );
 }

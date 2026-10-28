@@ -153,7 +153,8 @@ function persist() {
  * Simulates network latency so loading states are exercised. Returns a deep copy so
  * callers can never mutate the stored rows (a real backend never shares references).
  */
-const tick = <T,>(v: T) => new Promise<T>((r) => window.setTimeout(() => r(structuredClone(v)), 120));
+const LATENCY_MS = import.meta.env.MODE === 'test' ? 0 : 120;
+const tick = <T,>(v: T) => new Promise<T>((r) => window.setTimeout(() => r(structuredClone(v)), LATENCY_MS));
 
 function currentProfile() {
   return db.profiles.find((p) => p.id === db.session) ?? null;
