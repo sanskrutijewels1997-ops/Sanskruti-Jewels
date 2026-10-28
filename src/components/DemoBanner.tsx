@@ -1,47 +1,27 @@
-import { useState } from 'react';
-import { XIcon } from 'lucide-react';
 import { api } from '../lib/api';
 import { DEMO_ACCOUNTS, resetDemoData } from '../lib/api/demo';
 
-/** Shown only when the app runs without Supabase, so nobody mistakes it for live data. */
-export function DemoBanner() {
-  const [hidden, setHidden] = useState(() => {
-    try {
-      return sessionStorage.getItem('demo-banner') === 'hidden';
-    } catch {
-      return false;
-    }
-  });
-  if (api.mode !== 'demo' || hidden) return null;
+/** Shown on the Profile tab when the app runs without Supabase. */
+export function DemoNotice() {
+  if (api.mode !== 'demo') return null;
   return (
-    <div className="relative border-b border-gold-pale bg-gold-wash px-10 py-2 text-center text-xs leading-relaxed text-gold-light">
-      <strong className="font-semibold">Demo mode</strong> — data is stored only in this browser.
-      Admin: {DEMO_ACCOUNTS.admin.email} / {DEMO_ACCOUNTS.admin.password} · Customer:{' '}
-      {DEMO_ACCOUNTS.customer.email} / {DEMO_ACCOUNTS.customer.password} ·{' '}
+    <div className="rounded-2xl border border-gold-pale bg-gold-wash p-4 text-xs leading-relaxed text-ink-2">
+      <p className="font-semibold text-ink">Demo mode</p>
+      <p className="mt-1">Data is stored only in this browser.</p>
+      <p className="mt-1">
+        Admin: {DEMO_ACCOUNTS.admin.email} / {DEMO_ACCOUNTS.admin.password}
+        <br />
+        Customer: {DEMO_ACCOUNTS.customer.email} / {DEMO_ACCOUNTS.customer.password}
+      </p>
       <button
         type="button"
-        className="underline underline-offset-2 hover:text-charcoal"
+        className="mt-2 font-semibold text-brand underline underline-offset-2"
         onClick={() => {
           resetDemoData();
           window.location.reload();
         }}
       >
         Reset demo data
-      </button>
-      <button
-        type="button"
-        aria-label="Hide demo banner"
-        onClick={() => {
-          try {
-            sessionStorage.setItem('demo-banner', 'hidden');
-          } catch {
-            // Storage blocked: hide for this page view only.
-          }
-          setHidden(true);
-        }}
-        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 hover:bg-gold-pale"
-      >
-        <XIcon className="h-3.5 w-3.5" />
       </button>
     </div>
   );

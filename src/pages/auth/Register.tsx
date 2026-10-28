@@ -51,8 +51,8 @@ export function Register() {
       <AuthCard title="Check your inbox">
         <div className="text-center">
           <MailCheckIcon className="mx-auto h-10 w-10 text-gold" />
-          <p className="mt-4 text-sm text-charcoal-muted">
-            We've sent a confirmation link to <strong className="text-charcoal">{form.email}</strong>. Open it to
+          <p className="mt-4 text-sm text-ink-2">
+            We've sent a confirmation link to <strong className="text-ink">{form.email}</strong>. Open it to
             activate your account, then sign in.
           </p>
           <Link to="/login" className={`mt-7 ${primaryButton}`}>
@@ -90,9 +90,9 @@ export function Register() {
           {busy && <Spinner />} Create account
         </button>
       </form>
-      <p className="mt-6 text-center text-sm text-charcoal-muted">
+      <p className="mt-6 text-center text-sm text-ink-2">
         Already have an account?{' '}
-        <Link to={`/login?next=${encodeURIComponent(next)}`} className="font-medium text-gold hover:text-gold-light">
+        <Link to={`/login?next=${encodeURIComponent(next)}`} className="font-medium text-brand">
           Sign in
         </Link>
       </p>

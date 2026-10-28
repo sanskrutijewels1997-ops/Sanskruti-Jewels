@@ -41,7 +41,7 @@ export function AdminCustomers() {
   return (
     <DashboardShell eyebrow="People" title="Customers" subtitle={`${q.data?.length ?? 0} accounts`} nav={adminNav}>
       <div className="relative mb-5 max-w-md">
-        <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-charcoal-faint" />
+        <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-3" />
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, email, phone" aria-label="Search customers" className={`${inputClass} pl-9`} />
       </div>
       {q.isLoading ? (
@@ -51,21 +51,21 @@ export function AdminCustomers() {
       ) : list.length === 0 ? (
         <EmptyState title="No customers found" />
       ) : (
-        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white">
+        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
           {list.map((p) => (
             <li key={p.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 p-4 text-sm">
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-charcoal">{p.fullName || '—'}</p>
-                <p className="truncate text-xs text-charcoal-muted">
+                <p className="font-medium text-ink">{p.fullName || '—'}</p>
+                <p className="truncate text-xs text-ink-2">
                   {[p.email, p.phone, p.city].filter(Boolean).join(' · ')}
                 </p>
               </div>
-              <span className="text-xs text-charcoal-faint">Joined {formatDate(p.createdAt)}</span>
+              <span className="text-xs text-ink-3">Joined {formatDate(p.createdAt)}</span>
               {p.role === 'admin' && (
-                <span className="rounded-full bg-gold-wash px-2.5 py-1 text-[11px] font-medium text-gold-light">Admin</span>
+                <span className="rounded-full bg-gold-wash px-2.5 py-1 text-[11px] font-medium text-gold">Admin</span>
               )}
               {p.id !== user?.id && (
-                <button type="button" onClick={() => toggleAdmin(p)} className="text-xs text-charcoal-muted underline-offset-4 hover:text-gold hover:underline">
+                <button type="button" onClick={() => toggleAdmin(p)} className="text-xs text-ink-2 underline-offset-4 hover:text-brand hover:underline">
                   {p.role === 'admin' ? 'Remove admin' : 'Make admin'}
                 </button>
               )}

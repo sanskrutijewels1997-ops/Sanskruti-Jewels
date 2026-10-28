@@ -1,23 +1,26 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
-import { SiteLayout } from './components/SiteLayout';
+import { AppShell } from './components/AppShell';
 import { RequireAdmin, RequireAuth } from './components/Guards';
+import { PageLoader } from './components/ui';
 import { Home } from './pages/Home';
+import { Categories } from './pages/Categories';
 import { Catalogue } from './pages/Catalogue';
+import { Search } from './pages/Search';
 import { ProductDetail } from './pages/ProductDetail';
-import { Collections } from './pages/Collections';
 import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
 import { ForgotPassword } from './pages/auth/ForgotPassword';
 import { ResetPassword } from './pages/auth/ResetPassword';
-import { Account } from './pages/account/Account';
+import { Profile } from './pages/account/Profile';
+import { EditProfile } from './pages/account/EditProfile';
 import { Wishlist } from './pages/account/Wishlist';
 import { SavedLists } from './pages/account/SavedLists';
+import { ListDetail } from './pages/account/ListDetail';
 import { MyEnquiries } from './pages/account/MyEnquiries';
-import { PageLoader } from './components/ui';
 import { NotFound } from './pages/NotFound';
 
 // Admin screens are split into their own chunk; shoppers never download them.
@@ -41,44 +44,63 @@ const admin = (el: React.ReactNode) => (
   </RequireAdmin>
 );
 
+/** Providers need the router (for navigation), so they live inside the root route. */
+function Root() {
+  return (
+    <AuthProvider>
+      <AppProvider>
+        <Outlet />
+      </AppProvider>
+    </AuthProvider>
+  );
+}
+
+const router = createBrowserRouter([
+  {
+    element: <Root />,
+    children: [
+      {
+        element: <AppShell />,
+        children: [
+          { path: '/', element: <Home /> },
+          { path: '/categories', element: <Categories /> },
+          { path: '/collections', element: <Categories initialTab="collections" /> },
+          { path: '/catalogue', element: <Catalogue /> },
+          { path: '/search', element: <Search /> },
+          { path: '/product/:slug', element: <ProductDetail /> },
+          { path: '/wishlist', element: <Wishlist /> },
+          { path: '/account', element: <Profile /> },
+
+          { path: '/login', element: <Login /> },
+          { path: '/register', element: <Register /> },
+          { path: '/forgot-password', element: <ForgotPassword /> },
+          { path: '/reset-password', element: <ResetPassword /> },
+
+          { path: '/account/edit', element: customer(<EditProfile />) },
+          { path: '/account/enquiries', element: customer(<MyEnquiries />) },
+          { path: '/lists', element: customer(<SavedLists />) },
+          { path: '/lists/:id', element: customer(<ListDetail />) },
+
+          { path: '/admin', element: admin(<AdminDashboard />) },
+          { path: '/admin/products', element: admin(<AdminProducts />) },
+          { path: '/admin/products/new', element: admin(<ProductEditor />) },
+          { path: '/admin/products/:id', element: admin(<ProductEditor />) },
+          { path: '/admin/categories', element: admin(<AdminTaxonomy kind="categories" />) },
+          { path: '/admin/collections', element: admin(<AdminTaxonomy kind="collections" />) },
+          { path: '/admin/enquiries', element: admin(<AdminEnquiries />) },
+          { path: '/admin/customers', element: admin(<AdminCustomers />) },
+
+          { path: '*', element: <NotFound /> }
+        ]
+      }
+    ]
+  }
+]);
+
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <AppProvider>
-            <Routes>
-              <Route element={<SiteLayout />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/catalogue" element={<Catalogue />} />
-                <Route path="/product/:slug" element={<ProductDetail />} />
-                <Route path="/collections" element={<Collections />} />
-
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-
-                <Route path="/account" element={customer(<Account />)} />
-                <Route path="/wishlist" element={customer(<Wishlist />)} />
-                <Route path="/lists" element={customer(<SavedLists />)} />
-                <Route path="/account/enquiries" element={customer(<MyEnquiries />)} />
-
-                <Route path="/admin" element={admin(<AdminDashboard />)} />
-                <Route path="/admin/products" element={admin(<AdminProducts />)} />
-                <Route path="/admin/products/new" element={admin(<ProductEditor />)} />
-                <Route path="/admin/products/:id" element={admin(<ProductEditor />)} />
-                <Route path="/admin/categories" element={admin(<AdminTaxonomy kind="categories" />)} />
-                <Route path="/admin/collections" element={admin(<AdminTaxonomy kind="collections" />)} />
-                <Route path="/admin/enquiries" element={admin(<AdminEnquiries />)} />
-                <Route path="/admin/customers" element={admin(<AdminCustomers />)} />
-
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </Routes>
-          </AppProvider>
-        </AuthProvider>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </QueryClientProvider>
   );
 }

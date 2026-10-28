@@ -3,7 +3,7 @@ import { PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { DashboardShell, adminNav } from '../../components/DashboardShell';
 import { ImageUploader, useCleanupUnsavedUploads, type UploadedImage } from '../../components/admin/ImageUploader';
-import { Modal } from '../../components/Modal';
+import { BottomSheet } from '../../components/BottomSheet';
 import { ProductImageFallback } from '../../components/ProductCard';
 import { EmptyState, ErrorNotice, Field, PageLoader, Spinner, inputClass, primaryButton } from '../../components/ui';
 import { useApp } from '../../contexts/AppContext';
@@ -80,7 +80,7 @@ export function AdminTaxonomy({ kind }: { kind: Kind }) {
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {items.map((item) => (
-            <li key={item.id} className="flex items-center gap-4 rounded-xl border border-line bg-white p-3">
+            <li key={item.id} className="flex items-center gap-4 rounded-xl border border-line bg-surface p-3">
               <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg">
                 {item.imageUrl ? (
                   <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
@@ -89,8 +89,8 @@ export function AdminTaxonomy({ kind }: { kind: Kind }) {
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-charcoal">{item.name}</p>
-                <p className="text-xs text-charcoal-faint">
+                <p className="truncate font-medium text-ink">{item.name}</p>
+                <p className="text-xs text-ink-3">
                   {usage(item.id)} products · order {item.sortOrder}
                 </p>
               </div>
@@ -98,7 +98,7 @@ export function AdminTaxonomy({ kind }: { kind: Kind }) {
                 type="button"
                 onClick={() => setEditing(item)}
                 aria-label={`Edit ${item.name}`}
-                className="rounded-full p-2 text-charcoal-muted hover:bg-gold-wash hover:text-gold"
+                className="rounded-full p-2 text-ink-2 hover:bg-gold-wash hover:text-brand"
               >
                 <PencilIcon className="h-4 w-4" />
               </button>
@@ -106,7 +106,7 @@ export function AdminTaxonomy({ kind }: { kind: Kind }) {
                 type="button"
                 onClick={() => remove(item)}
                 aria-label={`Delete ${item.name}`}
-                className="rounded-full p-2 text-charcoal-muted hover:bg-red-950 hover:text-red-300"
+                className="rounded-full p-2 text-ink-2 hover:bg-danger/10 hover:text-danger"
               >
                 <Trash2Icon className="h-4 w-4" />
               </button>
@@ -115,7 +115,12 @@ export function AdminTaxonomy({ kind }: { kind: Kind }) {
         </ul>
       )}
 
-      <Modal open={!!editing} onClose={() => setEditing(null)} label={`Edit ${singular}`} className="max-w-lg">
+      <BottomSheet
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        title={editing?.id ? `Edit ${editing.name}` : `New ${singular}`}
+        className="sm:max-w-lg"
+      >
         {editing && (
           <TaxonomyForm
             key={editing.id ?? 'new'}
@@ -124,7 +129,7 @@ export function AdminTaxonomy({ kind }: { kind: Kind }) {
             onDone={() => setEditing(null)}
           />
         )}
-      </Modal>
+      </BottomSheet>
     </DashboardShell>
   );
 }
@@ -172,10 +177,7 @@ function TaxonomyForm({ item, kind, onDone }: { item: Item; kind: Kind; onDone: 
   };
 
   return (
-    <form onSubmit={save} className="space-y-4 p-6 sm:p-8">
-      <h2 className="pr-10 font-display text-3xl text-charcoal">
-        {item.id ? `Edit ${item.name}` : `New ${isCollections ? 'collection' : 'category'}`}
-      </h2>
+    <form onSubmit={save} className="space-y-4 px-5 py-4">
       <Field label="Name">
         <input
           autoFocus
@@ -212,7 +214,7 @@ function TaxonomyForm({ item, kind, onDone }: { item: Item; kind: Kind; onDone: 
         </Field>
       )}
       <div>
-        <p className="mb-1.5 text-xs font-medium text-charcoal-muted">Cover image</p>
+        <p className="mb-1.5 text-xs font-medium text-ink-2">Cover image</p>
         <ImageUploader
           images={images}
           onChange={setImages}

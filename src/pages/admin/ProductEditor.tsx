@@ -245,6 +245,7 @@ export function ProductEditor() {
       eyebrow={isNew ? 'New product' : `Editing ${existing?.sku}`}
       title={isNew ? 'Add product' : existing!.name}
       nav={adminNav}
+      fallback="/admin/products"
       actions={
         existing && (
           <Link to={`/product/${existing.slug}`} target="_blank" className={secondaryButton}>
@@ -363,7 +364,7 @@ export function ProductEditor() {
             </div>
 
             <div className="mt-6">
-              <p className="mb-2 text-xs font-medium text-charcoal-muted">Additional specifications</p>
+              <p className="mb-2 text-xs font-medium text-ink-2">Additional specifications</p>
               <ul className="space-y-2">
                 {form.specifications.map((s, i) => (
                   <li key={i} className="flex gap-2">
@@ -389,7 +390,7 @@ export function ProductEditor() {
                       type="button"
                       onClick={() => set('specifications', form.specifications.filter((_, j) => j !== i))}
                       aria-label={`Remove specification ${i + 1}`}
-                      className="shrink-0 rounded-lg px-2 text-charcoal-faint hover:text-red-400"
+                      className="shrink-0 rounded-lg px-2 text-ink-3 hover:text-danger"
                     >
                       <XIcon className="h-4 w-4" />
                     </button>
@@ -399,7 +400,7 @@ export function ProductEditor() {
               <button
                 type="button"
                 onClick={() => set('specifications', [...form.specifications, { label: '', value: '' }])}
-                className="mt-3 flex items-center gap-1.5 text-xs font-medium text-gold hover:text-gold-light"
+                className="mt-3 flex items-center gap-1.5 text-xs font-medium text-brand"
               >
                 <PlusIcon className="h-3.5 w-3.5" /> Add specification
               </button>
@@ -432,7 +433,7 @@ export function ProductEditor() {
                 type="button"
                 onClick={remove}
                 disabled={busy}
-                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full py-2.5 text-sm text-charcoal-muted hover:text-red-400"
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full py-2.5 text-sm text-ink-2 hover:text-danger"
               >
                 <Trash2Icon className="h-4 w-4" /> Delete product
               </button>
@@ -447,12 +448,12 @@ export function ProductEditor() {
                 <ProductImageFallback className="aspect-square w-full" />
               )}
               <div className="p-4">
-                <p className="text-[11px] text-charcoal-faint">{form.sku}</p>
-                <p className="mt-1 font-display text-lg text-charcoal">{form.name || 'Product name'}</p>
-                <p className="mt-1 text-xs text-charcoal-muted">
+                <p className="text-[11px] text-ink-3">{form.sku}</p>
+                <p className="mt-1 font-display text-lg text-ink">{form.name || 'Product name'}</p>
+                <p className="mt-1 text-xs text-ink-2">
                   {[categories.find((c) => c.id === form.categoryId)?.name, form.purity, formatWeight(preview)].filter(Boolean).join(' · ')}
                 </p>
-                <p className="mt-2 text-sm text-gold-light">{formatPrice(preview) ?? 'Price on request'}</p>
+                <p className="mt-2 text-sm text-gold">{formatPrice(preview) ?? 'Price on request'}</p>
               </div>
             </div>
           </Panel>
@@ -464,7 +465,7 @@ export function ProductEditor() {
 
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-line px-3 py-2.5 text-sm text-charcoal-soft">
+    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-line px-3 py-2.5 text-sm text-ink-2">
       {label}
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4" />
     </label>

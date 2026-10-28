@@ -10,6 +10,23 @@ Vercel today and ships to iOS and Android from the same codebase with Capacitor.
   request", draft/publish; categories and collections with cover images; enquiry inbox
   with status and internal notes; customer list with admin promotion.
 
+### App experience
+
+The UI is built mobile-first, following shopping apps such as Myntra and CaratLane and
+Baymard's product-list research:
+
+- Bottom tab bar (Home · Categories · Wishlist · Profile); pushed screens get a back button
+  and hide the tabs.
+- Home: tap-to-search bar, story-style category circles, swipeable banners, product rails.
+- Product list: split **Sort | Filter** bar pinned to the bottom. Filters open a full-screen
+  sheet with facets on the left and live result counts, plus removable applied-filter chips.
+  Filters live in the URL, so Back returns to the same filtered list and scroll position.
+- Product page: edge-to-edge swipe gallery, collapsible details, sticky Wishlist / Enquire bar.
+- Bottom sheets (drag to close), snackbars with actions, light/dark theme that follows the
+  phone, and a manual switch under Profile → Appearance.
+- Native touches through Capacitor: Android back button closes sheets first, haptic tap on
+  wishlist, status bar matched to the theme. Desktop gets a top nav and wider grids.
+
 ## Stack
 
 | Layer | Choice |

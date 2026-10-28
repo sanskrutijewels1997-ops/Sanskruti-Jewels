@@ -28,8 +28,8 @@ export function ForgotPassword() {
   return (
     <AuthCard title="Reset your password" subtitle={sent ? undefined : "We'll email you a link to choose a new one."}>
       {sent ? (
-        <p className="text-center text-sm text-charcoal-muted">
-          If an account exists for <strong className="text-charcoal">{email}</strong>, a reset link is on its way.
+        <p className="text-center text-sm text-ink-2">
+          If an account exists for <strong className="text-ink">{email}</strong>, a reset link is on its way.
         </p>
       ) : (
         <form onSubmit={submit} className="space-y-4">
@@ -43,7 +43,7 @@ export function ForgotPassword() {
         </form>
       )}
       <p className="mt-6 text-center text-sm">
-        <Link to="/login" className="text-charcoal-muted hover:text-gold">
+        <Link to="/login" className="text-ink-2 hover:text-brand">
           Back to sign in
         </Link>
       </p>

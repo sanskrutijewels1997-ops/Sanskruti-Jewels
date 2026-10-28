@@ -4,9 +4,13 @@ const config: CapacitorConfig = {
   appId: 'com.sanskrutijewels.app',
   appName: 'Sanskruti Jewels',
   webDir: 'dist',
-  backgroundColor: '#0A0908',
+  backgroundColor: '#FAF7F2',
   ios: { contentInset: 'never' },
-  android: { allowMixedContent: false }
+  android: { allowMixedContent: false },
+  plugins: {
+    SplashScreen: { launchShowDuration: 600, launchAutoHide: true, backgroundColor: '#0A0908', showSpinner: false },
+    StatusBar: { overlaysWebView: true }
+  }
 };
 
 export default config;

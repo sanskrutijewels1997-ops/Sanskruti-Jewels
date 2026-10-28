@@ -1,5 +1,5 @@
 /* @import url() FONT IMPORTS MUST ALWAYS BE AT THE VERY TOP OF THIS FILE, ABOVE THE TAILWIND IMPORTS — DO NOT DELETE THIS COMMENT */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 /* CRITICAL: THE FOLLOWING TAILWIND IMPORTS MUST NEVER BE DELETED OR REORDERED — DO NOT DELETE THIS COMMENT */
 @import 'tailwindcss/base';
@@ -8,41 +8,116 @@
 
 /* END TAILWIND IMPORTS — ALL OTHER CSS MUST GO BELOW THIS LINE */
 
-html {
-  scroll-behavior: smooth;
+/* ---- Theme tokens (space-separated RGB so Tailwind can apply alpha) ---- */
+:root {
+  color-scheme: light;
+  --bg: 250 247 242;
+  --surface: 255 255 255;
+  --surface-2: 244 239 231;
+  --surface-3: 233 226 214;
+  --ink: 28 25 23;
+  --ink-2: 87 83 78;
+  --ink-3: 138 132 124;
+  --line: 233 226 214;
+  --brand: 122 31 43; /* deep maroon, from the logo's red */
+  --on-brand: 255 255 255;
+  --brand-soft: 248 234 235;
+  --gold: 150 108 34;
+  --gold-wash: 250 243 228;
+  --gold-pale: 231 213 174;
+  --success: 22 128 61;
+  --danger: 185 28 28;
+}
+
+:root[data-theme='dark'] {
   color-scheme: dark;
+  --bg: 10 9 8;
+  --surface: 21 19 15;
+  --surface-2: 30 27 22;
+  --surface-3: 44 40 32;
+  --ink: 245 241 234;
+  --ink-2: 194 186 173;
+  --ink-3: 143 135 123;
+  --line: 44 40 32;
+  --brand: 201 162 77;
+  --on-brand: 10 9 8;
+  --brand-soft: 36 29 18;
+  --gold: 226 194 117;
+  --gold-wash: 36 29 18;
+  --gold-pale: 92 74 38;
+  --success: 74 222 128;
+  --danger: 248 113 113;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: 10 9 8;
+    --surface: 21 19 15;
+    --surface-2: 30 27 22;
+    --surface-3: 44 40 32;
+    --ink: 245 241 234;
+    --ink-2: 194 186 173;
+    --ink-3: 143 135 123;
+    --line: 44 40 32;
+    --brand: 201 162 77;
+    --on-brand: 10 9 8;
+    --brand-soft: 36 29 18;
+    --gold: 226 194 117;
+    --gold-wash: 36 29 18;
+    --gold-pale: 92 74 38;
+    --success: 74 222 128;
+    --danger: 248 113 113;
+  }
+}
+
+/* ---- App-like base ---- */
+html {
+  -webkit-text-size-adjust: 100%;
 }
 body {
-  background-color: #0a0908;
-  color: #ffffff;
+  background-color: rgb(var(--bg));
+  color: rgb(var(--ink));
   font-family: Inter, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+button,
+a,
+[role='tab'] {
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+img {
+  -webkit-user-drag: none;
 }
 ::selection {
-  background: #c9a24d;
-  color: #0a0908;
+  background: rgb(var(--gold-pale));
 }
-/* Primary actions render in gold on the black theme; text on them stays dark for contrast */
-.bg-charcoal {
-  background-color: #c9a24d !important;
+input[type='range'],
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: rgb(var(--brand));
 }
-.hover\:bg-charcoal:hover {
-  background-color: #c9a24d !important;
+
+/* Press feedback like a native button */
+.pressable {
+  transition: transform 120ms ease, opacity 120ms ease;
 }
-.hover\:bg-gold:hover {
-  background-color: #e2c275 !important;
+.pressable:active {
+  transform: scale(0.97);
+  opacity: 0.85;
 }
-/* Overlays (modal backdrops, image scrims) stay black */
-.bg-charcoal\/45,
-.bg-charcoal\/40 {
-  background-color: rgba(0, 0, 0, 0.6) !important;
-}
+
 .eyebrow {
   font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.22em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -55,13 +130,29 @@ body {
   width: 6px;
 }
 .thin-scrollbar::-webkit-scrollbar-thumb {
-  background: #3a342a;
+  background: rgb(var(--surface-3));
   border-radius: 999px;
 }
-input[type='range'],
-input[type='checkbox'] {
-  accent-color: #c9a24d;
+
+/* Safe areas for notches and the home indicator */
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
 }
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Opacity only: a transform here would make <main> the containing block for the
+   fixed bars inside screens (Sort/Filter, product actions) and break them. */
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+}
+.animate-page {
+  animation: page-in 200ms ease-out backwards;
+}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
@@ -70,16 +161,17 @@ input[type='checkbox'] {
 .skeleton {
   position: relative;
   overflow: hidden;
-  background: #1e1b16;
+  background: rgb(var(--surface-2));
 }
 .skeleton::after {
   content: '';
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(201, 162, 77, 0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgb(var(--surface) / 0.6), transparent);
   animation: shimmer 1.4s infinite;
 }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

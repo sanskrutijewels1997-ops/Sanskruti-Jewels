@@ -82,7 +82,7 @@ export function AdminProducts() {
     >
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-charcoal-faint" />
+          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-3" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or SKU" aria-label="Search products" className={`${inputClass} pl-9`} />
         </div>
         <select value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Filter by category" className={`${inputClass} sm:w-48`}>
@@ -117,10 +117,10 @@ export function AdminProducts() {
             }
           />
         ) : (
-          <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white">
+          <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
             {list.map((p) => (
               <li key={p.id} className={`flex items-center gap-3 p-3 sm:gap-4 sm:p-4 ${busyId === p.id ? 'opacity-50' : ''}`}>
-                <Link to={`/admin/products/${p.id}`} className="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-ivory-deep">
+                <Link to={`/admin/products/${p.id}`} className="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-surface-2">
                   {p.images[0] ? (
                     <img src={p.images[0].url} alt="" className="h-full w-full object-cover" />
                   ) : (
@@ -128,16 +128,16 @@ export function AdminProducts() {
                   )}
                 </Link>
                 <div className="min-w-0 flex-1">
-                  <Link to={`/admin/products/${p.id}`} className="block truncate font-medium text-charcoal hover:text-gold">
+                  <Link to={`/admin/products/${p.id}`} className="block truncate font-medium text-ink hover:text-brand">
                     {p.name}
                   </Link>
-                  <p className="mt-0.5 truncate text-xs text-charcoal-faint">
+                  <p className="mt-0.5 truncate text-xs text-ink-3">
                     {[p.sku, categoryName(p.categoryId), `${p.images.length} img`, formatPrice(p) ?? 'On request'].filter(Boolean).join(' · ')}
                   </p>
                 </div>
                 <span
                   className={`hidden rounded-full px-2.5 py-1 text-[11px] font-medium sm:inline ${
-                    p.isPublished ? 'bg-emerald-950 text-emerald-300' : 'bg-ivory-dark text-charcoal-muted'
+                    p.isPublished ? 'bg-success/15 text-success' : 'bg-surface-3 text-ink-2'
                   }`}
                 >
                   {p.isPublished ? 'Live' : 'Draft'}
@@ -149,11 +149,11 @@ export function AdminProducts() {
                     onClick={() => togglePublish(p)}
                     aria-label={p.isPublished ? 'Unpublish' : 'Publish'}
                     title={p.isPublished ? 'Unpublish' : 'Publish'}
-                    className="rounded-full p-2 text-charcoal-muted hover:bg-gold-wash hover:text-gold"
+                    className="rounded-full p-2 text-ink-2 hover:bg-gold-wash hover:text-brand"
                   >
                     {p.isPublished ? <EyeIcon className="h-4 w-4" /> : <EyeOffIcon className="h-4 w-4" />}
                   </button>
-                  <Link to={`/admin/products/${p.id}`} aria-label="Edit" title="Edit" className="rounded-full p-2 text-charcoal-muted hover:bg-gold-wash hover:text-gold">
+                  <Link to={`/admin/products/${p.id}`} aria-label="Edit" title="Edit" className="rounded-full p-2 text-ink-2 hover:bg-gold-wash hover:text-brand">
                     <PencilIcon className="h-4 w-4" />
                   </Link>
                   <button
@@ -162,7 +162,7 @@ export function AdminProducts() {
                     onClick={() => remove(p)}
                     aria-label="Delete"
                     title="Delete"
-                    className="rounded-full p-2 text-charcoal-muted hover:bg-red-950 hover:text-red-300"
+                    className="rounded-full p-2 text-ink-2 hover:bg-danger/10 hover:text-danger"
                   >
                     <Trash2Icon className="h-4 w-4" />
                   </button>

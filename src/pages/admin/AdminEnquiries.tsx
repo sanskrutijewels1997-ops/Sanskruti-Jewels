@@ -30,7 +30,7 @@ export function AdminEnquiries() {
             onClick={() => setFilter(s)}
             aria-pressed={filter === s}
             className={`shrink-0 rounded-full border px-4 py-1.5 text-xs font-medium ${
-              filter === s ? 'border-gold bg-gold-wash text-charcoal' : 'border-line text-charcoal-muted hover:border-gold'
+              filter === s ? 'border-brand bg-brand-soft text-ink' : 'border-line text-ink-2 hover:border-brand'
             }`}
           >
             {s} ({(q.data ?? []).filter((e) => (s === 'All' ? true : s === 'Open' ? e.status !== 'Closed' : e.status === s)).length})
@@ -75,14 +75,14 @@ function EnquiryRow({ enquiry: e }: { enquiry: Enquiry }) {
   };
 
   return (
-    <li className="rounded-xl border border-line bg-white p-4 sm:p-5">
+    <li className="rounded-xl border border-line bg-surface p-4 sm:p-5">
       <div className="flex flex-wrap items-start gap-4">
         {p?.images[0] && <img src={p.images[0].url} alt="" className="h-16 w-16 rounded-lg object-cover" />}
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-charcoal">{e.name}</p>
-          <p className="mt-0.5 text-sm text-charcoal-muted">
+          <p className="font-medium text-ink">{e.name}</p>
+          <p className="mt-0.5 text-sm text-ink-2">
             {p ? (
-              <Link to={`/admin/products/${p.id}`} className="hover:text-gold">
+              <Link to={`/admin/products/${p.id}`} className="hover:text-brand">
                 {p.name} · {p.sku}
               </Link>
             ) : e.productId ? (
@@ -91,7 +91,7 @@ function EnquiryRow({ enquiry: e }: { enquiry: Enquiry }) {
               'General enquiry'
             )}
           </p>
-          <p className="mt-1 text-xs text-charcoal-faint">
+          <p className="mt-1 text-xs text-ink-3">
             {formatDate(e.createdAt)}
             {e.size && ` · Size ${e.size}`}
             {e.quantity > 1 && ` · Qty ${e.quantity}`}
@@ -109,9 +109,9 @@ function EnquiryRow({ enquiry: e }: { enquiry: Enquiry }) {
           ))}
         </select>
       </div>
-      {e.message && <p className="mt-3 rounded-lg bg-ivory px-3 py-2 text-sm text-charcoal-soft">{e.message}</p>}
+      {e.message && <p className="mt-3 rounded-lg bg-surface-2 px-3 py-2 text-sm text-ink-2">{e.message}</p>}
       <div className="mt-3 flex flex-wrap gap-2 text-xs">
-        <a href={`tel:${e.phone}`} className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-charcoal-soft hover:border-gold">
+        <a href={`tel:${e.phone}`} className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-ink-2 hover:border-brand">
           <PhoneIcon className="h-3.5 w-3.5 text-gold" /> {e.phone}
         </a>
         {waNumber && (
@@ -119,13 +119,13 @@ function EnquiryRow({ enquiry: e }: { enquiry: Enquiry }) {
             href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Hi ${e.name}, thank you for your enquiry${p ? ` about ${p.name}` : ''} at Sanskruti Jewels.`)}`}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-charcoal-soft hover:border-gold"
+            className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-ink-2 hover:border-brand"
           >
             <MessageCircleIcon className="h-3.5 w-3.5 text-gold" /> WhatsApp
           </a>
         )}
         {e.email && (
-          <a href={`mailto:${e.email}`} className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-charcoal-soft hover:border-gold">
+          <a href={`mailto:${e.email}`} className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-ink-2 hover:border-brand">
             <MailIcon className="h-3.5 w-3.5 text-gold" /> {e.email}
           </a>
         )}

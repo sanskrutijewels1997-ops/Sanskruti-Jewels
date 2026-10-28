@@ -81,18 +81,18 @@ export function ImageUploader({
           void handleFiles(e.dataTransfer.files);
         }}
         className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-8 text-center transition-colors duration-150 ease-luxe ${
-          dragOver ? 'border-gold bg-gold-wash' : 'border-line'
+          dragOver ? 'border-brand bg-brand-soft' : 'border-line'
         }`}
       >
         {uploading > 0 ? <Spinner className="h-6 w-6 text-gold" /> : <ImagePlusIcon className="h-6 w-6 text-gold" />}
-        <p className="mt-3 text-sm font-medium text-charcoal">
+        <p className="mt-3 text-sm font-medium text-ink">
           {uploading > 0 ? `Uploading ${uploading}…` : multiple ? 'Drop photos here' : 'Drop a photo here'}
         </p>
-        <p className="mt-1 text-xs text-charcoal-muted">JPG, PNG or WebP · resized to 1600px automatically</p>
+        <p className="mt-1 text-xs text-ink-2">JPG, PNG or WebP · resized to 1600px automatically</p>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="mt-4 rounded-full border border-charcoal px-5 py-2 text-xs font-semibold text-charcoal transition-colors duration-150 ease-luxe hover:bg-charcoal hover:text-white"
+          className="mt-4 rounded-full border border-ink px-5 py-2 text-xs font-semibold text-ink transition-colors duration-150 ease-luxe hover:bg-ink hover:text-bg"
         >
           {multiple ? 'Choose photos' : 'Choose photo'}
         </button>
@@ -112,16 +112,16 @@ export function ImageUploader({
       {images.length > 0 && (
         <ul className={`mt-4 grid gap-3 ${multiple ? 'grid-cols-3 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3'}`}>
           {images.map((img, i) => (
-            <li key={img.url} className="group relative overflow-hidden rounded-lg border border-line bg-ivory-deep">
+            <li key={img.url} className="group relative overflow-hidden rounded-lg border border-line bg-surface-2">
               <img src={img.url} alt="" className="aspect-square w-full object-cover" />
               {multiple && i === 0 && (
-                <span className="eyebrow absolute left-1.5 top-1.5 rounded-full bg-charcoal px-2 py-0.5 text-[9px] text-white">Cover</span>
+                <span className="eyebrow absolute left-1.5 top-1.5 rounded-full bg-brand px-2 py-0.5 text-[9px] text-brand-on">Cover</span>
               )}
               <button
                 type="button"
                 onClick={() => onChange(images.filter((_, j) => j !== i))}
                 aria-label={`Remove image ${i + 1}`}
-                className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-charcoal-muted shadow-card hover:text-red-400"
+                className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-surface/95 text-ink-2 shadow-card hover:text-danger"
               >
                 <XIcon className="h-3.5 w-3.5" />
               </button>
@@ -132,7 +132,7 @@ export function ImageUploader({
                     disabled={i === 0}
                     onClick={() => move(i, i - 1)}
                     aria-label="Move left"
-                    className="flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-charcoal shadow-card disabled:opacity-30"
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-surface/95 text-ink shadow-card disabled:opacity-30"
                   >
                     <ArrowLeftIcon className="h-3.5 w-3.5" />
                   </button>
@@ -142,7 +142,7 @@ export function ImageUploader({
                       onClick={() => move(i, 0)}
                       aria-label="Make cover image"
                       title="Make cover"
-                      className="flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-gold shadow-card"
+                      className="flex h-7 w-7 items-center justify-center rounded-full bg-surface/95 text-gold shadow-card"
                     >
                       <StarIcon className="h-3.5 w-3.5" />
                     </button>
@@ -152,7 +152,7 @@ export function ImageUploader({
                     disabled={i === images.length - 1}
                     onClick={() => move(i, i + 1)}
                     aria-label="Move right"
-                    className="flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-charcoal shadow-card disabled:opacity-30"
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-surface/95 text-ink shadow-card disabled:opacity-30"
                   >
                     <ArrowRightIcon className="h-3.5 w-3.5" />
                   </button>

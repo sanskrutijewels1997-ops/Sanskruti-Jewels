@@ -3,14 +3,21 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { friendlyError } from '../lib/format';
+import { haptic } from '../lib/native';
 import { qk } from '../lib/queries';
 import { useAuth } from './AuthContext';
 import type { Product, SavedList } from '../types';
+
+export interface ToastAction {
+  label: string;
+  to: string;
+}
 
 interface Toast {
   id: number;
   message: string;
   tone: 'success' | 'info' | 'error';
+  action?: ToastAction;
 }
 
 interface AppState {
@@ -24,10 +31,8 @@ interface AppState {
   setListItem: (listId: string, productId: string, on: boolean) => void;
   updateListNote: (id: string, note: string) => void;
   toasts: Toast[];
-  notify: (message: string, tone?: Toast['tone']) => void;
+  notify: (message: string, tone?: Toast['tone'], action?: ToastAction) => void;
   dismissToast: (id: number) => void;
-  quickView: Product | null;
-  setQuickView: (p: Product | null) => void;
   enquiryProduct: Product | null;
   /** Opens the enquiry form; pass null for a general enquiry. */
   openEnquiry: (p: Product | null) => void;
@@ -63,7 +68,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const location = useLocation();
 
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [quickView, setQuickView] = useState<Product | null>(null);
   const [enquiryProduct, setEnquiryProduct] = useState<Product | null>(null);
   const [enquiryOpen, setEnquiryOpen] = useState(false);
   const [listPicker, setListPicker] = useState<Product | null>(null);
@@ -81,10 +85,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setToasts((t) => t.filter((x) => x.id !== id));
   }, []);
 
-  const notify = useCallback((message: string, tone: Toast['tone'] = 'success') => {
+  const notify = useCallback((message: string, tone: Toast['tone'] = 'success', action?: ToastAction) => {
     const id = ++toastId;
-    setToasts((t) => [...t, { id, message, tone }]);
-    window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3200);
+    // Snackbars replace each other rather than stacking, like native apps.
+    setToasts([{ id, message, tone, action }]);
+    window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), action ? 4000 : 2800);
   }, []);
 
   const requireLogin = useCallback(
@@ -127,8 +132,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       const on = !wishlist.includes(productId);
+      haptic();
       wishlistMutation.mutate({ productId, on });
-      notify(on ? 'Added to your wishlist' : 'Removed from your wishlist', on ? 'success' : 'info');
+      if (on) notify('Added to wishlist', 'success', { label: 'View', to: '/wishlist' });
+      else notify('Removed from wishlist', 'info');
     },
     [userId, wishlist, wishlistMutation, notify, requireLogin]
   );
@@ -225,12 +232,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       toasts,
       notify,
       dismissToast,
-      quickView,
-      setQuickView,
       enquiryProduct,
       enquiryOpen,
       openEnquiry: (p) => {
-        setQuickView(null);
         setEnquiryProduct(p);
         setEnquiryOpen(true);
       },
@@ -241,7 +245,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           requireLogin('Sign in to save pieces to a list');
           return;
         }
-        setQuickView(null);
         setListPicker(p);
       },
       closeListPicker: () => setListPicker(null),
@@ -260,7 +263,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       mutateLists,
       toasts,
       dismissToast,
-      quickView,
       enquiryProduct,
       enquiryOpen,
       listPicker,

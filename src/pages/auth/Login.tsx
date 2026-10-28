@@ -49,7 +49,7 @@ export function Login() {
           />
         </Field>
         <div className="text-right">
-          <Link to="/forgot-password" className="text-xs text-charcoal-muted hover:text-gold">
+          <Link to="/forgot-password" className="text-xs text-ink-2 hover:text-brand">
             Forgot password?
           </Link>
         </div>
@@ -58,9 +58,9 @@ export function Login() {
           {busy && <Spinner />} Sign in
         </button>
       </form>
-      <p className="mt-6 text-center text-sm text-charcoal-muted">
+      <p className="mt-6 text-center text-sm text-ink-2">
         New here?{' '}
-        <Link to={`/register?next=${encodeURIComponent(next)}`} className="font-medium text-gold hover:text-gold-light">
+        <Link to={`/register?next=${encodeURIComponent(next)}`} className="font-medium text-brand">
           Create an account
         </Link>
       </p>

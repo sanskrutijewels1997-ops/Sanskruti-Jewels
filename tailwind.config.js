@@ -1,51 +1,35 @@
-export default {content: [
-  './index.html',
-  './src/**/*.{js,ts,jsx,tsx}'
-],
+// Colours are CSS variables (see src/index.css) so the app can follow the phone's
+// light/dark setting. Names describe the role, not the colour.
+const v = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
-        // Page backgrounds — deep black tones
-        ivory: {
-          DEFAULT: '#0A0908',
-          deep: '#11100D',
-          dark: '#1E1B16',
-        },
-        // Text tones — white family
-        charcoal: {
-          DEFAULT: '#FFFFFF',
-          soft: '#EDE8DF',
-          muted: '#C2BAAD',
-          faint: '#8F877B',
-        },
-        // Raised surfaces (cards, panels, inputs)
-        white: '#15130F',
-        gold: {
-          DEFAULT: '#C9A24D',
-          light: '#E2C275',
-          pale: '#5C4A26',
-          wash: '#241D12',
-        },
-        line: '#2C2820',
+        bg: v('bg'),
+        surface: { DEFAULT: v('surface'), 2: v('surface-2'), 3: v('surface-3') },
+        ink: { DEFAULT: v('ink'), 2: v('ink-2'), 3: v('ink-3') },
+        line: v('line'),
+        brand: { DEFAULT: v('brand'), on: v('on-brand'), soft: v('brand-soft') },
+        gold: { DEFAULT: v('gold'), wash: v('gold-wash'), pale: v('gold-pale') },
+        success: v('success'),
+        danger: v('danger')
       },
       fontFamily: {
         display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif']
       },
-      letterSpacing: {
-        luxe: '0.22em',
-      },
+      letterSpacing: { luxe: '0.18em' },
       boxShadow: {
-        card: '0 1px 2px rgba(0,0,0,0.4), 0 8px 24px -12px rgba(0,0,0,0.6)',
-        lift: '0 18px 44px -18px rgba(201,162,77,0.28)',
-        panel: '0 24px 60px -24px rgba(0,0,0,0.85)',
+        card: '0 1px 2px rgb(0 0 0 / 0.06), 0 4px 16px -8px rgb(0 0 0 / 0.12)',
+        lift: '0 12px 32px -12px rgb(0 0 0 / 0.25)',
+        sheet: '0 -8px 40px -12px rgb(0 0 0 / 0.35)',
+        bar: '0 -1px 0 rgb(var(--line)), 0 -6px 20px -12px rgb(0 0 0 / 0.15)'
       },
-      transitionTimingFunction: {
-        luxe: 'cubic-bezier(0.23, 1, 0.32, 1)',
-      },
-      maxWidth: {
-        site: '1440px',
-      },
-    },
-  },
-}
+      transitionTimingFunction: { luxe: 'cubic-bezier(0.23, 1, 0.32, 1)' },
+      maxWidth: { site: '1280px' },
+      spacing: { tabbar: '64px' }
+    }
+  }
+};

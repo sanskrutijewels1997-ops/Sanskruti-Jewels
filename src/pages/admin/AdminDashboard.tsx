@@ -43,16 +43,16 @@ export function AdminDashboard() {
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
             <Panel title="Products by category">
               {s.byCategory.length === 0 ? (
-                <p className="text-sm text-charcoal-muted">No products yet.</p>
+                <p className="text-sm text-ink-2">No products yet.</p>
               ) : (
                 <ul className="space-y-3" aria-label="Number of products in each category">
                   {s.byCategory.map((c) => (
                     <li key={c.name} className="grid grid-cols-[120px_1fr_32px] items-center gap-3 text-sm" title={`${c.name}: ${c.count}`}>
-                      <span className="truncate text-charcoal-soft">{c.name}</span>
-                      <span className="h-2.5 rounded-r bg-ivory-dark">
+                      <span className="truncate text-ink-2">{c.name}</span>
+                      <span className="h-2.5 rounded-r bg-surface-3">
                         <span className="block h-full rounded-r bg-gold" style={{ width: `${(c.count / maxCat) * 100}%` }} />
                       </span>
-                      <span className="text-right tabular-nums text-charcoal">{c.count}</span>
+                      <span className="text-right tabular-nums text-ink">{c.count}</span>
                     </li>
                   ))}
                 </ul>
@@ -61,17 +61,17 @@ export function AdminDashboard() {
 
             <Panel title="Most wishlisted">
               {s.topWishlisted.length === 0 ? (
-                <p className="text-sm text-charcoal-muted">Nobody has wishlisted anything yet.</p>
+                <p className="text-sm text-ink-2">Nobody has wishlisted anything yet.</p>
               ) : (
                 <ol className="divide-y divide-line">
                   {s.topWishlisted.map((t, i) => (
                     <li key={t.id} className="flex items-center gap-3 py-3 text-sm">
-                      <span className="w-5 text-charcoal-faint">{i + 1}</span>
-                      <Link to={`/admin/products/${t.id}`} className="flex-1 truncate text-charcoal hover:text-gold">
+                      <span className="w-5 text-ink-3">{i + 1}</span>
+                      <Link to={`/admin/products/${t.id}`} className="flex-1 truncate text-ink hover:text-brand">
                         {t.name}
                       </Link>
-                      <span className="text-xs text-charcoal-faint">{t.sku}</span>
-                      <span className="w-10 text-right tabular-nums text-charcoal">♥ {t.count}</span>
+                      <span className="text-xs text-ink-3">{t.sku}</span>
+                      <span className="w-10 text-right tabular-nums text-ink">♥ {t.count}</span>
                     </li>
                   ))}
                 </ol>
@@ -83,23 +83,23 @@ export function AdminDashboard() {
             <Panel
               title="Latest enquiries"
               actions={
-                <Link to="/admin/enquiries" className="text-sm text-gold hover:text-gold-light">
+                <Link to="/admin/enquiries" className="text-sm text-brand">
                   View all →
                 </Link>
               }
             >
               {!enquiries.data?.length ? (
-                <p className="text-sm text-charcoal-muted">No enquiries yet.</p>
+                <p className="text-sm text-ink-2">No enquiries yet.</p>
               ) : (
                 <ul className="divide-y divide-line">
                   {enquiries.data.slice(0, 6).map((e) => (
                     <li key={e.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 text-sm">
-                      <span className="font-medium text-charcoal">{e.name}</span>
-                      <span className="text-charcoal-muted">{e.phone}</span>
-                      <span className="flex-1 truncate text-charcoal-muted">
+                      <span className="font-medium text-ink">{e.name}</span>
+                      <span className="text-ink-2">{e.phone}</span>
+                      <span className="flex-1 truncate text-ink-2">
                         {e.productId ? byId(e.productId)?.name ?? 'Deleted product' : 'General enquiry'}
                       </span>
-                      <span className="text-xs text-charcoal-faint">{formatDate(e.createdAt)}</span>
+                      <span className="text-xs text-ink-3">{formatDate(e.createdAt)}</span>
                       <span className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${enquiryTone[e.status]}`}>{e.status}</span>
                     </li>
                   ))}

@@ -23,8 +23,8 @@ export function RequireAdmin({ children }: { children: React.ReactNode }) {
   if (!isAdmin) {
     return (
       <div className="mx-auto max-w-xl px-5 py-32 text-center">
-        <h1 className="font-display text-4xl text-charcoal">Admins only</h1>
-        <p className="mt-3 text-sm text-charcoal-muted">
+        <h1 className="font-display text-4xl text-ink">Admins only</h1>
+        <p className="mt-3 text-sm text-ink-2">
           You're signed in as {user.email}, which doesn't have admin access.
         </p>
       </div>

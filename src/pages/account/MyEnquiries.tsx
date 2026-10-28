@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { DashboardShell, accountNav } from '../../components/DashboardShell';
+import { MessageSquareIcon, PlusIcon } from 'lucide-react';
+import { HeaderIconButton, PageHeader } from '../../components/PageHeader';
+import { ProductImageFallback } from '../../components/ProductCard';
 import { EmptyState, ErrorNotice, PageLoader, primaryButton } from '../../components/ui';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -10,9 +12,9 @@ import { qk, useCatalogue } from '../../lib/queries';
 import type { EnquiryStatus } from '../../types';
 
 export const enquiryTone: Record<EnquiryStatus, string> = {
-  New: 'bg-gold-wash text-gold-light',
-  Contacted: 'bg-emerald-950 text-emerald-300',
-  Closed: 'bg-ivory-dark text-charcoal-muted'
+  New: 'bg-gold-wash text-gold',
+  Contacted: 'bg-success/15 text-success',
+  Closed: 'bg-surface-2 text-ink-3'
 };
 
 export function MyEnquiries() {
@@ -26,66 +28,73 @@ export function MyEnquiries() {
   });
 
   return (
-    <DashboardShell
-      eyebrow="Questions you've asked"
-      title="My Enquiries"
-      nav={accountNav}
-      actions={
-        <button type="button" onClick={() => openEnquiry(null)} className={primaryButton}>
-          New enquiry
-        </button>
-      }
-    >
+    <div className="mx-auto max-w-2xl lg:px-6">
+      <PageHeader
+        title="My Enquiries"
+        fallback="/account"
+        actions={
+          <HeaderIconButton label="New enquiry" onClick={() => openEnquiry(null)}>
+            <PlusIcon className="h-6 w-6" />
+          </HeaderIconButton>
+        }
+      />
       {q.isLoading ? (
         <PageLoader />
       ) : q.error ? (
-        <ErrorNotice error={q.error} />
+        <div className="p-4">
+          <ErrorNotice error={q.error} />
+        </div>
       ) : !q.data?.length ? (
         <EmptyState
+          icon={MessageSquareIcon}
           title="No enquiries yet"
-          text="Tap “Enquire” on any piece to ask about price, size or customisation."
+          text="Tap “Enquire now” on any piece to ask about price, size or customisation."
           action={
-            <Link to="/catalogue" className={primaryButton}>
+            <Link to="/catalogue" className={`w-full ${primaryButton}`}>
               Browse jewellery
             </Link>
           }
         />
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3 px-4 py-4 lg:px-0">
           {q.data.map((e) => {
             const p = e.productId ? byId(e.productId) : undefined;
-            return (
-              <li key={e.id} className="flex gap-4 rounded-xl border border-line bg-white p-4">
-                {p?.images[0] && (
-                  <img src={p.images[0].url} alt="" className="h-16 w-16 shrink-0 rounded-lg object-cover" />
+            const body = (
+              <>
+                {p?.images[0] ? (
+                  <img src={p.images[0].url} alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />
+                ) : (
+                  <ProductImageFallback className="h-16 w-16 shrink-0 rounded-xl" />
                 )}
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-medium text-charcoal">
-                      {p ? (
-                        <Link to={`/product/${p.slug}`} className="hover:text-gold">
-                          {p.name}
-                        </Link>
-                      ) : (
-                        'General enquiry'
-                      )}
-                    </p>
-                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${enquiryTone[e.status]}`}>
-                      {e.status}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-charcoal-faint">
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-start justify-between gap-2">
+                    <span className="truncate text-[15px] font-semibold text-ink">{p?.name ?? 'General enquiry'}</span>
+                    <span className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold ${enquiryTone[e.status]}`}>{e.status}</span>
+                  </span>
+                  <span className="mt-0.5 block text-xs text-ink-3">
                     {formatDate(e.createdAt)}
                     {e.size && ` · Size ${e.size}`}
                     {e.quantity > 1 && ` · Qty ${e.quantity}`}
-                  </p>
-                  {e.message && <p className="mt-2 text-sm text-charcoal-muted">{e.message}</p>}
-                </div>
+                  </span>
+                  {e.message && <span className="mt-1.5 line-clamp-2 block text-[13px] text-ink-2">{e.message}</span>}
+                </span>
+              </>
+            );
+            const cls = 'pressable flex gap-3 rounded-2xl border border-line bg-surface p-3';
+            return (
+              <li key={e.id}>
+                {p ? (
+                  <Link to={`/product/${p.slug}`} className={cls}>
+                    {body}
+                  </Link>
+                ) : (
+                  <div className={cls}>{body}</div>
+                )}
               </li>
             );
           })}
         </ul>
       )}
-    </DashboardShell>
+    </div>
   );
 }
