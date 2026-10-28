@@ -1,0 +1,102 @@
+/* @import url() FONT IMPORTS MUST ALWAYS BE AT THE VERY TOP OF THIS FILE, ABOVE THE TAILWIND IMPORTS — DO NOT DELETE THIS COMMENT */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* CRITICAL: THE FOLLOWING TAILWIND IMPORTS MUST NEVER BE DELETED OR REORDERED — DO NOT DELETE THIS COMMENT */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* END TAILWIND IMPORTS — ALL OTHER CSS MUST GO BELOW THIS LINE */
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+body {
+  background-color: #0a0908;
+  color: #ffffff;
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+::selection {
+  background: #c9a24d;
+  color: #0a0908;
+}
+/* Primary actions render in gold on the black theme; text on them stays dark for contrast */
+.bg-charcoal {
+  background-color: #c9a24d !important;
+}
+.hover\:bg-charcoal:hover {
+  background-color: #c9a24d !important;
+}
+.hover\:bg-gold:hover {
+  background-color: #e2c275 !important;
+}
+/* Overlays (modal backdrops, image scrims) stay black */
+.bg-charcoal\/45,
+.bg-charcoal\/40 {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+/* Charts */
+.recharts-cartesian-grid line {
+  stroke: #2c2820;
+}
+.recharts-default-tooltip {
+  background-color: #15130f !important;
+  border-color: #2c2820 !important;
+  color: #ffffff;
+}
+.recharts-tooltip-cursor {
+  fill: #1e1b16;
+}
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.thin-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #3a342a;
+  border-radius: 999px;
+}
+input[type='range'],
+input[type='checkbox'] {
+  accent-color: #c9a24d;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #1e1b16;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 77, 0.08), transparent);
+  animation: shimmer 1.4s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
