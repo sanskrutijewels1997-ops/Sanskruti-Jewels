@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { Toaster } from './Toaster';
 import { QuickViewModal } from './QuickViewModal';
-import { QuoteModal } from './QuoteModal';
-import { CollectionPickerModal } from './CollectionPickerModal';
+import { EnquiryModal } from './EnquiryModal';
+import { ListPickerModal } from './ListPickerModal';
+import { DemoBanner } from './DemoBanner';
 
-const appRoutes = ['/dashboard', '/orders', '/admin', '/supplier/dashboard', '/supplier/add-product'];
+const appRoutes = ['/account', '/admin', '/wishlist', '/lists'];
 
 export function SiteLayout() {
   const { pathname, hash } = useLocation();
@@ -20,15 +21,16 @@ export function SiteLayout() {
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-ivory">
+      <DemoBanner />
       <Header />
       <main className="flex-1">
         <Outlet />
       </main>
       {!isApp && <Footer />}
       <QuickViewModal />
-      <QuoteModal />
-      <CollectionPickerModal />
+      <EnquiryModal />
+      <ListPickerModal />
       <Toaster />
-    </div>);
-
+    </div>
+  );
 }

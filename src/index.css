@@ -37,18 +37,6 @@ body {
 .bg-charcoal\/40 {
   background-color: rgba(0, 0, 0, 0.6) !important;
 }
-/* Charts */
-.recharts-cartesian-grid line {
-  stroke: #2c2820;
-}
-.recharts-default-tooltip {
-  background-color: #15130f !important;
-  border-color: #2c2820 !important;
-  color: #ffffff;
-}
-.recharts-tooltip-cursor {
-  fill: #1e1b16;
-}
 .eyebrow {
   font-size: 0.6875rem;
   font-weight: 500;

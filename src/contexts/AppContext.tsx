@@ -1,12 +1,11 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState } from
-'react';
-import { initialCollections, initialQuotes } from '../data/collections';
-import type { CustomerCollection, Product, QuoteRequest } from '../types';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { api } from '../lib/api';
+import { friendlyError } from '../lib/format';
+import { qk } from '../lib/queries';
+import { useAuth } from './AuthContext';
+import type { Product, SavedList } from '../types';
 
 interface Toast {
   id: number;
@@ -15,174 +14,258 @@ interface Toast {
 }
 
 interface AppState {
-  saved: string[];
-  toggleSave: (id: string) => void;
-  isSaved: (id: string) => boolean;
-  collections: CustomerCollection[];
-  createCollection: (name: string, customer: string, occasion: string) => void;
-  renameCollection: (id: string, name: string) => void;
-  deleteCollection: (id: string) => void;
-  addToCollection: (collectionId: string, productId: string) => void;
-  removeFromCollection: (collectionId: string, productId: string) => void;
-  updateNote: (collectionId: string, note: string) => void;
-  quotes: QuoteRequest[];
-  addQuote: (q: Omit<QuoteRequest, 'id' | 'status' | 'raised'>) => string;
+  wishlist: string[];
+  isWishlisted: (id: string) => boolean;
+  toggleWishlist: (id: string) => void;
+  lists: SavedList[];
+  createList: (name: string, occasion: string) => Promise<SavedList | null>;
+  renameList: (id: string, name: string) => void;
+  deleteList: (id: string) => void;
+  setListItem: (listId: string, productId: string, on: boolean) => void;
+  updateListNote: (id: string, note: string) => void;
   toasts: Toast[];
   notify: (message: string, tone?: Toast['tone']) => void;
   dismissToast: (id: number) => void;
-  loggedIn: boolean;
-  setLoggedIn: (v: boolean) => void;
   quickView: Product | null;
   setQuickView: (p: Product | null) => void;
-  quoteProduct: Product | null;
-  setQuoteProduct: (p: Product | null) => void;
-  collectionPicker: Product | null;
-  setCollectionPicker: (p: Product | null) => void;
+  enquiryProduct: Product | null;
+  /** Opens the enquiry form; pass null for a general enquiry. */
+  openEnquiry: (p: Product | null) => void;
+  enquiryOpen: boolean;
+  closeEnquiry: () => void;
+  listPicker: Product | null;
+  openListPicker: (p: Product) => void;
+  closeListPicker: () => void;
   recentlyViewed: string[];
   markViewed: (id: string) => void;
+  /** Sends a guest to the login page, returning them here afterwards. */
+  requireLogin: (reason: string) => void;
 }
 
 const AppContext = createContext<AppState | null>(null);
+const RECENT_KEY = 'sanskruti-recently-viewed';
 
 let toastId = 0;
 
-export function AppProvider({ children }: {children: React.ReactNode;}) {
-  const [saved, setSaved] = useState<string[]>([
-  'KYJ-102853',
-  'KYJ-102884',
-  'KYJ-103063',
-  'KYJ-102938']
-  );
-  const [collections, setCollections] = useState<CustomerCollection[]>(initialCollections);
-  const [quotes, setQuotes] = useState<QuoteRequest[]>(initialQuotes);
+function readRecent(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]') as string[];
+  } catch {
+    return [];
+  }
+}
+
+export function AppProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  const userId = user?.id ?? '';
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [loggedIn, setLoggedIn] = useState(false);
   const [quickView, setQuickView] = useState<Product | null>(null);
-  const [quoteProduct, setQuoteProduct] = useState<Product | null>(null);
-  const [collectionPicker, setCollectionPicker] = useState<Product | null>(null);
-  const [recentlyViewed, setRecentlyViewed] = useState<string[]>([
-  'KYJ-102968',
-  'KYJ-103044',
-  'KYJ-102911',
-  'KYJ-102957',
-  'KYJ-103096']
-  );
+  const [enquiryProduct, setEnquiryProduct] = useState<Product | null>(null);
+  const [enquiryOpen, setEnquiryOpen] = useState(false);
+  const [listPicker, setListPicker] = useState<Product | null>(null);
+  const [recentlyViewed, setRecentlyViewed] = useState<string[]>(readRecent);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(RECENT_KEY, JSON.stringify(recentlyViewed));
+    } catch {
+      // Storage unavailable (private mode); recently viewed just won't persist.
+    }
+  }, [recentlyViewed]);
 
   const dismissToast = useCallback((id: number) => {
     setToasts((t) => t.filter((x) => x.id !== id));
   }, []);
 
-  const notify = useCallback(
-    (message: string, tone: Toast['tone'] = 'success') => {
-      const id = ++toastId;
-      setToasts((t) => [...t, { id, message, tone }]);
-      window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3200);
+  const notify = useCallback((message: string, tone: Toast['tone'] = 'success') => {
+    const id = ++toastId;
+    setToasts((t) => [...t, { id, message, tone }]);
+    window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3200);
+  }, []);
+
+  const requireLogin = useCallback(
+    (reason: string) => {
+      notify(reason, 'info');
+      navigate(`/login?next=${encodeURIComponent(location.pathname + location.search)}`);
     },
-    []
+    [navigate, notify, location.pathname, location.search]
   );
 
-  const toggleSave = useCallback(
-    (id: string) => {
-      setSaved((prev) => {
-        const has = prev.includes(id);
-        notify(has ? 'Removed from saved designs' : 'Saved to your designs', has ? 'info' : 'success');
-        return has ? prev.filter((x) => x !== id) : [...prev, id];
-      });
+  // ---- wishlist -----------------------------------------------------------
+
+  const wishlistQuery = useQuery({
+    queryKey: qk.wishlist(userId),
+    queryFn: () => api.listWishlist(userId),
+    enabled: !!userId
+  });
+  const wishlist = useMemo(() => (userId ? wishlistQuery.data ?? [] : []), [userId, wishlistQuery.data]);
+
+  const wishlistMutation = useMutation({
+    mutationFn: ({ productId, on }: { productId: string; on: boolean }) =>
+      api.setWishlisted(userId, productId, on),
+    onMutate: async ({ productId, on }) => {
+      const key = qk.wishlist(userId);
+      await queryClient.cancelQueries({ queryKey: key });
+      const prev = queryClient.getQueryData<string[]>(key) ?? [];
+      queryClient.setQueryData<string[]>(key, on ? [productId, ...prev] : prev.filter((x) => x !== productId));
+      return { prev };
     },
-    [notify]
+    onError: (e, _vars, ctx) => {
+      if (ctx) queryClient.setQueryData(qk.wishlist(userId), ctx.prev);
+      notify(friendlyError(e), 'error');
+    }
+  });
+
+  const toggleWishlist = useCallback(
+    (productId: string) => {
+      if (!userId) {
+        requireLogin('Sign in to save pieces to your wishlist');
+        return;
+      }
+      const on = !wishlist.includes(productId);
+      wishlistMutation.mutate({ productId, on });
+      notify(on ? 'Added to your wishlist' : 'Removed from your wishlist', on ? 'success' : 'info');
+    },
+    [userId, wishlist, wishlistMutation, notify, requireLogin]
   );
+
+  // ---- saved lists --------------------------------------------------------
+
+  const listsQuery = useQuery({
+    queryKey: qk.lists(userId),
+    queryFn: () => api.listSavedLists(userId),
+    enabled: !!userId
+  });
+  const lists = useMemo(() => (userId ? listsQuery.data ?? [] : []), [userId, listsQuery.data]);
+
+  const refreshLists = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: qk.lists(userId) }),
+    [queryClient, userId]
+  );
+
+  /** Applies an optimistic change to the cached lists, then runs the request. */
+  const mutateLists = useCallback(
+    async (update: (l: SavedList[]) => SavedList[], request: () => Promise<unknown>, done?: string) => {
+      const key = qk.lists(userId);
+      const prev = queryClient.getQueryData<SavedList[]>(key) ?? [];
+      queryClient.setQueryData<SavedList[]>(key, update(prev));
+      try {
+        await request();
+        if (done) notify(done);
+      } catch (e) {
+        queryClient.setQueryData(key, prev);
+        notify(friendlyError(e), 'error');
+      } finally {
+        void refreshLists();
+      }
+    },
+    [queryClient, userId, notify, refreshLists]
+  );
+
+  // ---- context value ------------------------------------------------------
 
   const value = useMemo<AppState>(
     () => ({
-      saved,
-      toggleSave,
-      isSaved: (id: string) => saved.includes(id),
-      collections,
-      createCollection: (name, customer, occasion) => {
-        setCollections((c) => [
-        {
-          id: `COL-${Math.floor(Math.random() * 9000 + 1000)}`,
-          name,
-          customer,
-          occasion,
-          productIds: [],
-          note: '',
-          updated: 'Just now',
-          preference: 'New collection'
-        },
-        ...c]
-        );
-        notify(`Collection “${name}” created`);
+      wishlist,
+      isWishlisted: (id) => wishlist.includes(id),
+      toggleWishlist,
+      lists,
+      createList: async (name, occasion) => {
+        if (!userId) {
+          requireLogin('Sign in to create a list');
+          return null;
+        }
+        try {
+          const list = await api.createSavedList(userId, name, occasion);
+          await refreshLists();
+          notify(`List “${name}” created`);
+          return list;
+        } catch (e) {
+          notify(friendlyError(e), 'error');
+          return null;
+        }
       },
-      renameCollection: (id, name) => {
-        setCollections((c) => c.map((x) => x.id === id ? { ...x, name, updated: 'Just now' } : x));
-        notify('Collection renamed');
-      },
-      deleteCollection: (id) => {
-        setCollections((c) => c.filter((x) => x.id !== id));
-        notify('Collection deleted', 'info');
-      },
-      addToCollection: (collectionId, productId) => {
-        setCollections((c) =>
-        c.map((x) =>
-        x.id === collectionId && !x.productIds.includes(productId) ?
-        { ...x, productIds: [productId, ...x.productIds], updated: 'Just now' } :
-        x
-        )
-        );
-        notify('Added to customer collection');
-      },
-      removeFromCollection: (collectionId, productId) => {
-        setCollections((c) =>
-        c.map((x) =>
-        x.id === collectionId ?
-        { ...x, productIds: x.productIds.filter((p) => p !== productId), updated: 'Just now' } :
-        x
-        )
-        );
-        notify('Removed from collection', 'info');
-      },
-      updateNote: (collectionId, note) => {
-        setCollections((c) => c.map((x) => x.id === collectionId ? { ...x, note } : x));
-      },
-      quotes,
-      addQuote: (q) => {
-        const id = `QR-${Math.floor(Math.random() * 9000 + 1000)}`;
-        setQuotes((prev) => [
-        { ...q, id, status: 'Sent', raised: '22 Aug 2026' },
-        ...prev]
-        );
-        return id;
-      },
+      renameList: (id, name) =>
+        void mutateLists(
+          (ls) => ls.map((l) => (l.id === id ? { ...l, name } : l)),
+          () => api.updateSavedList(id, { name }),
+          'List renamed'
+        ),
+      deleteList: (id) =>
+        void mutateLists(
+          (ls) => ls.filter((l) => l.id !== id),
+          () => api.deleteSavedList(id),
+          'List deleted'
+        ),
+      setListItem: (listId, productId, on) =>
+        void mutateLists(
+          (ls) =>
+            ls.map((l) =>
+              l.id !== listId
+                ? l
+                : {
+                    ...l,
+                    productIds: on
+                      ? [productId, ...l.productIds.filter((p) => p !== productId)]
+                      : l.productIds.filter((p) => p !== productId)
+                  }
+            ),
+          () => api.setListItem(listId, productId, on),
+          on ? 'Added to list' : 'Removed from list'
+        ),
+      updateListNote: (id, note) =>
+        void mutateLists(
+          (ls) => ls.map((l) => (l.id === id ? { ...l, note } : l)),
+          () => api.updateSavedList(id, { note })
+        ),
       toasts,
       notify,
       dismissToast,
-      loggedIn,
-      setLoggedIn,
       quickView,
       setQuickView,
-      quoteProduct,
-      setQuoteProduct,
-      collectionPicker,
-      setCollectionPicker,
+      enquiryProduct,
+      enquiryOpen,
+      openEnquiry: (p) => {
+        setQuickView(null);
+        setEnquiryProduct(p);
+        setEnquiryOpen(true);
+      },
+      closeEnquiry: () => setEnquiryOpen(false),
+      listPicker,
+      openListPicker: (p) => {
+        if (!userId) {
+          requireLogin('Sign in to save pieces to a list');
+          return;
+        }
+        setQuickView(null);
+        setListPicker(p);
+      },
+      closeListPicker: () => setListPicker(null),
       recentlyViewed,
-      markViewed: (id: string) =>
-      setRecentlyViewed((r) => [id, ...r.filter((x) => x !== id)].slice(0, 8))
+      markViewed: (id) => setRecentlyViewed((r) => [id, ...r.filter((x) => x !== id)].slice(0, 12)),
+      requireLogin
     }),
     [
-    saved,
-    toggleSave,
-    collections,
-    quotes,
-    toasts,
-    notify,
-    dismissToast,
-    loggedIn,
-    quickView,
-    quoteProduct,
-    collectionPicker,
-    recentlyViewed]
-
+      wishlist,
+      toggleWishlist,
+      lists,
+      userId,
+      requireLogin,
+      refreshLists,
+      notify,
+      mutateLists,
+      toasts,
+      dismissToast,
+      quickView,
+      enquiryProduct,
+      enquiryOpen,
+      listPicker,
+      recentlyViewed
+    ]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
