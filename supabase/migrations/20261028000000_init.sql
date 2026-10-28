@@ -1,4 +1,4 @@
--- Sanskruti Jewels — initial schema
+-- Sanskruti Jewels — initial schema (safe to re-run)
 -- Roles: every auth user gets a row in public.profiles with role 'customer'.
 -- Admins are promoted manually (see README) and are the only ones who can
 -- write catalogue data or read other people's data.
@@ -9,7 +9,7 @@ create extension if not exists pgcrypto;
 -- Profiles & roles
 -- ---------------------------------------------------------------------------
 
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   email text,
   full_name text not null default '',
@@ -51,6 +51,7 @@ begin
 end;
 $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
@@ -74,6 +75,7 @@ begin
 end;
 $$;
 
+drop trigger if exists profiles_guard_update on public.profiles;
 create trigger profiles_guard_update
   before update on public.profiles
   for each row execute function public.guard_profile_update();
@@ -82,7 +84,7 @@ create trigger profiles_guard_update
 -- Catalogue
 -- ---------------------------------------------------------------------------
 
-create table public.categories (
+create table if not exists public.categories (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique,
   name text not null,
@@ -91,7 +93,7 @@ create table public.categories (
   created_at timestamptz not null default now()
 );
 
-create table public.collections (
+create table if not exists public.collections (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique,
   name text not null,
@@ -101,7 +103,7 @@ create table public.collections (
   created_at timestamptz not null default now()
 );
 
-create table public.products (
+create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
   sku text not null unique,
   slug text not null unique,
@@ -131,11 +133,11 @@ create table public.products (
   updated_at timestamptz not null default now()
 );
 
-create index products_category_idx on public.products (category_id);
-create index products_collection_idx on public.products (collection_id);
-create index products_published_idx on public.products (is_published, created_at desc);
+create index if not exists products_category_idx on public.products (category_id);
+create index if not exists products_collection_idx on public.products (collection_id);
+create index if not exists products_published_idx on public.products (is_published, created_at desc);
 
-create table public.product_images (
+create table if not exists public.product_images (
   id uuid primary key default gen_random_uuid(),
   product_id uuid not null references public.products (id) on delete cascade,
   url text not null,
@@ -146,7 +148,7 @@ create table public.product_images (
   created_at timestamptz not null default now()
 );
 
-create index product_images_product_idx on public.product_images (product_id, sort_order);
+create index if not exists product_images_product_idx on public.product_images (product_id, sort_order);
 
 create or replace function public.touch_updated_at()
 returns trigger
@@ -158,6 +160,7 @@ begin
 end;
 $$;
 
+drop trigger if exists products_touch on public.products;
 create trigger products_touch
   before update on public.products
   for each row execute function public.touch_updated_at();
@@ -206,16 +209,16 @@ $$;
 -- Customer data
 -- ---------------------------------------------------------------------------
 
-create table public.wishlist_items (
+create table if not exists public.wishlist_items (
   user_id uuid not null references auth.users (id) on delete cascade,
   product_id uuid not null references public.products (id) on delete cascade,
   created_at timestamptz not null default now(),
   primary key (user_id, product_id)
 );
 
-create index wishlist_product_idx on public.wishlist_items (product_id);
+create index if not exists wishlist_product_idx on public.wishlist_items (product_id);
 
-create table public.saved_lists (
+create table if not exists public.saved_lists (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
   name text not null,
@@ -225,20 +228,21 @@ create table public.saved_lists (
   updated_at timestamptz not null default now()
 );
 
-create index saved_lists_user_idx on public.saved_lists (user_id);
+create index if not exists saved_lists_user_idx on public.saved_lists (user_id);
 
+drop trigger if exists saved_lists_touch on public.saved_lists;
 create trigger saved_lists_touch
   before update on public.saved_lists
   for each row execute function public.touch_updated_at();
 
-create table public.saved_list_items (
+create table if not exists public.saved_list_items (
   list_id uuid not null references public.saved_lists (id) on delete cascade,
   product_id uuid not null references public.products (id) on delete cascade,
   created_at timestamptz not null default now(),
   primary key (list_id, product_id)
 );
 
-create table public.enquiries (
+create table if not exists public.enquiries (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users (id) on delete set null,
   product_id uuid references public.products (id) on delete set null,
@@ -254,9 +258,10 @@ create table public.enquiries (
   updated_at timestamptz not null default now()
 );
 
-create index enquiries_status_idx on public.enquiries (status, created_at desc);
-create index enquiries_user_idx on public.enquiries (user_id);
+create index if not exists enquiries_status_idx on public.enquiries (status, created_at desc);
+create index if not exists enquiries_user_idx on public.enquiries (user_id);
 
+drop trigger if exists enquiries_touch on public.enquiries;
 create trigger enquiries_touch
   before update on public.enquiries
   for each row execute function public.touch_updated_at();
@@ -316,27 +321,36 @@ alter table public.saved_list_items enable row level security;
 alter table public.enquiries enable row level security;
 
 -- profiles
+drop policy if exists "profiles: read own or admin" on public.profiles;
 create policy "profiles: read own or admin" on public.profiles
   for select using (id = auth.uid() or public.is_admin());
+drop policy if exists "profiles: update own or admin" on public.profiles;
 create policy "profiles: update own or admin" on public.profiles
   for update using (id = auth.uid() or public.is_admin())
   with check (id = auth.uid() or public.is_admin());
 
 -- categories / collections: public read, admin write
+drop policy if exists "categories: public read" on public.categories;
 create policy "categories: public read" on public.categories for select using (true);
+drop policy if exists "categories: admin write" on public.categories;
 create policy "categories: admin write" on public.categories
   for all using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "collections: public read" on public.collections;
 create policy "collections: public read" on public.collections for select using (true);
+drop policy if exists "collections: admin write" on public.collections;
 create policy "collections: admin write" on public.collections
   for all using (public.is_admin()) with check (public.is_admin());
 
 -- products: published ones are public, drafts only for admins
+drop policy if exists "products: read published or admin" on public.products;
 create policy "products: read published or admin" on public.products
   for select using (is_published or public.is_admin());
+drop policy if exists "products: admin write" on public.products;
 create policy "products: admin write" on public.products
   for all using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "product_images: read if product visible" on public.product_images;
 create policy "product_images: read if product visible" on public.product_images
   for select using (
     exists (
@@ -344,16 +358,20 @@ create policy "product_images: read if product visible" on public.product_images
       where p.id = product_id and (p.is_published or public.is_admin())
     )
   );
+drop policy if exists "product_images: admin write" on public.product_images;
 create policy "product_images: admin write" on public.product_images
   for all using (public.is_admin()) with check (public.is_admin());
 
 -- wishlist: own rows only
+drop policy if exists "wishlist: own" on public.wishlist_items;
 create policy "wishlist: own" on public.wishlist_items
   for all using (user_id = auth.uid()) with check (user_id = auth.uid());
 
 -- saved lists: own rows only
+drop policy if exists "saved_lists: own" on public.saved_lists;
 create policy "saved_lists: own" on public.saved_lists
   for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+drop policy if exists "saved_list_items: own" on public.saved_list_items;
 create policy "saved_list_items: own" on public.saved_list_items
   for all using (
     exists (select 1 from public.saved_lists l where l.id = list_id and l.user_id = auth.uid())
@@ -363,15 +381,19 @@ create policy "saved_list_items: own" on public.saved_list_items
 
 -- enquiries: anyone (incl. guests) can submit; signed-in customers see their own;
 -- admins see and manage all.
+drop policy if exists "enquiries: submit" on public.enquiries;
 create policy "enquiries: submit" on public.enquiries
   for insert with check (
     (user_id is null or user_id = auth.uid())
     and status = 'New' and admin_note = ''
   );
+drop policy if exists "enquiries: read own or admin" on public.enquiries;
 create policy "enquiries: read own or admin" on public.enquiries
   for select using (user_id = auth.uid() or public.is_admin());
+drop policy if exists "enquiries: admin update" on public.enquiries;
 create policy "enquiries: admin update" on public.enquiries
   for update using (public.is_admin()) with check (public.is_admin());
+drop policy if exists "enquiries: admin delete" on public.enquiries;
 create policy "enquiries: admin delete" on public.enquiries
   for delete using (public.is_admin());
 
@@ -394,12 +416,15 @@ values (
 )
 on conflict (id) do nothing;
 
+drop policy if exists "product-images: admin insert" on storage.objects;
 create policy "product-images: admin insert" on storage.objects
   for insert to authenticated
   with check (bucket_id = 'product-images' and public.is_admin());
+drop policy if exists "product-images: admin update" on storage.objects;
 create policy "product-images: admin update" on storage.objects
   for update to authenticated
   using (bucket_id = 'product-images' and public.is_admin());
+drop policy if exists "product-images: admin delete" on storage.objects;
 create policy "product-images: admin delete" on storage.objects
   for delete to authenticated
   using (bucket_id = 'product-images' and public.is_admin());
