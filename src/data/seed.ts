@@ -9,14 +9,12 @@ export interface SeedCategory {
   /** Slug of the parent category for sub-categories. */
   parent: string | null;
 }
-export interface SeedCollection { slug: string; name: string; tagline: string; image: string; }
 export interface SeedProduct {
   sku: string;
   slug: string;
   name: string;
   description: string;
   category: string;
-  collection: string;
   style: string;
   metal: string;
   purity: string;
@@ -248,45 +246,6 @@ export const seedCategories: SeedCategory[] = [
   }
 ];
 
-export const seedCollections: SeedCollection[] = [
-  {
-    "slug": "bridal",
-    "name": "Bridal Collection",
-    "tagline": "Ceremonial polki, kundan and temple sets for the big day.",
-    "image": "/images/editorial-bridal.jpg"
-  },
-  {
-    "slug": "everyday",
-    "name": "Everyday Elegance",
-    "tagline": "Light, wearable pieces made for every day.",
-    "image": "/images/editorial-everyday.jpg"
-  },
-  {
-    "slug": "traditional",
-    "name": "Traditional Gold",
-    "tagline": "Nakshi, antique and temple work rooted in heritage craft.",
-    "image": "/images/temple.jpg"
-  },
-  {
-    "slug": "modern",
-    "name": "Modern Minimal",
-    "tagline": "Sculptural, featherlight designs with a contemporary edge.",
-    "image": "/images/editorial-modern.jpg"
-  },
-  {
-    "slug": "statement",
-    "name": "Statement Jewellery",
-    "tagline": "Showstopping pieces that turn every head in the room.",
-    "image": "/images/editorial-statement.jpg"
-  },
-  {
-    "slug": "mens",
-    "name": "Men's Collection",
-    "tagline": "Kadas, cuban links and signets crafted for him.",
-    "image": "/images/mens.jpg"
-  }
-];
-
 export const seedProducts: SeedProduct[] = [
   {
     "sku": "SJ-102847",
@@ -294,7 +253,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Rajwadi Antique Bridal Choker",
     "description": "A ceremonial choker built on hand-drawn gold wire filigree with kundan setting across the central motif. Finished in matte antique with hanging pearl drops.",
     "category": "short-necklace",
-    "collection": "bridal",
     "style": "Bridal",
     "metal": "Gold",
     "purity": "22K",
@@ -337,7 +295,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Kundan Grand Bridal Set",
     "description": "Complete bridal ensemble with choker, long haar, jhumkas and maang tikka. Nizami-inspired layout with graduated polki plates.",
     "category": "long-necklace",
-    "collection": "bridal",
     "style": "Bridal",
     "metal": "Gold",
     "purity": "92 Melting",
@@ -380,7 +337,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Pearl Drop Temple Jhumkas",
     "description": "Classic dome jhumka with nakshi rim, laxmi motif top and a full row of pearl drops. Screw-back closure for daily comfort.",
     "category": "coimbatore-zumka",
-    "collection": "traditional",
     "style": "Temple",
     "metal": "Gold",
     "purity": "22K",
@@ -423,7 +379,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Engraved Band Signet Ring",
     "description": "Sculptural band with hand-engraved chevron detailing and a high-polish inner shank. Sits flush with stacking rings.",
     "category": "gents-rings",
-    "collection": "modern",
     "style": "Modern",
     "metal": "Gold",
     "purity": "18K",
@@ -466,7 +421,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Solitaire Halo Engagement Ring",
     "description": "Four-prong solitaire mount with a micro-pave halo and split shank. Available with lab-grown or natural centre stones.",
     "category": "casting-ladies-rings",
-    "collection": "modern",
     "style": "Modern",
     "metal": "Diamond",
     "purity": "18K",
@@ -513,7 +467,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Teardrop Diamond Pendant",
     "description": "A single pear-cut stone in a bezel-and-prong hybrid setting. Supplied with or without an 18 inch cable chain.",
     "category": "pendant",
-    "collection": "everyday",
     "style": "Minimal",
     "metal": "Diamond",
     "purity": "18K",
@@ -560,7 +513,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Contemporary Diamond Mangalsutra",
     "description": "Double-line black bead mangalsutra with a compact diamond floral pendant designed for daily office wear.",
     "category": "rajkot-vati",
-    "collection": "everyday",
     "style": "Modern",
     "metal": "Diamond",
     "purity": "18K",
@@ -607,7 +559,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Men's Textured Gold Kada",
     "description": "Hinged kada with hand-chiselled chevron texture and a concealed push clasp. Heavy gauge, hollow core construction.",
     "category": "kada",
-    "collection": "mens",
     "style": "Modern",
     "metal": "Gold",
     "purity": "92 Melting",
@@ -650,7 +601,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Featherlight Geometric Necklace",
     "description": "Hollow-form gold necklace under 5 grams with a small geometric charm. Light enough for every day.",
     "category": "short-necklace",
-    "collection": "modern",
     "style": "Lightweight",
     "metal": "Gold",
     "purity": "18K",
@@ -693,7 +643,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Lakshmi Temple Haaram",
     "description": "Long temple haaram with repeating Lakshmi and peacock plates, hand-set with cabochon rubies through the frame.",
     "category": "laxmi-har",
-    "collection": "traditional",
     "style": "Temple",
     "metal": "Gold",
     "purity": "22K",
@@ -736,7 +685,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Diamond Drop Cocktail Earrings",
     "description": "Detachable stud-and-drop construction giving you two looks from one pair.",
     "category": "earring",
-    "collection": "statement",
     "style": "Modern",
     "metal": "Diamond",
     "purity": "18K",
@@ -783,7 +731,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Filigree Bridal Long Necklace",
     "description": "Jaipur filigree work across a graduated collar with a detachable central pendant that can be worn separately.",
     "category": "long-necklace",
-    "collection": "bridal",
     "style": "Bridal",
     "metal": "Gold",
     "purity": "92 Melting",
@@ -826,7 +773,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Everyday Diamond Studs",
     "description": "Classic four-prong diamond studs with secure screw backs. An everyday essential.",
     "category": "karwari-tops",
-    "collection": "everyday",
     "style": "Daily Wear",
     "metal": "Diamond",
     "purity": "14K",
@@ -873,7 +819,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Antique Peacock Pendant",
     "description": "Antique-finish peacock motif pendant with fine nakshi border and a single pearl drop at the base.",
     "category": "pendant",
-    "collection": "traditional",
     "style": "Antique",
     "metal": "Gold",
     "purity": "92 Melting",
@@ -916,7 +861,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Slim Beaded Mangalsutra",
     "description": "Single-line lightweight mangalsutra with an understated gold vati. Designed for the sub-5 gram price band.",
     "category": "karwari-vati",
-    "collection": "everyday",
     "style": "Lightweight",
     "metal": "Gold",
     "purity": "18K",
@@ -959,7 +903,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Statement Emerald Collar",
     "description": "A bold collar with graduated emerald cabochons framed in uncut diamond. Built for flagship display windows.",
     "category": "short-necklace",
-    "collection": "statement",
     "style": "Traditional",
     "metal": "Gold",
     "purity": "22K",
@@ -1002,7 +945,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Polki Bridal Jhumka",
     "description": "Oversized bridal jhumka with detachable ear-chain sahara and a triple row of pearl fringe.",
     "category": "karwari-zumka",
-    "collection": "bridal",
     "style": "Bridal",
     "metal": "Gold",
     "purity": "92 Melting",
@@ -1045,7 +987,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Minimal Stacking Ring Trio",
     "description": "Three slim bands — plain, twisted and single-stone — sold as a coordinated stack or individually.",
     "category": "ladies-rings",
-    "collection": "modern",
     "style": "Minimal",
     "metal": "Gold",
     "purity": "14K",
@@ -1088,7 +1029,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Diamond Cluster Cocktail Ring",
     "description": "Flower cluster head with illusion setting that reads two sizes larger than its carat weight.",
     "category": "ladies-rings",
-    "collection": "statement",
     "style": "Modern",
     "metal": "Diamond",
     "purity": "18K",
@@ -1135,7 +1075,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Bridal Maang Tikka & Set",
     "description": "Coordinated tikka, passa and choker trio finished to match a bride’s primary necklace order.",
     "category": "tika",
-    "collection": "bridal",
     "style": "Bridal",
     "metal": "Gold",
     "purity": "92 Melting",
@@ -1178,7 +1117,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Men's Signet Gold Ring",
     "description": "Broad-face signet with a brushed top plate, available blank or with your own engraving.",
     "category": "casting-gents-rings",
-    "collection": "mens",
     "style": "Modern",
     "metal": "Gold",
     "purity": "22K",
@@ -1221,7 +1159,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Delicate Layering Necklace",
     "description": "Ultra-fine layering chain designed to be sold in threes. A strong entry price-point for younger buyers.",
     "category": "long-necklace",
-    "collection": "modern",
     "style": "Minimal",
     "metal": "Gold",
     "purity": "14K",
@@ -1264,7 +1201,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Emerald Drop Temple Necklace",
     "description": "Temple plates strung with graduated emerald beads and finished with a hand-knotted silk cord back.",
     "category": "laxmi-har",
-    "collection": "traditional",
     "style": "Temple",
     "metal": "Gold",
     "purity": "92 Melting",
@@ -1307,7 +1243,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Diamond Bezel Pendant Set",
     "description": "Bezel-set pendant with matching studs, packaged as a ready gifting set with certificate.",
     "category": "casting-lockets",
-    "collection": "everyday",
     "style": "Daily Wear",
     "metal": "Diamond",
     "purity": "18K",
@@ -1354,7 +1289,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Broad Gold Choker Necklace",
     "description": "Wide gold choker with a dense floral field and hidden hook closure at the nape.",
     "category": "short-necklace",
-    "collection": "traditional",
     "style": "Traditional",
     "metal": "Gold",
     "purity": "22K",
@@ -1397,7 +1331,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Platinum Eternity Band",
     "description": "Channel-set platinum eternity band with a comfort-fit profile, produced to exact finger size.",
     "category": "couple-band",
-    "collection": "modern",
     "style": "Minimal",
     "metal": "Platinum",
     "purity": "18K",
@@ -1436,7 +1369,6 @@ export const seedProducts: SeedProduct[] = [
     "name": "Layered Pearl & Gold Haar",
     "description": "Three-layer pearl haar with polki spacers and a detachable central plate.",
     "category": "long-necklace",
-    "collection": "bridal",
     "style": "Traditional",
     "metal": "Gold",
     "purity": "92 Melting",

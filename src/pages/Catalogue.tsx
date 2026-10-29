@@ -49,12 +49,12 @@ function usePageLimit() {
 export function Catalogue() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
-  const { published, categories, collections, categoryName, loading, error } = useCatalogue();
+  const { published, categories, categoryName, loading, error } = useCatalogue();
   const { filters, q, sort } = parseParams(params);
   const [sheet, setSheet] = useState<'sort' | 'filter' | null>(null);
   const [limit, setLimit] = usePageLimit();
 
-  const lookups = useMemo(() => ({ categories, collections, categoryName }), [categories, collections, categoryName]);
+  const lookups = useMemo(() => ({ categories, categoryName }), [categories, categoryName]);
   const results = useMemo(
     () => sortProducts(applyFilters(published, filters, q, lookups), sort),
     // params string captures every filter/sort/query change
@@ -68,7 +68,6 @@ export function Catalogue() {
     window.scrollTo({ top: 0 });
   };
 
-  const collection = filters.collections.length === 1 ? collections.find((c) => c.slug === filters.collections[0]) : undefined;
   const category = filters.categories.length === 1 ? categories.find((c) => c.slug === filters.categories[0]) : undefined;
   // Sub-category tabs when browsing a category that has them (or one of its children).
   const parentCategory = category ? (category.parentId ? categories.find((c) => c.id === category.parentId) : category) : undefined;
@@ -78,7 +77,7 @@ export function Catalogue() {
 
   const purityTitle =
     filters.purities.length === 1 ? purityShortcuts.find((s) => s.value === filters.purities[0])?.label : undefined;
-  const title = q ? `“${q}”` : collection?.name ?? category?.name ?? purityTitle ?? (filters.newOnly ? 'New Arrivals' : 'All Jewellery');
+  const title = q ? `“${q}”` : category?.name ?? purityTitle ?? (filters.newOnly ? 'New Arrivals' : 'All Jewellery');
 
   const count = activeCount(filters);
 
@@ -90,7 +89,6 @@ export function Catalogue() {
     );
   // With sub-category tabs showing, the category is already visible there.
   if (!showSubTabs) listChip('categories', (v) => categories.find((c) => c.slug === v)?.name ?? v);
-  listChip('collections', (v) => collections.find((c) => c.slug === v)?.name ?? v);
   listChip('metals', (v) => v);
   filters.purities
     .filter((v) => !purityShortcuts.some((s) => s.value === v))

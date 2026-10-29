@@ -20,7 +20,6 @@ interface FormState {
   slug: string;
   description: string;
   categoryId: string;
-  collectionId: string;
   style: string;
   metal: string;
   purity: string;
@@ -28,6 +27,8 @@ interface FormState {
   weightMax: string;
   make: string;
   grossWeight: string;
+  /** Unanswered (null) until the admin picks Yes or No. */
+  hasStone: boolean | null;
   stoneWeight: string;
   netWeight: string;
   quantity: string;
@@ -48,7 +49,6 @@ const blank: FormState = {
   slug: '',
   description: '',
   categoryId: '',
-  collectionId: '',
   style: '',
   metal: 'Gold',
   purity: '22K',
@@ -56,7 +56,8 @@ const blank: FormState = {
   weightMax: '',
   make: '',
   grossWeight: '',
-  stoneWeight: '0',
+  hasStone: null,
+  stoneWeight: '',
   netWeight: '',
   quantity: '1',
   stone: '',
@@ -78,7 +79,6 @@ function fromProduct(p: Product): FormState {
     slug: p.slug,
     description: p.description,
     categoryId: p.categoryId ?? '',
-    collectionId: p.collectionId ?? '',
     style: p.style,
     metal: p.metal,
     purity: p.purity,
@@ -86,7 +86,8 @@ function fromProduct(p: Product): FormState {
     weightMax: num(p.weightMax),
     make: p.make,
     grossWeight: num(p.grossWeight),
-    stoneWeight: num(p.stoneWeight),
+    hasStone: p.stoneWeight === null ? null : p.stoneWeight > 0,
+    stoneWeight: p.stoneWeight ? String(p.stoneWeight) : '',
     netWeight: num(p.netWeight),
     quantity: p.quantity === null ? '' : String(p.quantity),
     stone: p.stone,
@@ -116,7 +117,7 @@ export function ProductEditor() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { notify } = useApp();
-  const { products, categories, collections, categoryPath, loading } = useCatalogue();
+  const { products, categories, categoryPath, loading } = useCatalogue();
   const existing = useMemo(() => products.find((p) => p.id === id), [products, id]);
   const { sessionUploads, markSaved } = useCleanupUnsavedUploads();
 
@@ -148,12 +149,13 @@ export function ProductEditor() {
   const text = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     set(k, e.target.value as never);
 
-  const setWeight = (k: 'grossWeight' | 'stoneWeight', value: string) =>
+  const setWeight = (patch: Partial<Pick<FormState, 'grossWeight' | 'stoneWeight' | 'hasStone'>>) =>
     setForm((f) => {
-      const next = { ...f, [k]: value };
+      const next = { ...f, ...patch };
       const gross = Number(next.grossWeight);
-      const stoneWt = Number(next.stoneWeight || 0);
-      if (!netTouched && next.grossWeight !== '' && !Number.isNaN(gross) && !Number.isNaN(stoneWt)) {
+      const stoneWt = next.hasStone ? Number(next.stoneWeight || 0) : 0;
+      // Answering "Has stones?" always recalculates; typing a weight only until net is edited.
+      if ((!netTouched || 'hasStone' in patch) && next.grossWeight !== '' && !Number.isNaN(gross) && !Number.isNaN(stoneWt)) {
         next.netWeight = String(Math.max(0, Math.round((gross - stoneWt) * 1000) / 1000));
       }
       return next;
@@ -177,11 +179,13 @@ export function ProductEditor() {
     if (!form.categoryId) errs.push('Choose a category.');
     if (!form.make.trim()) errs.push('Make is required.');
     const gross = Number(form.grossWeight);
-    const stoneWt = Number(form.stoneWeight);
+    const stoneWt = form.hasStone ? Number(form.stoneWeight) : 0;
     const net = Number(form.netWeight);
     if (form.grossWeight === '' || Number.isNaN(gross) || gross <= 0) errs.push('Gross weight is required and must be more than 0.');
-    if (form.stoneWeight === '' || Number.isNaN(stoneWt) || stoneWt < 0) errs.push('Stone weight is required (enter 0 if there are no stones).');
-    else if (gross > 0 && stoneWt > gross) errs.push('Stone weight cannot exceed gross weight.');
+    if (form.hasStone === null) errs.push('Say whether the piece has stones.');
+    else if (form.hasStone && (form.stoneWeight === '' || Number.isNaN(stoneWt) || stoneWt <= 0)) {
+      errs.push('Stone weight is required and must be more than 0.');
+    } else if (gross > 0 && stoneWt > gross) errs.push('Stone weight cannot exceed gross weight.');
     if (form.netWeight === '' || Number.isNaN(net) || net < 0) errs.push('Net weight is required.');
     else if (gross > 0 && net > gross) errs.push('Net weight cannot exceed gross weight.');
     if (form.quantity === '' || !Number.isInteger(Number(form.quantity)) || Number(form.quantity) < 0) errs.push('Quantity must be a whole number (0 or more).');
@@ -214,7 +218,6 @@ export function ProductEditor() {
         slug: form.slug,
         description: form.description.trim(),
         categoryId: form.categoryId || null,
-        collectionId: form.collectionId || null,
         style: form.style.trim(),
         metal: form.metal,
         purity: form.purity,
@@ -222,7 +225,7 @@ export function ProductEditor() {
         weightMax: form.weightMax === '' ? null : Number(form.weightMax),
         make: form.make.trim(),
         grossWeight: Number(form.grossWeight),
-        stoneWeight: Number(form.stoneWeight),
+        stoneWeight: form.hasStone ? Number(form.stoneWeight) : 0,
         netWeight: Number(form.netWeight),
         quantity: Number(form.quantity),
         stone: form.stone.trim(),
@@ -341,16 +344,6 @@ export function ProductEditor() {
                   className={inputClass}
                 />
               </Field>
-              <Field label="Collection">
-                <select value={form.collectionId} onChange={text('collectionId')} className={inputClass}>
-                  <option value="">— None —</option>
-                  {collections.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </Field>
               <Field label="Description" className="sm:col-span-2">
                 <textarea rows={4} value={form.description} onChange={text('description')} className={`${inputClass} h-auto resize-y py-2.5`} />
               </Field>
@@ -388,22 +381,25 @@ export function ProductEditor() {
                   min={0}
                   inputMode="decimal"
                   value={form.grossWeight}
-                  onChange={(e) => setWeight('grossWeight', e.target.value)}
+                  onChange={(e) => setWeight({ grossWeight: e.target.value })}
                   className={inputClass}
                 />
               </Field>
-              <Field label="Stone weight (g)" required>
-                <input
-                  required
-                  type="number"
-                  step="0.001"
-                  min={0}
-                  inputMode="decimal"
-                  value={form.stoneWeight}
-                  onChange={(e) => setWeight('stoneWeight', e.target.value)}
-                  className={inputClass}
-                />
-              </Field>
+              <YesNo label="Has stones?" value={form.hasStone} onChange={(v) => setWeight({ hasStone: v })} />
+              {form.hasStone && (
+                <Field label="Stone weight (g)" required>
+                  <input
+                    required
+                    type="number"
+                    step="0.001"
+                    min={0}
+                    inputMode="decimal"
+                    value={form.stoneWeight}
+                    onChange={(e) => setWeight({ stoneWeight: e.target.value })}
+                    className={inputClass}
+                  />
+                </Field>
+              )}
               <Field label="Net weight (g)" required hint={netTouched ? undefined : 'Gross − stone, edit if needed'}>
                 <input
                   required
@@ -422,25 +418,7 @@ export function ProductEditor() {
               <Field label="Qty" required>
                 <input required type="number" step="1" min={0} inputMode="numeric" value={form.quantity} onChange={text('quantity')} className={inputClass} />
               </Field>
-              <fieldset className="sm:col-span-2">
-                <legend className="mb-1.5 text-xs font-medium text-ink-2">
-                  Trending<span className="text-danger" aria-hidden="true"> *</span>
-                </legend>
-                <div role="radiogroup" aria-label="Trending" className="grid h-12 grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1">
-                  {[true, false].map((v) => (
-                    <button
-                      key={String(v)}
-                      type="button"
-                      role="radio"
-                      aria-checked={form.isFeatured === v}
-                      onClick={() => set('isFeatured', v)}
-                      className={`rounded-lg text-sm font-semibold ${form.isFeatured === v ? 'bg-surface text-ink shadow-card' : 'text-ink-3'}`}
-                    >
-                      {v ? 'Yes' : 'No'}
-                    </button>
-                  ))}
-                </div>
-              </fieldset>
+              <YesNo label="Trending" value={form.isFeatured} onChange={(v) => set('isFeatured', v)} />
             </div>
           </Panel>
 
@@ -587,5 +565,34 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
       {label}
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4" />
     </label>
+  );
+}
+
+/** Required Yes/No question shown as a two-way segmented control. */
+function YesNo({ label, value, onChange }: { label: string; value: boolean | null; onChange: (v: boolean) => void }) {
+  return (
+    <fieldset>
+      <legend className="mb-1.5 text-xs font-medium text-ink-2">
+        {label}
+        <span className="text-danger" aria-hidden="true">
+          {' '}
+          *
+        </span>
+      </legend>
+      <div role="radiogroup" aria-label={label} className="grid h-12 grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1">
+        {[true, false].map((v) => (
+          <button
+            key={String(v)}
+            type="button"
+            role="radio"
+            aria-checked={value === v}
+            onClick={() => onChange(v)}
+            className={`rounded-lg text-sm font-semibold ${value === v ? 'bg-surface text-ink shadow-card' : 'text-ink-3'}`}
+          >
+            {v ? 'Yes' : 'No'}
+          </button>
+        ))}
+      </div>
+    </fieldset>
   );
 }

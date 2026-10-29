@@ -26,15 +26,10 @@ describe('Supabase adapter', () => {
   });
 
   it('lists the seeded catalogue with ordered images', async () => {
-    const [products, categories, collections] = await Promise.all([
-      customerApi.listProducts(),
-      customerApi.listCategories(),
-      customerApi.listCollections()
-    ]);
+    const [products, categories] = await Promise.all([customerApi.listProducts(), customerApi.listCategories()]);
     expect(products.length).toBeGreaterThanOrEqual(27);
     expect(categories.length).toBeGreaterThanOrEqual(34);
     expect(categories.filter((c) => c.parentId).length).toBeGreaterThanOrEqual(18);
-    expect(collections.length).toBeGreaterThanOrEqual(6);
     const p = products.find((x) => x.sku.startsWith('SJ-1') && x.images.length > 1)!;
     expect(p.images.map((i) => i.sortOrder)).toEqual([...p.images.map((i) => i.sortOrder)].sort((a, b) => a - b));
     expect(typeof p.weightMin).toBe('number');
@@ -49,7 +44,6 @@ describe('Supabase adapter', () => {
       name: 'Adapter Ring',
       description: 'd',
       categoryId: null,
-      collectionId: null,
       style: 'Modern',
       metal: 'Gold',
       purity: '22K',
@@ -93,7 +87,7 @@ describe('Supabase adapter', () => {
     await expect(customerApi.saveCategory({ slug: `c-${run}`, name: 'c', imageUrl: null, parentId: null, sortOrder: 0 })).rejects.toThrow(/row-level security/);
   });
 
-  it('manages categories and collections as admin', async () => {
+  it('manages categories as admin', async () => {
     const cat = await adminApi.saveCategory({ slug: `cat-${run}`, name: 'Anklets', imageUrl: null, parentId: null, sortOrder: 50 });
     const renamed = await adminApi.saveCategory({ ...cat, name: 'Payal' });
     expect(renamed.name).toBe('Payal');
@@ -108,9 +102,6 @@ describe('Supabase adapter', () => {
     await expect(adminApi.saveCategory({ ...cat, parentId: other.id })).rejects.toThrow(/cannot become a sub-category/);
     await adminApi.deleteCategory(cat.id);
     expect((await adminApi.listCategories()).some((c) => c.id === sub.id)).toBe(false);
-    const col = await adminApi.saveCollection({ slug: `col-${run}`, name: 'Festive', tagline: 't', imageUrl: null, sortOrder: 50 });
-    expect((await adminApi.saveCollection({ ...col, tagline: 'Diwali' })).tagline).toBe('Diwali');
-    await adminApi.deleteCollection(col.id);
   });
 
   it('round-trips wishlist, saved lists, enquiries and profile edits for a customer', async () => {

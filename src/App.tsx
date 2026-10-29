@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { Outlet, RouterProvider, createBrowserRouter, type RouteObject } from 'react-router-dom';
+import { Navigate, Outlet, RouterProvider, createBrowserRouter, type RouteObject } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
@@ -27,7 +27,7 @@ import { NotFound } from './pages/NotFound';
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard').then((m) => ({ default: m.AdminDashboard })));
 const AdminProducts = lazy(() => import('./pages/admin/AdminProducts').then((m) => ({ default: m.AdminProducts })));
 const ProductEditor = lazy(() => import('./pages/admin/ProductEditor').then((m) => ({ default: m.ProductEditor })));
-const AdminTaxonomy = lazy(() => import('./pages/admin/AdminTaxonomy').then((m) => ({ default: m.AdminTaxonomy })));
+const AdminCategories = lazy(() => import('./pages/admin/AdminCategories').then((m) => ({ default: m.AdminCategories })));
 const AdminEnquiries = lazy(() => import('./pages/admin/AdminEnquiries').then((m) => ({ default: m.AdminEnquiries })));
 const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers').then((m) => ({ default: m.AdminCustomers })));
 
@@ -68,7 +68,8 @@ export const routes: RouteObject[] = [
         children: [
           { path: '/', element: <Home /> },
           { path: '/categories', element: <Categories /> },
-          { path: '/collections', element: <Categories initialTab="collections" /> },
+          // Old collection links keep working by landing on Categories
+          { path: '/collections', element: <Navigate to="/categories" replace /> },
           { path: '/catalogue', element: <Catalogue /> },
           { path: '/search', element: <Search /> },
           { path: '/product/:slug', element: <ProductDetail /> },
@@ -89,8 +90,8 @@ export const routes: RouteObject[] = [
           { path: '/admin/products', element: admin(<AdminProducts />) },
           { path: '/admin/products/new', element: admin(<ProductEditor />) },
           { path: '/admin/products/:id', element: admin(<ProductEditor />) },
-          { path: '/admin/categories', element: admin(<AdminTaxonomy kind="categories" />) },
-          { path: '/admin/collections', element: admin(<AdminTaxonomy kind="collections" />) },
+          { path: '/admin/categories', element: admin(<AdminCategories />) },
+          { path: '/admin/collections', element: <Navigate to="/admin/categories" replace /> },
           { path: '/admin/enquiries', element: admin(<AdminEnquiries />) },
           { path: '/admin/customers', element: admin(<AdminCustomers />) },
 

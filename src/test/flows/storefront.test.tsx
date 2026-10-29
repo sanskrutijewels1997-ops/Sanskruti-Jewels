@@ -8,13 +8,13 @@ import { seedCategories, seedProducts } from '../../data/seed';
 const search = (router: ReturnType<typeof renderApp>['router']) => router.state.location.search;
 
 describe('Home', () => {
-  it('shows category shortcuts, rails and collections', async () => {
+  it('shows category shortcuts and rails', async () => {
     renderApp('/');
     expect(await screen.findByRole('heading', { name: 'New Arrivals' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Trending Now' })).toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Curated Collections' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Curated Collections' })).not.toBeInTheDocument();
     const cats = screen.getByRole('navigation', { name: 'Categories' });
-    expect(within(cats).getByText('Short Necklace')).toBeInTheDocument();
+    expect(await within(cats).findByText('Short Necklace')).toBeInTheDocument();
     // Only main categories appear as circles, not sub-categories
     expect(within(cats).queryByText('Gents Rings')).not.toBeInTheDocument();
     // Bottom tab bar is present on tab roots
@@ -30,12 +30,18 @@ describe('Home', () => {
 });
 
 describe('Categories', () => {
-  it('switches between categories and collections', async () => {
-    const user = userEvent.setup();
+  it('lists main categories with their type and design counts', async () => {
     renderApp('/categories');
     expect(await screen.findByText('All Jewellery')).toBeInTheDocument();
-    await user.click(screen.getByRole('tab', { name: 'collections' }));
-    expect(await screen.findByText('Bridal Collection')).toBeInTheDocument();
+    const rings = await screen.findByRole('link', { name: /^Rings/ });
+    expect(rings).toHaveAttribute('href', '/catalogue?category=rings');
+    expect(rings).toHaveTextContent('3 types');
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+  });
+
+  it('redirects old collection links to Categories', async () => {
+    const { router } = renderApp('/collections');
+    await waitFor(() => expect(router.state.location.pathname).toBe('/categories'));
   });
 });
 

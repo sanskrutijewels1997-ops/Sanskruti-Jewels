@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { DEMO_ACCOUNTS, createDemoBackend } from './demo';
-import { seedCategories, seedCollections, seedProducts } from '../../data/seed';
+import { seedCategories, seedProducts } from '../../data/seed';
 import type { ProductInput } from '../../types';
 
 const api = createDemoBackend();
@@ -14,7 +14,6 @@ function input(over: Partial<ProductInput> = {}): ProductInput {
     name: 'Test Ring',
     description: '',
     categoryId: null,
-    collectionId: null,
     style: 'Modern',
     metal: 'Gold',
     purity: '22K',
@@ -47,7 +46,6 @@ describe('seed data', () => {
   it('loads the starter catalogue', async () => {
     expect(await api.listProducts()).toHaveLength(seedProducts.length);
     expect(await api.listCategories()).toHaveLength(seedCategories.length);
-    expect(await api.listCollections()).toHaveLength(seedCollections.length);
   });
 
   it('links every seeded product to its category and keeps image order', async () => {
@@ -148,25 +146,18 @@ describe('admin catalogue management', () => {
     expect(again?.name).not.toBe('Mutated');
   });
 
-  it('un-links products when their category or collection is deleted', async () => {
+  it('un-links products when their category is deleted', async () => {
     const [cat] = await api.listCategories();
-    const [col] = await api.listCollections();
     await api.deleteCategory(cat.id);
-    await api.deleteCollection(col.id);
     const products = await api.listProducts();
-    expect(products.some((p) => p.categoryId === cat.id || p.collectionId === col.id)).toBe(false);
+    expect(products.some((p) => p.categoryId === cat.id)).toBe(false);
   });
 
-  it('creates and renames categories and collections, rejecting duplicate slugs', async () => {
+  it('creates and renames categories, rejecting duplicate slugs', async () => {
     const cat = await api.saveCategory({ slug: 'anklets', name: 'Anklets', imageUrl: null, parentId: null, sortOrder: 99 });
     await api.saveCategory({ ...cat, name: 'Payal' });
     expect((await api.listCategories()).find((c) => c.id === cat.id)?.name).toBe('Payal');
     await expect(api.saveCategory({ slug: 'anklets', name: 'Dup', imageUrl: null, parentId: null, sortOrder: 0 })).rejects.toThrow('already exists');
-
-    const col = await api.saveCollection({ slug: 'festive', name: 'Festive', tagline: 't', imageUrl: null, sortOrder: 9 });
-    await api.saveCollection({ ...col, tagline: 'Diwali' });
-    expect((await api.listCollections()).find((c) => c.id === col.id)?.tagline).toBe('Diwali');
-    await expect(api.saveCollection({ slug: 'festive', name: 'x', tagline: '', imageUrl: null, sortOrder: 0 })).rejects.toThrow('already exists');
   });
 
   it('keeps sub-categories one level deep and deletes them with their parent', async () => {

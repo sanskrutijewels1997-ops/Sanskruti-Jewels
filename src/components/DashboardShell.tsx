@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  FoldersIcon,
   LayoutDashboardIcon,
   MessageSquareIcon,
   PackageIcon,
@@ -20,7 +19,6 @@ export const adminNav: NavItem[] = [
   { label: 'Dashboard', to: '/admin', icon: LayoutDashboardIcon },
   { label: 'Products', to: '/admin/products', icon: PackageIcon },
   { label: 'Categories', to: '/admin/categories', icon: TagsIcon },
-  { label: 'Collections', to: '/admin/collections', icon: FoldersIcon },
   { label: 'Enquiries', to: '/admin/enquiries', icon: MessageSquareIcon },
   { label: 'Customers', to: '/admin/customers', icon: UsersIcon }
 ];

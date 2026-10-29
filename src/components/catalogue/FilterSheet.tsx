@@ -31,8 +31,8 @@ export function FilterSheet({
   q: string;
   onApply: (f: Filters) => void;
 }) {
-  const { published, categories, collections, categoryName } = useCatalogue();
-  const lookups = useMemo(() => ({ categories, collections, categoryName }), [categories, collections, categoryName]);
+  const { published, categories, categoryName } = useCatalogue();
+  const lookups = useMemo(() => ({ categories, categoryName }), [categories, categoryName]);
   const [draft, setDraft] = useState(value);
   const [facet, setFacet] = useState<Facet>('categories');
 
@@ -50,7 +50,6 @@ export function FilterSheet({
         { value: c.slug, label: c.name },
         ...categories.filter((s) => s.parentId === c.id).map((s) => ({ value: s.slug, label: s.name, sub: true }))
       ]),
-    collections: collections.map((c) => ({ value: c.slug, label: c.name })),
     metals: metals.map((m) => ({ value: m, label: m })),
     purities: purities.map((m) => ({ value: m, label: m })),
     styles: styles.map((m) => ({ value: m, label: m })),
@@ -59,7 +58,6 @@ export function FilterSheet({
 
   const facets: { key: Facet; label: string; count: number }[] = [
     { key: 'categories', label: 'Category', count: draft.categories.length },
-    { key: 'collections', label: 'Collection', count: draft.collections.length },
     { key: 'metals', label: 'Metal', count: draft.metals.length },
     { key: 'purities', label: 'Purity', count: draft.purities.length },
     { key: 'styles', label: 'Style', count: draft.styles.length },

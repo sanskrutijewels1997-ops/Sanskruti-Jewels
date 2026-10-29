@@ -1,7 +1,6 @@
 import type {
   AdminStats,
   Category,
-  Collection,
   Enquiry,
   EnquiryInput,
   EnquiryStatus,
@@ -51,7 +50,6 @@ export interface Backend {
   // catalogue (published only, unless the caller is an admin)
   listProducts(): Promise<Product[]>;
   listCategories(): Promise<Category[]>;
-  listCollections(): Promise<Collection[]>;
   recordView(productId: string): Promise<void>;
 
   // admin catalogue management
@@ -59,8 +57,6 @@ export interface Backend {
   deleteProduct(id: string): Promise<void>;
   saveCategory(input: Omit<Category, 'id'> & { id?: string }): Promise<Category>;
   deleteCategory(id: string): Promise<void>;
-  saveCollection(input: Omit<Collection, 'id'> & { id?: string }): Promise<Collection>;
-  deleteCollection(id: string): Promise<void>;
   uploadImage(file: Blob, folder: string): Promise<{ url: string; storagePath: string | null }>;
   removeImages(storagePaths: string[]): Promise<void>;
   adminStats(): Promise<AdminStats>;

@@ -1,9 +1,8 @@
-import type { Category, Collection, Product } from '../types';
+import type { Category, Product } from '../types';
 
 /** Catalogue filters. They live in the URL so Back restores the exact list. */
 export interface Filters {
   categories: string[]; // category slugs
-  collections: string[]; // collection slugs
   metals: string[];
   purities: string[];
   styles: string[];
@@ -12,13 +11,12 @@ export interface Filters {
   newOnly: boolean;
 }
 
-export type ListFacet = 'categories' | 'collections' | 'metals' | 'purities' | 'styles' | 'availability';
+export type ListFacet = 'categories' | 'metals' | 'purities' | 'styles' | 'availability';
 
 export const MAX_WEIGHT = 120;
 
 export const emptyFilters: Filters = {
   categories: [],
-  collections: [],
   metals: [],
   purities: [],
   styles: [],
@@ -29,7 +27,6 @@ export const emptyFilters: Filters = {
 
 const LIST_PARAMS: Record<ListFacet, string> = {
   categories: 'category',
-  collections: 'collection',
   metals: 'metal',
   purities: 'purity',
   styles: 'style',
@@ -71,12 +68,11 @@ export function activeCount(f: Filters) {
 
 interface Lookups {
   categories: Category[];
-  collections: Collection[];
   categoryName: (id: string | null) => string;
 }
 
 /**
- * The values a product has for a list facet (slugs for categories/collections).
+ * The values a product has for a list facet (slugs for categories).
  * A product in a sub-category also counts for its parent, so choosing "Rings" includes
  * "Gents Rings" and "Ladies Rings".
  */
@@ -87,10 +83,6 @@ export function facetValues(p: Product, facet: ListFacet, l: Lookups): string[] 
       if (!own) return [];
       const parent = own.parentId ? l.categories.find((c) => c.id === own.parentId) : undefined;
       return parent ? [own.slug, parent.slug] : [own.slug];
-    }
-    case 'collections': {
-      const slug = l.collections.find((c) => c.id === p.collectionId)?.slug;
-      return slug ? [slug] : [];
     }
     case 'metals':
       return [p.metal];

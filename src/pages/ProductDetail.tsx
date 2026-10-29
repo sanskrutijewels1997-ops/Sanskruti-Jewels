@@ -31,7 +31,7 @@ import type { Product } from '../types';
 
 export function ProductDetail() {
   const { slug } = useParams();
-  const { products, categories, loading, categoryName, categoryPath, collectionName, byId } = useCatalogue();
+  const { products, categories, loading, categoryName, categoryPath, byId } = useCatalogue();
   const { isAdmin } = useAuth();
   const { isWishlisted, toggleWishlist, openEnquiry, openListPicker, markViewed, recentlyViewed, notify } = useApp();
   const goBack = useGoBack('/catalogue');
@@ -71,7 +71,7 @@ export function ProductDetail() {
   const categorySlug = categories.find((c) => c.id === product.categoryId)?.slug;
   const published = products.filter((p) => p.isPublished);
   const similar = published
-    .filter((p) => p.id !== product.id && (p.categoryId === product.categoryId || p.collectionId === product.collectionId))
+    .filter((p) => p.id !== product.id && p.categoryId === product.categoryId)
     .slice(0, 10);
   const recent = recentlyViewed
     .filter((r) => r !== product.id)
@@ -80,6 +80,7 @@ export function ProductDetail() {
     .slice(0, 10);
 
   const grams = (v: number | null) => (v === null ? '' : `${v} g`);
+  const stoneWeight = product.stoneWeight === 0 ? 'No stones' : grams(product.stoneWeight);
   const range = product.weightMin !== null || product.weightMax !== null ? formatWeight({ weightMin: product.weightMin, weightMax: product.weightMax }) : '';
   // Core trade specs first, then the optional details.
   const specs = [
@@ -87,11 +88,10 @@ export function ProductDetail() {
     ['Make', product.make],
     ['Purity', product.purity],
     ['Gross weight', grams(product.grossWeight)],
-    ['Stone weight', grams(product.stoneWeight)],
+    ['Stone weight', stoneWeight],
     ['Net weight', grams(product.netWeight)],
     ['Qty', product.quantity === null ? '' : String(product.quantity)],
     ['SKU', product.sku],
-    ['Collection', collectionName(product.collectionId)],
     ['Style', product.style],
     ['Metal', product.metal],
     ['Weight range', product.grossWeight === null ? range : ''],
@@ -180,7 +180,7 @@ export function ProductDetail() {
                 [GemIcon, 'Purity', product.purity],
                 [ScaleIcon, 'Gross weight', grams(product.grossWeight) || formatWeight(product)],
                 [ScaleIcon, 'Net weight', grams(product.netWeight)],
-                [SparklesIcon, 'Stone weight', grams(product.stoneWeight)],
+                [SparklesIcon, 'Stone weight', stoneWeight],
                 [HammerIcon, 'Make', product.make],
                 [PackageIcon, 'Qty', product.quantity === null ? '' : String(product.quantity)]
               ] as const

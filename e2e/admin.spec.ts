@@ -27,10 +27,11 @@ test('admin creates, publishes and unpublishes a product with photos', async ({ 
   await page.getByLabel('Category').selectOption({ label: 'Pendant' });
   await page.getByRole('combobox', { name: 'Make', exact: true }).fill('Handmade');
   await page.getByLabel('Gross weight (g)').fill('6.4');
+  await page.getByRole('radiogroup', { name: 'Has stones?' }).getByRole('radio', { name: 'Yes' }).click();
   await page.getByLabel('Stone weight (g)').fill('0.4');
   await expect(page.getByLabel('Net weight (g)')).toHaveValue('6');
   await page.getByLabel('Qty').fill('2');
-  await page.getByRole('radio', { name: 'Yes' }).click();
+  await page.getByRole('radiogroup', { name: 'Trending' }).getByRole('radio', { name: 'Yes' }).click();
   await page.getByRole('button', { name: 'Add specification' }).click();
   await page.getByLabel('Specification 2 label').fill('Gemstone');
   await page.getByLabel('Specification 2 value').fill('Emerald');

@@ -34,7 +34,7 @@ export function PageHeader({
 }) {
   const goBack = useGoBack(fallback);
   return (
-    <header className="pt-safe sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:pt-0 lg:backdrop-blur-none">
+    <header className="pt-safe sticky top-0 z-30 border-b border-line bg-surface lg:static lg:border-0 lg:bg-transparent lg:pt-0">
       <div className="mx-auto flex h-14 max-w-site items-center gap-1 px-2 lg:h-auto lg:px-6 lg:pb-2 lg:pt-8">
         {back && (
           <button

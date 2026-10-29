@@ -11,17 +11,15 @@ import {
   sortProducts,
   toParams
 } from './filters';
-import type { Category, Collection, Product } from '../types';
+import type { Category, Product } from '../types';
 
 const categories: Category[] = [
   { id: 'c-ring', slug: 'rings', name: 'Rings', parentId: null, imageUrl: null, sortOrder: 0 },
   { id: 'c-neck', slug: 'necklaces', name: 'Necklaces', parentId: null, imageUrl: null, sortOrder: 1 },
   { id: 'c-gents', slug: 'gents-rings', name: 'Gents Rings', parentId: 'c-ring', imageUrl: null, sortOrder: 2 }
 ];
-const collections: Collection[] = [{ id: 'k-bridal', slug: 'bridal', name: 'Bridal', tagline: '', imageUrl: null, sortOrder: 0 }];
 const lookups = {
   categories,
-  collections,
   categoryName: (id: string | null) => categories.find((c) => c.id === id)?.name ?? ''
 };
 
@@ -33,7 +31,6 @@ function product(over: Partial<Product>): Product {
     name: 'Piece',
     description: '',
     categoryId: null,
-    collectionId: null,
     style: 'Modern',
     metal: 'Gold',
     purity: '22K',
@@ -62,7 +59,7 @@ function product(over: Partial<Product>): Product {
 }
 
 const ring = product({ sku: 'R1', name: 'Solitaire Ring', categoryId: 'c-ring', metal: 'Diamond', purity: '18K', weightMin: 3, price: 50000, showPrice: true, views: 10, createdAt: '2026-03-01T00:00:00Z' });
-const choker = product({ sku: 'N1', name: 'Kundan Bridal Choker', categoryId: 'c-neck', collectionId: 'k-bridal', weightMin: 60, isNew: true, availability: 'Made to Order', views: 99, createdAt: '2026-02-01T00:00:00Z' });
+const choker = product({ sku: 'N1', name: 'Kundan Bridal Choker', categoryId: 'c-neck', weightMin: 60, isNew: true, availability: 'Made to Order', views: 99, createdAt: '2026-02-01T00:00:00Z' });
 const chain = product({ sku: 'N2', name: 'Rope Chain', categoryId: 'c-neck', weightMin: 9, price: 20000, showPrice: true, views: 5, createdAt: '2026-01-01T00:00:00Z' });
 const hidden = product({ sku: 'N3', name: 'Hidden Price Chain', categoryId: 'c-neck', price: 1000, showPrice: false, createdAt: '2025-12-01T00:00:00Z' });
 const all = [ring, choker, chain, hidden];
@@ -72,7 +69,6 @@ describe('URL params', () => {
     const f = {
       ...emptyFilters,
       categories: ['rings', 'necklaces'],
-      collections: ['bridal'],
       metals: ['Gold'],
       purities: ['22K'],
       styles: ['Temple'],
@@ -105,9 +101,8 @@ describe('applyFilters', () => {
   const run = (over: Partial<typeof emptyFilters>, q = '') =>
     applyFilters(all, { ...emptyFilters, ...over }, q, lookups).map((p) => p.sku);
 
-  it('filters by category and collection slug', () => {
+  it('filters by category slug', () => {
     expect(run({ categories: ['rings'] })).toEqual(['R1']);
-    expect(run({ collections: ['bridal'] })).toEqual(['N1']);
   });
 
   it('combines values within a facet with OR and across facets with AND', () => {

@@ -26,7 +26,7 @@ const metalTiles = [
 ];
 
 export function Home() {
-  const { published, topCategories, collections, byId, loading } = useCatalogue();
+  const { published, topCategories, byId, loading } = useCatalogue();
   const { recentlyViewed, openEnquiry } = useApp();
   const recent = recentlyViewed
     .map((id) => byId(id))
@@ -44,7 +44,7 @@ export function Home() {
         <Logo />
         <SinceBadge />
       </div>
-      <header className="sticky top-[env(safe-area-inset-top)] z-30 bg-bg/95 backdrop-blur-md lg:hidden">
+      <header className="sticky top-[env(safe-area-inset-top)] z-30 bg-bg lg:hidden">
         <div className="px-4 pb-3">
           <Link
             to="/search"
@@ -100,37 +100,6 @@ export function Home() {
           ))}
         </div>
       </section>
-
-      {collections.length > 0 && (
-        <section className="py-6 lg:py-10">
-          <SectionHeader
-            title="Curated Collections"
-            action={
-              <Link to="/collections" className="flex shrink-0 items-center text-[13px] font-semibold text-brand">
-                All <ChevronRightIcon className="h-4 w-4" />
-              </Link>
-            }
-          />
-          <div className="mt-4 grid grid-cols-2 gap-3 px-4 lg:grid-cols-3 lg:gap-5 lg:px-0">
-            {collections.slice(0, 6).map((c) => (
-              <Link
-                key={c.id}
-                to={`/catalogue?collection=${c.slug}`}
-                className="pressable relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-xl bg-surface-2 lg:aspect-[4/3]"
-              >
-                {c.imageUrl && <img src={c.imageUrl} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />}
-                <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" aria-hidden="true" />
-                <span className="relative p-3 text-white lg:p-5">
-                  <span className="block font-display text-lg font-semibold leading-tight lg:text-2xl">{c.name}</span>
-                  <span className="mt-0.5 block text-[11px] opacity-80">
-                    {published.filter((p) => p.collectionId === c.id).length} designs
-                  </span>
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
 
       <ProductRail
         title="Trending Now"
@@ -248,27 +217,28 @@ function CategoryCircle({ to, label, children }: { to: string; label: string; ch
 
 /** Swipeable promo banners that auto-advance, with page dots. */
 function HeroCarousel() {
-  const { collections } = useCatalogue();
+  const { topCategories } = useCatalogue();
   const trackRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
 
   const slides = [
     {
       key: 'hero',
-      to: '/catalogue?collection=bridal',
+      to: '/catalogue',
       image: '/images/hero.jpg',
-      eyebrow: 'The Bridal Edit',
+      eyebrow: 'Handcrafted since 1977',
       title: 'Heirlooms for your big day',
-      cta: 'Shop bridal'
+      cta: 'Explore designs'
     },
-    ...collections
-      .filter((c) => c.imageUrl && c.slug !== 'bridal')
+    // Then a few main categories that have a photo
+    ...topCategories
+      .filter((c) => c.imageUrl)
       .slice(0, 4)
       .map((c) => ({
         key: c.id,
-        to: `/catalogue?collection=${c.slug}`,
+        to: `/catalogue?category=${c.slug}`,
         image: c.imageUrl as string,
-        eyebrow: 'Collection',
+        eyebrow: 'Shop by category',
         title: c.name,
         cta: 'Explore'
       }))

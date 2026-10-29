@@ -16,7 +16,7 @@ export function BottomTabBar() {
   return (
     <nav
       aria-label="Main"
-      className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur-md lg:hidden"
+      className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface lg:hidden"
     >
       <ul className="grid h-tabbar grid-cols-4">
         {tabs.map(({ to, label, icon: Icon }) => (

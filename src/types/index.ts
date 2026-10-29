@@ -25,15 +25,6 @@ export interface Category {
   sortOrder: number;
 }
 
-export interface Collection {
-  id: string;
-  slug: string;
-  name: string;
-  tagline: string;
-  imageUrl: string | null;
-  sortOrder: number;
-}
-
 export interface Product {
   id: string;
   sku: string;
@@ -41,7 +32,6 @@ export interface Product {
   name: string;
   description: string;
   categoryId: string | null;
-  collectionId: string | null;
   style: string;
   metal: string;
   purity: string;

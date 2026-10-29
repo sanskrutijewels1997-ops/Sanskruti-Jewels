@@ -49,7 +49,10 @@ describe('Product editor', () => {
     await user.selectOptions(screen.getByLabelText('Category', { exact: false }), 'Pendant');
     await user.type(screen.getByLabelText('Make', { exact: false }), 'Handmade');
     await user.type(screen.getByLabelText('Gross weight (g)', { exact: false }), '10.5');
-    await user.clear(screen.getByLabelText('Stone weight (g)', { exact: false }));
+    // Stone weight only appears once "Has stones?" is answered Yes
+    expect(screen.getByText('Say whether the piece has stones.')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Stone weight (g)', { exact: false })).not.toBeInTheDocument();
+    await user.click(within(screen.getByRole('radiogroup', { name: 'Has stones?' })).getByRole('radio', { name: 'Yes' }));
     await user.type(screen.getByLabelText('Stone weight (g)', { exact: false }), '0.75');
     // Screen readers hear "Gross weight (g)", not the visual asterisk
     expect(screen.getByRole('spinbutton', { name: 'Gross weight (g)' })).toBeRequired();
@@ -58,7 +61,7 @@ describe('Product editor', () => {
     expect(screen.getByLabelText('Net weight (g)', { exact: false })).toHaveValue(9.75);
     await user.clear(screen.getByLabelText('Qty', { exact: false }));
     await user.type(screen.getByLabelText('Qty', { exact: false }), '3');
-    await user.click(screen.getByRole('radio', { name: 'Yes' }));
+    await user.click(within(screen.getByRole('radiogroup', { name: 'Trending' })).getByRole('radio', { name: 'Yes' }));
     await user.type(screen.getByLabelText('Price (₹)'), '45000');
     await user.click(screen.getByRole('button', { name: 'Add specification' }));
     await user.type(screen.getByLabelText('Specification 2 label'), 'Gemstone');
@@ -82,6 +85,30 @@ describe('Product editor', () => {
     });
     expect(saved.specifications).toContainEqual({ label: 'Gemstone', value: 'Emerald' });
     expect(await screen.findByRole('button', { name: 'Save changes' })).toBeInTheDocument();
+  });
+
+  it('saves no stone weight when the piece has no stones', async () => {
+    const user = userEvent.setup();
+    const product = (await api.listProducts()).find((p) => (p.stoneWeight ?? 0) > 0)!;
+    renderApp(`/admin/products/${product.id}`);
+    const stones = within(await screen.findByRole('radiogroup', { name: 'Has stones?' }));
+    await waitFor(() => expect(stones.getByRole('radio', { name: 'Yes' })).toBeChecked());
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByText('Changes saved');
+
+    // Yes with a blank weight is rejected
+    await user.clear(screen.getByLabelText('Stone weight (g)', { exact: false }));
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    expect(await screen.findByText('Stone weight is required and must be more than 0.')).toBeInTheDocument();
+
+    // No hides the field, and net weight follows gross
+    await user.click(stones.getByRole('radio', { name: 'No' }));
+    expect(screen.queryByLabelText('Stone weight (g)', { exact: false })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Net weight (g)', { exact: false })).toHaveValue(product.grossWeight);
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await waitFor(async () =>
+      expect((await api.listProducts()).find((p) => p.id === product.id)).toMatchObject({ stoneWeight: 0, netWeight: product.grossWeight })
+    );
   });
 
   it('rejects stone or net weight above the gross weight', async () => {
@@ -150,7 +177,7 @@ describe('Products list', () => {
   });
 });
 
-describe('Categories & collections', () => {
+describe('Categories', () => {
   it('adds a category from the sheet', async () => {
     const user = userEvent.setup();
     renderApp('/admin/categories');
@@ -162,12 +189,13 @@ describe('Categories & collections', () => {
     expect((await api.listCategories()).some((c) => c.slug === 'toe-rings')).toBe(true);
   });
 
-  it('deletes a collection after confirmation', async () => {
+  it('deletes a category after confirmation', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     const user = userEvent.setup();
-    renderApp('/admin/collections');
-    await user.click(await screen.findByRole('button', { name: 'Delete Bridal Collection' }));
-    await waitFor(async () => expect((await api.listCollections()).some((c) => c.slug === 'bridal')).toBe(false));
+    const { router } = renderApp('/admin/collections');
+    await waitFor(() => expect(router.state.location.pathname).toBe('/admin/categories'));
+    await user.click(await screen.findByRole('button', { name: 'Delete Tika' }));
+    await waitFor(async () => expect((await api.listCategories()).some((c) => c.slug === 'tika')).toBe(false));
   });
 });
 

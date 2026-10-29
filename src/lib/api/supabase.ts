@@ -1,7 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type {
   Category,
-  Collection,
   Enquiry,
   Product,
   ProductImage,
@@ -30,7 +29,6 @@ function toProduct(r: any): Product {
     name: r.name,
     description: r.description,
     categoryId: r.category_id,
-    collectionId: r.collection_id,
     style: r.style,
     metal: r.metal,
     purity: r.purity,
@@ -71,17 +69,6 @@ function toProfile(r: any): Profile {
 
 function toCategory(r: any): Category {
   return { id: r.id, slug: r.slug, name: r.name, parentId: r.parent_id ?? null, imageUrl: r.image_url, sortOrder: r.sort_order };
-}
-
-function toCollection(r: any): Collection {
-  return {
-    id: r.id,
-    slug: r.slug,
-    name: r.name,
-    tagline: r.tagline,
-    imageUrl: r.image_url,
-    sortOrder: r.sort_order
-  };
 }
 
 function toEnquiry(r: any): Enquiry {
@@ -183,10 +170,6 @@ export function createSupabaseBackend(url: string, anonKey: string): Backend {
       const data = must(await sb.from('categories').select('*').order('sort_order').order('name'));
       return (data as any[]).map(toCategory);
     },
-    async listCollections() {
-      const data = must(await sb.from('collections').select('*').order('sort_order').order('name'));
-      return (data as any[]).map(toCollection);
-    },
     async recordView(productId) {
       await sb.rpc('record_product_view', { p_product_id: productId });
     },
@@ -198,7 +181,6 @@ export function createSupabaseBackend(url: string, anonKey: string): Backend {
         name: input.name,
         description: input.description,
         category_id: input.categoryId,
-        collection_id: input.collectionId,
         style: input.style,
         metal: input.metal,
         purity: input.purity,
@@ -263,22 +245,6 @@ export function createSupabaseBackend(url: string, anonKey: string): Backend {
     },
     async deleteCategory(id) {
       must(await sb.from('categories').delete().eq('id', id));
-    },
-    async saveCollection(input) {
-      const row = {
-        slug: input.slug,
-        name: input.name,
-        tagline: input.tagline,
-        image_url: input.imageUrl,
-        sort_order: input.sortOrder
-      };
-      const q = input.id
-        ? sb.from('collections').update(row).eq('id', input.id)
-        : sb.from('collections').insert(row);
-      return toCollection(must(await q.select().single()));
-    },
-    async deleteCollection(id) {
-      must(await sb.from('collections').delete().eq('id', id));
     },
     async uploadImage(file, folder) {
       const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';

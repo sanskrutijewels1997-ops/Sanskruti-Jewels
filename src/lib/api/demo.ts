@@ -1,7 +1,6 @@
-import { seedCategories, seedCollections, seedProducts } from '../../data/seed';
+import { seedCategories, seedProducts } from '../../data/seed';
 import type {
   Category,
-  Collection,
   Enquiry,
   Product,
   Profile,
@@ -17,7 +16,7 @@ import type { AuthUser, Backend } from './types';
  */
 
 // Bump when the seed shape changes so browsers re-seed instead of loading stale data.
-const KEY = 'sanskruti-demo-db-v3';
+const KEY = 'sanskruti-demo-db-v4';
 
 interface DemoUser {
   id: string;
@@ -30,7 +29,6 @@ interface DB {
   profiles: Profile[];
   session: string | null;
   categories: Category[];
-  collections: Collection[];
   products: Product[];
   wishlist: { userId: string; productId: string; createdAt: string }[];
   lists: (Omit<SavedList, 'productIds'> & { userId: string })[];
@@ -56,14 +54,6 @@ function seed(): DB {
     imageUrl: c.image,
     sortOrder: i
   }));
-  const collections: Collection[] = seedCollections.map((c, i) => ({
-    id: uid(),
-    slug: c.slug,
-    name: c.name,
-    tagline: c.tagline,
-    imageUrl: c.image,
-    sortOrder: i
-  }));
   const products: Product[] = seedProducts.map((p) => {
     const created = new Date(Date.now() - p.ageDays * 86400000).toISOString();
     return {
@@ -73,7 +63,6 @@ function seed(): DB {
       name: p.name,
       description: p.description,
       categoryId: categories.find((c) => c.slug === p.category)?.id ?? null,
-      collectionId: collections.find((c) => c.slug === p.collection)?.id ?? null,
       style: p.style,
       metal: p.metal,
       purity: p.purity,
@@ -128,7 +117,6 @@ function seed(): DB {
     ],
     session: null,
     categories,
-    collections,
     products,
     wishlist: [],
     lists: [],
@@ -273,9 +261,6 @@ export function createDemoBackend(): Backend {
     async listCategories() {
       return tick([...db.categories].sort((a, b) => a.sortOrder - b.sortOrder));
     },
-    async listCollections() {
-      return tick([...db.collections].sort((a, b) => a.sortOrder - b.sortOrder));
-    },
     async recordView(productId) {
       const p = db.products.find((x) => x.id === productId);
       if (p) p.views += 1;
@@ -341,28 +326,6 @@ export function createDemoBackend(): Backend {
       db.categories = db.categories.filter((c) => !removed.has(c.id));
       db.products.forEach((p) => {
         if (p.categoryId && removed.has(p.categoryId)) p.categoryId = null;
-      });
-      persist();
-    },
-    async saveCollection(input) {
-      requireAdmin();
-      if (db.collections.some((c) => c.id !== input.id && c.slug === input.slug)) {
-        throw new Error('A collection with this slug already exists');
-      }
-      let col = db.collections.find((c) => c.id === input.id);
-      if (col) Object.assign(col, input);
-      else {
-        col = { ...input, id: uid() };
-        db.collections.push(col);
-      }
-      persist();
-      return tick({ ...col });
-    },
-    async deleteCollection(id) {
-      requireAdmin();
-      db.collections = db.collections.filter((c) => c.id !== id);
-      db.products.forEach((p) => {
-        if (p.collectionId === id) p.collectionId = null;
       });
       persist();
     },

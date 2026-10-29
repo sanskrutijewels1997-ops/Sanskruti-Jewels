@@ -10,50 +10,34 @@ import { useApp } from '../../contexts/AppContext';
 import { api } from '../../lib/api';
 import { friendlyError, slugify } from '../../lib/format';
 import { qk, useCatalogue } from '../../lib/queries';
+import type { Category } from '../../types';
 
-type Kind = 'categories' | 'collections';
+type Item = Omit<Category, 'id'> & { id?: string };
 
-interface Item {
-  id?: string;
-  slug: string;
-  name: string;
-  tagline: string;
-  imageUrl: string | null;
-  sortOrder: number;
-  /** Categories only: set for sub-categories. */
-  parentId: string | null;
-}
-
-/** Shared CRUD screen for categories and collections — they differ only by the tagline. */
-export function AdminTaxonomy({ kind }: { kind: Kind }) {
-  const { categories, collections, products, loading } = useCatalogue();
+/** Admin screen for main categories and their sub-categories. */
+export function AdminCategories() {
+  const { categories, products, loading } = useCatalogue();
   const [editing, setEditing] = useState<Item | null>(null);
   const { notify } = useApp();
   const queryClient = useQueryClient();
-  const isCollections = kind === 'collections';
-  const singular = isCollections ? 'collection' : 'category';
 
-  // Categories: each main category followed by its sub-categories.
-  const items: Item[] = isCollections
-    ? collections.map((c) => ({ ...c, parentId: null }))
-    : categories
-        .filter((c) => !c.parentId)
-        .flatMap((c) => [c, ...categories.filter((s) => s.parentId === c.id)])
-        .map((c) => ({ ...c, tagline: '' }));
+  // Each main category followed by its sub-categories.
+  const items: Item[] = categories
+    .filter((c) => !c.parentId)
+    .flatMap((c) => [c, ...categories.filter((s) => s.parentId === c.id)]);
   const childrenOf = (id?: string) => items.filter((i) => id && i.parentId === id);
-  const usage = (id?: string) =>
-    products.filter((p) => (isCollections ? p.collectionId : p.categoryId) === id).length;
+  const usage = (id?: string) => products.filter((p) => p.categoryId === id).length;
 
   const remove = async (item: Item) => {
     const subs = childrenOf(item.id);
     const n = usage(item.id) + subs.reduce((sum, s) => sum + usage(s.id), 0);
     const warn =
       (subs.length ? ` Its ${subs.length} sub-categor${subs.length > 1 ? 'ies' : 'y'} will be deleted too.` : '') +
-      (n ? ` ${n} product${n > 1 ? 's' : ''} will be left without a ${singular}.` : '');
+      (n ? ` ${n} product${n > 1 ? 's' : ''} will be left without a category.` : '');
     if (!item.id || !window.confirm(`Delete “${item.name}”?${warn}`)) return;
     try {
-      await (isCollections ? api.deleteCollection(item.id) : api.deleteCategory(item.id));
-      queryClient.invalidateQueries({ queryKey: isCollections ? qk.collections : qk.categories });
+      await api.deleteCategory(item.id);
+      queryClient.invalidateQueries({ queryKey: qk.categories });
       queryClient.invalidateQueries({ queryKey: qk.products });
       notify(`Deleted “${item.name}”`, 'info');
     } catch (e) {
@@ -64,31 +48,27 @@ export function AdminTaxonomy({ kind }: { kind: Kind }) {
   return (
     <DashboardShell
       eyebrow="Catalogue"
-      title={isCollections ? 'Collections' : 'Categories'}
-      subtitle={
-        isCollections
-          ? 'Curated groupings shown on the home page, e.g. Bridal, Everyday.'
-          : 'Main categories and their sub-categories, e.g. Rings › Gents Rings.'
-      }
+      title="Categories"
+      subtitle="Main categories and their sub-categories, e.g. Rings › Gents Rings."
       nav={adminNav}
       actions={
         <button
           type="button"
           onClick={() =>
-            setEditing({ slug: '', name: '', tagline: '', imageUrl: null, sortOrder: items.length, parentId: null })
+            setEditing({ slug: '', name: '', imageUrl: null, sortOrder: items.length, parentId: null })
           }
           className={primaryButton}
         >
-          <PlusIcon className="h-4 w-4" /> Add {singular}
+          <PlusIcon className="h-4 w-4" /> Add category
         </button>
       }
     >
       {loading ? (
         <PageLoader />
       ) : items.length === 0 ? (
-        <EmptyState title={`No ${kind} yet`} />
+        <EmptyState title="No categories yet" />
       ) : (
-        <ul className={isCollections ? 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3' : 'space-y-2'}>
+        <ul className="space-y-2">
           {items.map((item) => (
             <li
               key={item.id}
@@ -110,11 +90,11 @@ export function AdminTaxonomy({ kind }: { kind: Kind }) {
                   {usage(item.id)} {usage(item.id) === 1 ? 'product' : 'products'}
                 </p>
               </div>
-              {!isCollections && !item.parentId && (
+              {!item.parentId && (
                 <button
                   type="button"
                   onClick={() =>
-                    setEditing({ slug: '', name: '', tagline: '', imageUrl: null, sortOrder: items.length, parentId: item.id ?? null })
+                    setEditing({ slug: '', name: '', imageUrl: null, sortOrder: items.length, parentId: item.id ?? null })
                   }
                   aria-label={`Add sub-category to ${item.name}`}
                   title="Add sub-category"
@@ -147,24 +127,18 @@ export function AdminTaxonomy({ kind }: { kind: Kind }) {
       <BottomSheet
         open={!!editing}
         onClose={() => setEditing(null)}
-        title={editing?.id ? `Edit ${editing.name}` : editing?.parentId ? 'New sub-category' : `New ${singular}`}
+        title={editing?.id ? `Edit ${editing.name}` : editing?.parentId ? 'New sub-category' : 'New category'}
         className="sm:max-w-lg"
       >
         {editing && (
-          <TaxonomyForm
-            key={editing.id ?? 'new'}
-            item={editing}
-            kind={kind}
-            onDone={() => setEditing(null)}
-          />
+          <CategoryForm key={editing.id ?? 'new'} item={editing} onDone={() => setEditing(null)} />
         )}
       </BottomSheet>
     </DashboardShell>
   );
 }
 
-function TaxonomyForm({ item, kind, onDone }: { item: Item; kind: Kind; onDone: () => void }) {
-  const isCollections = kind === 'collections';
+function CategoryForm({ item, onDone }: { item: Item; onDone: () => void }) {
   const queryClient = useQueryClient();
   const { notify } = useApp();
   const { sessionUploads, markSaved } = useCleanupUnsavedUploads();
@@ -196,10 +170,9 @@ function TaxonomyForm({ item, kind, onDone }: { item: Item; kind: Kind; onDone: 
         imageUrl: images[0]?.url ?? null,
         sortOrder: Number(form.sortOrder) || 0
       };
-      if (isCollections) await api.saveCollection({ ...base, tagline: form.tagline.trim() });
-      else await api.saveCategory({ ...base, parentId: form.parentId || null });
+      await api.saveCategory({ ...base, parentId: form.parentId || null });
       markSaved(images.map((i) => i.storagePath));
-      queryClient.invalidateQueries({ queryKey: isCollections ? qk.collections : qk.categories });
+      queryClient.invalidateQueries({ queryKey: qk.categories });
       notify(`Saved “${base.name}”`);
       onDone();
     } catch (err) {
@@ -241,8 +214,7 @@ function TaxonomyForm({ item, kind, onDone }: { item: Item; kind: Kind; onDone: 
           />
         </Field>
       </div>
-      {!isCollections && (
-        <Field
+      <Field
           label="Parent category"
           hint={hasChildren ? 'This category has sub-categories, so it stays a main category.' : 'Leave as “None” for a main category.'}
         >
@@ -260,19 +232,13 @@ function TaxonomyForm({ item, kind, onDone }: { item: Item; kind: Kind; onDone: 
             ))}
           </select>
         </Field>
-      )}
-      {isCollections && (
-        <Field label="Tagline">
-          <input value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} className={inputClass} />
-        </Field>
-      )}
       <div>
         <p className="mb-1.5 text-xs font-medium text-ink-2">Cover image</p>
         <ImageUploader
           images={images}
           onChange={setImages}
           multiple={false}
-          folder={kind}
+          folder="categories"
           sessionUploads={sessionUploads}
           onError={(m) => setError(m)}
         />
