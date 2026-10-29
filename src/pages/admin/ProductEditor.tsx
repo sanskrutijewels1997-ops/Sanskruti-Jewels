@@ -7,7 +7,7 @@ import { ImageUploader, useCleanupUnsavedUploads, type UploadedImage } from '../
 import { ProductImageFallback } from '../../components/ProductCard';
 import { ErrorNotice, Field, PageLoader, Panel, Spinner, inputClass, primaryButton, secondaryButton } from '../../components/ui';
 import { useApp } from '../../contexts/AppContext';
-import { availabilities, metals, purities, styles } from '../../data/options';
+import { availabilities, makes, metals, purities, styles } from '../../data/options';
 import { api } from '../../lib/api';
 import { formatPrice, formatWeight, friendlyError, slugify } from '../../lib/format';
 import { qk, useCatalogue } from '../../lib/queries';
@@ -25,6 +25,11 @@ interface FormState {
   purity: string;
   weightMin: string;
   weightMax: string;
+  make: string;
+  grossWeight: string;
+  stoneWeight: string;
+  netWeight: string;
+  quantity: string;
   stone: string;
   size: string;
   availability: Availability;
@@ -48,6 +53,11 @@ const blank: FormState = {
   purity: '22K',
   weightMin: '',
   weightMax: '',
+  make: '',
+  grossWeight: '',
+  stoneWeight: '0',
+  netWeight: '',
+  quantity: '1',
   stone: '',
   size: '',
   availability: 'Ready Stock',
@@ -73,6 +83,11 @@ function fromProduct(p: Product): FormState {
     purity: p.purity,
     weightMin: num(p.weightMin),
     weightMax: num(p.weightMax),
+    make: p.make,
+    grossWeight: num(p.grossWeight),
+    stoneWeight: num(p.stoneWeight),
+    netWeight: num(p.netWeight),
+    quantity: p.quantity === null ? '' : String(p.quantity),
     stone: p.stone,
     size: p.size,
     availability: p.availability,
@@ -107,6 +122,8 @@ export function ProductEditor() {
   const [form, setForm] = useState<FormState>(blank);
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [slugTouched, setSlugTouched] = useState(false);
+  // Net weight follows gross − stone until the admin types their own value.
+  const [netTouched, setNetTouched] = useState(false);
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
@@ -118,6 +135,7 @@ export function ProductEditor() {
       setForm(fromProduct(existing));
       setImages(existing.images.map((i) => ({ url: i.url, storagePath: i.storagePath })));
       setSlugTouched(true);
+      setNetTouched(true);
       setReady(true);
     } else if (isNew) {
       setForm({ ...blank, sku: suggestSku(products) });
@@ -128,6 +146,17 @@ export function ProductEditor() {
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));
   const text = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     set(k, e.target.value as never);
+
+  const setWeight = (k: 'grossWeight' | 'stoneWeight', value: string) =>
+    setForm((f) => {
+      const next = { ...f, [k]: value };
+      const gross = Number(next.grossWeight);
+      const stoneWt = Number(next.stoneWeight || 0);
+      if (!netTouched && next.grossWeight !== '' && !Number.isNaN(gross) && !Number.isNaN(stoneWt)) {
+        next.netWeight = String(Math.max(0, Math.round((gross - stoneWt) * 1000) / 1000));
+      }
+      return next;
+    });
 
   const onName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
@@ -143,6 +172,19 @@ export function ProductEditor() {
     if (!form.name.trim()) errs.push('Name is required.');
     if (!form.sku.trim()) errs.push('SKU is required.');
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(form.slug)) errs.push('URL slug may only contain lowercase letters, numbers and dashes.');
+    // Required trade specifications
+    if (!form.categoryId) errs.push('Choose a category.');
+    if (!form.make.trim()) errs.push('Make is required.');
+    const gross = Number(form.grossWeight);
+    const stoneWt = Number(form.stoneWeight);
+    const net = Number(form.netWeight);
+    if (form.grossWeight === '' || Number.isNaN(gross) || gross <= 0) errs.push('Gross weight is required and must be more than 0.');
+    if (form.stoneWeight === '' || Number.isNaN(stoneWt) || stoneWt < 0) errs.push('Stone weight is required (enter 0 if there are no stones).');
+    else if (gross > 0 && stoneWt > gross) errs.push('Stone weight cannot exceed gross weight.');
+    if (form.netWeight === '' || Number.isNaN(net) || net < 0) errs.push('Net weight is required.');
+    else if (gross > 0 && net > gross) errs.push('Net weight cannot exceed gross weight.');
+    if (form.quantity === '' || !Number.isInteger(Number(form.quantity)) || Number(form.quantity) < 0) errs.push('Quantity must be a whole number (0 or more).');
+
     const wMin = form.weightMin === '' ? null : Number(form.weightMin);
     const wMax = form.weightMax === '' ? null : Number(form.weightMax);
     if ((wMin !== null && (Number.isNaN(wMin) || wMin < 0)) || (wMax !== null && (Number.isNaN(wMax) || wMax < 0))) {
@@ -177,6 +219,11 @@ export function ProductEditor() {
         purity: form.purity,
         weightMin: form.weightMin === '' ? null : Number(form.weightMin),
         weightMax: form.weightMax === '' ? null : Number(form.weightMax),
+        make: form.make.trim(),
+        grossWeight: Number(form.grossWeight),
+        stoneWeight: Number(form.stoneWeight),
+        netWeight: Number(form.netWeight),
+        quantity: Number(form.quantity),
         stone: form.stone.trim(),
         size: form.size.trim(),
         availability: form.availability,
@@ -237,7 +284,8 @@ export function ProductEditor() {
     price: form.price === '' ? null : Number(form.price),
     showPrice: form.showPrice,
     weightMin: form.weightMin === '' ? null : Number(form.weightMin),
-    weightMax: form.weightMax === '' ? null : Number(form.weightMax)
+    weightMax: form.weightMax === '' ? null : Number(form.weightMax),
+    grossWeight: form.grossWeight === '' ? null : Number(form.grossWeight)
   };
 
   return (
@@ -292,16 +340,6 @@ export function ProductEditor() {
                   className={inputClass}
                 />
               </Field>
-              <Field label="Category">
-                <select value={form.categoryId} onChange={text('categoryId')} className={inputClass}>
-                  <option value="">— None —</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </Field>
               <Field label="Collection">
                 <select value={form.collectionId} onChange={text('collectionId')} className={inputClass}>
                   <option value="">— None —</option>
@@ -318,18 +356,102 @@ export function ProductEditor() {
             </div>
           </Panel>
 
-          <Panel title="Specifications">
+          <Panel title="Product specifications" hint="Required for every product.">
             <div className="grid gap-4 sm:grid-cols-3">
-              <Field label="Metal">
-                <select value={form.metal} onChange={text('metal')} className={inputClass}>
-                  {metals.map((m) => (
+              <Field label="Category" required>
+                <select required value={form.categoryId} onChange={text('categoryId')} className={inputClass}>
+                  <option value="">Choose…</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Make" required>
+                <input required list="make-options" value={form.make} onChange={text('make')} className={inputClass} placeholder="Handmade" />
+                <datalist id="make-options">
+                  {makes.map((m) => (
+                    <option key={m} value={m} />
+                  ))}
+                </datalist>
+              </Field>
+              <Field label="Purity" required>
+                <select required value={form.purity} onChange={text('purity')} className={inputClass}>
+                  {purities.map((m) => (
                     <option key={m}>{m}</option>
                   ))}
                 </select>
               </Field>
-              <Field label="Purity">
-                <select value={form.purity} onChange={text('purity')} className={inputClass}>
-                  {purities.map((m) => (
+              <Field label="Gross weight (g)" required>
+                <input
+                  required
+                  type="number"
+                  step="0.001"
+                  min={0}
+                  inputMode="decimal"
+                  value={form.grossWeight}
+                  onChange={(e) => setWeight('grossWeight', e.target.value)}
+                  className={inputClass}
+                />
+              </Field>
+              <Field label="Stone weight (g)" required>
+                <input
+                  required
+                  type="number"
+                  step="0.001"
+                  min={0}
+                  inputMode="decimal"
+                  value={form.stoneWeight}
+                  onChange={(e) => setWeight('stoneWeight', e.target.value)}
+                  className={inputClass}
+                />
+              </Field>
+              <Field label="Net weight (g)" required hint={netTouched ? undefined : 'Gross − stone, edit if needed'}>
+                <input
+                  required
+                  type="number"
+                  step="0.001"
+                  min={0}
+                  inputMode="decimal"
+                  value={form.netWeight}
+                  onChange={(e) => {
+                    setNetTouched(true);
+                    set('netWeight', e.target.value);
+                  }}
+                  className={inputClass}
+                />
+              </Field>
+              <Field label="Qty" required>
+                <input required type="number" step="1" min={0} inputMode="numeric" value={form.quantity} onChange={text('quantity')} className={inputClass} />
+              </Field>
+              <fieldset className="sm:col-span-2">
+                <legend className="mb-1.5 text-xs font-medium text-ink-2">
+                  Trending<span className="text-danger" aria-hidden="true"> *</span>
+                </legend>
+                <div role="radiogroup" aria-label="Trending" className="grid h-12 grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1">
+                  {[true, false].map((v) => (
+                    <button
+                      key={String(v)}
+                      type="button"
+                      role="radio"
+                      aria-checked={form.isFeatured === v}
+                      onClick={() => set('isFeatured', v)}
+                      className={`rounded-lg text-sm font-semibold ${form.isFeatured === v ? 'bg-surface text-ink shadow-card' : 'text-ink-3'}`}
+                    >
+                      {v ? 'Yes' : 'No'}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+          </Panel>
+
+          <Panel title="More details" hint="Optional.">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Field label="Metal">
+                <select value={form.metal} onChange={text('metal')} className={inputClass}>
+                  {metals.map((m) => (
                     <option key={m}>{m}</option>
                   ))}
                 </select>
@@ -342,12 +464,6 @@ export function ProductEditor() {
                   ))}
                 </datalist>
               </Field>
-              <Field label="Weight from (g)">
-                <input type="number" step="0.001" min={0} inputMode="decimal" value={form.weightMin} onChange={text('weightMin')} className={inputClass} />
-              </Field>
-              <Field label="Weight to (g)">
-                <input type="number" step="0.001" min={0} inputMode="decimal" value={form.weightMax} onChange={text('weightMax')} className={inputClass} />
-              </Field>
               <Field label="Availability">
                 <select value={form.availability} onChange={text('availability')} className={inputClass}>
                   {availabilities.map((a) => (
@@ -355,7 +471,13 @@ export function ProductEditor() {
                   ))}
                 </select>
               </Field>
-              <Field label="Size / length" className="sm:col-span-3">
+              <Field label="Weight from (g)" hint="Optional range for made-to-order pieces">
+                <input type="number" step="0.001" min={0} inputMode="decimal" value={form.weightMin} onChange={text('weightMin')} className={inputClass} />
+              </Field>
+              <Field label="Weight to (g)">
+                <input type="number" step="0.001" min={0} inputMode="decimal" value={form.weightMax} onChange={text('weightMax')} className={inputClass} />
+              </Field>
+              <Field label="Size / length">
                 <input value={form.size} onChange={text('size')} className={inputClass} placeholder="16 inch adjustable" />
               </Field>
               <Field label="Stone details" className="sm:col-span-3">
@@ -422,7 +544,6 @@ export function ProductEditor() {
             <div className="space-y-3">
               <Toggle label="Published (visible in store)" checked={form.isPublished} onChange={(v) => set('isPublished', v)} />
               <Toggle label="Mark as New Arrival" checked={form.isNew} onChange={(v) => set('isNew', v)} />
-              <Toggle label="Featured on home page" checked={form.isFeatured} onChange={(v) => set('isFeatured', v)} />
             </div>
             <button type="submit" disabled={busy} className={`mt-6 w-full ${primaryButton} py-3.5`}>
               {busy && <Spinner />}

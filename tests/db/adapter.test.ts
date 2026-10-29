@@ -54,6 +54,11 @@ describe('Supabase adapter', () => {
       purity: '22K',
       weightMin: 2.5,
       weightMax: 3,
+      make: 'Machine Made',
+      grossWeight: 3.25,
+      stoneWeight: 0.25,
+      netWeight: 3,
+      quantity: 4,
       stone: '',
       size: '',
       availability: 'Ready Stock' as const,
@@ -66,7 +71,7 @@ describe('Supabase adapter', () => {
       images: [upload, { url: '/images/gold-ring.jpg', storagePath: null }]
     };
     const created = await adminApi.saveProduct(base);
-    expect(created).toMatchObject({ sku: base.sku, price: 12345, weightMin: 2.5, isPublished: false });
+    expect(created).toMatchObject({ sku: base.sku, price: 12345, weightMin: 2.5, isPublished: false, make: 'Machine Made', grossWeight: 3.25, stoneWeight: 0.25, netWeight: 3, quantity: 4 });
     expect(created.images.map((i) => i.url)).toEqual([upload.url, '/images/gold-ring.jpg']);
 
     // Customers can't see the draft

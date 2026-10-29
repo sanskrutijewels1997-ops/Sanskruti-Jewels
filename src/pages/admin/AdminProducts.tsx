@@ -132,7 +132,7 @@ export function AdminProducts() {
                     {p.name}
                   </Link>
                   <p className="mt-0.5 truncate text-xs text-ink-3">
-                    {[p.sku, categoryName(p.categoryId), `${p.images.length} img`, formatPrice(p) ?? 'On request'].filter(Boolean).join(' · ')}
+                    {[p.sku, categoryName(p.categoryId), p.purity, p.quantity === null ? 'Qty not set' : `Qty ${p.quantity}`, p.isFeatured ? 'Trending' : '', formatPrice(p) ?? 'On request'].filter(Boolean).join(' · ')}
                   </p>
                 </div>
                 <span

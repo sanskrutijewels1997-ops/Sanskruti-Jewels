@@ -36,6 +36,11 @@ function product(over: Partial<Product>): Product {
     purity: '22K',
     weightMin: 5,
     weightMax: 6,
+    make: 'Handmade',
+    grossWeight: null,
+    stoneWeight: null,
+    netWeight: null,
+    quantity: 1,
     stone: '',
     size: '',
     availability: 'Ready Stock',
@@ -109,6 +114,9 @@ describe('applyFilters', () => {
 
   it('applies weight, new-only and text search', () => {
     expect(run({ maxWeight: 10 })).toEqual(['R1', 'N2', 'N3']);
+    // Gross weight, when set, is what the weight filter uses
+    const heavy = { ...ring, grossWeight: 40 };
+    expect(applyFilters([heavy], { ...emptyFilters, maxWeight: 10 }, '', lookups)).toEqual([]);
     expect(run({ newOnly: true })).toEqual(['N1']);
     expect(run({}, 'chain rope')).toEqual(['N2']);
     expect(run({}, 'necklaces')).toEqual(['N1', 'N2', 'N3']); // matches category name

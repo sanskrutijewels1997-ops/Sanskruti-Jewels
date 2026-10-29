@@ -19,19 +19,29 @@ export function Field({
   label,
   hint,
   children,
-  className = ''
+  className = '',
+  required = false
 }: {
   label: string;
   hint?: string;
   children: React.ReactNode;
   className?: string;
+  /** Shows an asterisk (hidden from screen readers; the input carries `required`). */
+  required?: boolean;
 }) {
   // The hint sits outside the <label> so it isn't read as part of the field's name.
   const hintId = React.useId();
   return (
     <div className={className}>
       <label className="block">
-        <span className="mb-1.5 block text-xs font-medium text-ink-2">{label}</span>
+        <span className="mb-1.5 block text-xs font-medium text-ink-2">
+          {label}
+          {required && (
+            <span className="text-danger" aria-hidden="true">
+              {' '}*
+            </span>
+          )}
+        </span>
         {hint && React.isValidElement<{ 'aria-describedby'?: string }>(children)
           ? React.cloneElement(children, { 'aria-describedby': hintId })
           : children}

@@ -15,6 +15,8 @@ describe('formatWeight', () => {
     expect(formatWeight({ weightMin: 4, weightMax: 4 })).toBe('4 g');
     expect(formatWeight({ weightMin: null, weightMax: 7 })).toBe('7 g');
     expect(formatWeight({ weightMin: null, weightMax: null })).toBe('');
+    // Gross weight wins over the optional range
+    expect(formatWeight({ weightMin: 3, weightMax: 5, grossWeight: 4.25 })).toBe('4.25 g');
   });
 });
 

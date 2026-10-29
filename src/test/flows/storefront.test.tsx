@@ -132,6 +132,18 @@ describe('Product page', () => {
     expect(screen.getAllByText('Price on request').length).toBeGreaterThan(0);
     expect(screen.getByText(`SKU ${p.sku}`)).toBeInTheDocument();
     expect(screen.getByText(p.specifications[0].value)).toBeInTheDocument();
+    // Core trade specs are listed
+    const specs = screen.getByText('Product category').closest('dl')!;
+    for (const [label, value] of [
+      ['Make', p.make],
+      ['Purity', p.purity],
+      ['Gross weight', `${p.grossWeight} g`],
+      ['Stone weight', `${p.stoneWeight} g`],
+      ['Net weight', `${p.netWeight} g`],
+      ['Qty', String(p.quantity)]
+    ]) {
+      expect(within(specs).getByText(label).nextElementSibling).toHaveTextContent(value);
+    }
   });
 
   it('shows a not-found state for unknown products', async () => {

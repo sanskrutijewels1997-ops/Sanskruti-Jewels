@@ -25,6 +25,12 @@ test('admin creates, publishes and unpublishes a product with photos', async ({ 
   await page.getByLabel('Price (₹)').fill('45000');
   await page.getByText('Show price to customers').click();
   await page.getByLabel('Category').selectOption({ label: 'Pendants' });
+  await page.getByRole('combobox', { name: 'Make', exact: true }).fill('Handmade');
+  await page.getByLabel('Gross weight (g)').fill('6.4');
+  await page.getByLabel('Stone weight (g)').fill('0.4');
+  await expect(page.getByLabel('Net weight (g)')).toHaveValue('6');
+  await page.getByLabel('Qty').fill('2');
+  await page.getByRole('radio', { name: 'Yes' }).click();
   await page.getByRole('button', { name: 'Add specification' }).click();
   await page.getByLabel('Specification 2 label').fill('Gemstone');
   await page.getByLabel('Specification 2 value').fill('Emerald');
@@ -40,8 +46,9 @@ test('admin creates, publishes and unpublishes a product with photos', async ({ 
   await expect(page.getByRole('article')).toHaveCount(1);
   await expect(page.getByText('₹45,000').first()).toBeVisible();
   await page.getByRole('article').getByRole('link').first().click();
-  await page.getByText('Specifications').click();
+  // Specifications are open by default on the product page
   await expect(page.getByText('Emerald')).toBeVisible();
+  await expect(page.getByText('6.4 g').first()).toBeVisible();
 
   // Unpublish → hidden from guests
   await page.goto('/admin/products');

@@ -28,12 +28,13 @@ for (const p of seedProducts) {
   lines.push(
     `with p as (
   insert into public.products (sku, slug, name, description, category_id, collection_id, style, metal, purity,
-    weight_min, weight_max, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values (${q(p.sku)}, ${q(p.slug)}, ${q(p.name)}, ${q(p.description)},
     (select id from public.categories where slug = ${q(p.category)}),
     (select id from public.collections where slug = ${q(p.collection)}),
-    ${q(p.style)}, ${q(p.metal)}, ${q(p.purity)}, ${n(p.weightMin)}, ${n(p.weightMax)}, ${q(p.stone)}, ${q(p.size)},
+    ${q(p.style)}, ${q(p.metal)}, ${q(p.purity)}, ${n(p.weightMin)}, ${n(p.weightMax)},
+    ${q(p.make)}, ${n(p.grossWeight)}, ${n(p.stoneWeight)}, ${n(p.netWeight)}, ${p.quantity}, ${q(p.stone)}, ${q(p.size)},
     ${q(p.availability)}, ${n(p.price)}, ${p.showPrice}, ${q(JSON.stringify(p.specifications))}::jsonb,
     ${p.isNew}, ${p.isFeatured}, true, ${p.views}, now() - interval '${p.ageDays} days', now() - interval '${p.ageDays} days')
   on conflict (sku) do nothing

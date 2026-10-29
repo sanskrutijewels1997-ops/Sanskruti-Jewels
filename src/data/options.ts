@@ -14,6 +14,9 @@ export const purityShortcuts = [
   { value: '22K', label: '22 Carat', short: '22 Carat' }
 ] as const;
 
+/** Suggestions for the Make field; admins can type anything. */
+export const makes = ['Handmade', 'Machine Made', 'Casting', 'CNC', 'Kolkata', 'Rajkot', 'Turkish', 'Italian'];
+
 export const styles = [
   'Traditional',
   'Modern',

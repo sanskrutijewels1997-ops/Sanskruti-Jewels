@@ -132,7 +132,7 @@ describe('Filter sheet extras', () => {
     await user.click(within(sheet).getByRole('button', { name: 'Under 10 g' }));
     await user.click(within(sheet).getByRole('tab', { name: 'New Arrivals' }));
     await user.click(within(sheet).getByRole('checkbox', { name: 'Show only new arrivals' }));
-    const expected = seedProducts.filter((p) => p.isNew && p.weightMin <= 10).length;
+    const expected = seedProducts.filter((p) => p.isNew && p.grossWeight <= 10).length;
     await user.click(within(sheet).getByRole('button', { name: new RegExp(`Show ${expected} item`) }));
     await waitFor(() => expect(router.state.location.search).toContain('maxw=10'));
     expect(router.state.location.search).toContain('filter=new');
@@ -165,5 +165,48 @@ describe('Misc screens', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/login'));
     await user.click(await screen.findByRole('button', { name: 'Back' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/account'));
+  });
+});
+
+describe('Products created before the trade-spec fields existed', () => {
+  async function legacyProduct() {
+    await signInAs('admin');
+    const [p] = await api.listProducts();
+    const { images, id, views: _v, createdAt: _c, updatedAt: _u, ...rest } = p;
+    void _v;
+    void _c;
+    void _u;
+    return api.saveProduct({
+      ...rest,
+      id,
+      make: '',
+      grossWeight: null,
+      stoneWeight: null,
+      netWeight: null,
+      quantity: null,
+      weightMin: 60,
+      weightMax: 70,
+      images: images.map((i) => ({ url: i.url, storagePath: i.storagePath }))
+    });
+  }
+
+  it('hides the missing specs and falls back to the weight range', async () => {
+    const p = await legacyProduct();
+    renderApp(`/product/${p.slug}`);
+    const specs = (await screen.findByText('Product category')).closest('dl')!;
+    expect(within(specs).queryByText('Qty')).not.toBeInTheDocument();
+    expect(within(specs).queryByText('Gross weight')).not.toBeInTheDocument();
+    expect(within(specs).getByText('Weight range').nextElementSibling).toHaveTextContent('60–70 g');
+  });
+
+  it('asks the admin to fill them in on the next save', async () => {
+    const p = await legacyProduct();
+    const user = userEvent.setup();
+    renderApp(`/admin/products/${p.id}`);
+    await waitFor(() => expect(screen.getByLabelText('Product name')).toHaveValue(p.name));
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    expect(await screen.findByText('Make is required.')).toBeInTheDocument();
+    expect(screen.getByText(/Gross weight is required/)).toBeInTheDocument();
+    expect(screen.getByText(/Quantity must be a whole number/)).toBeInTheDocument();
   });
 });

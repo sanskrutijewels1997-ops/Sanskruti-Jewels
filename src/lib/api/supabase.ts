@@ -20,6 +20,8 @@ function toImage(r: any): ProductImage {
   return { id: r.id, url: r.url, storagePath: r.storage_path, sortOrder: r.sort_order };
 }
 
+const num = (v: unknown) => (v === null || v === undefined ? null : Number(v));
+
 function toProduct(r: any): Product {
   return {
     id: r.id,
@@ -34,6 +36,11 @@ function toProduct(r: any): Product {
     purity: r.purity,
     weightMin: r.weight_min === null ? null : Number(r.weight_min),
     weightMax: r.weight_max === null ? null : Number(r.weight_max),
+    make: r.make ?? '',
+    grossWeight: num(r.gross_weight),
+    stoneWeight: num(r.stone_weight),
+    netWeight: num(r.net_weight),
+    quantity: num(r.quantity),
     stone: r.stone,
     size: r.size,
     availability: r.availability,
@@ -197,6 +204,11 @@ export function createSupabaseBackend(url: string, anonKey: string): Backend {
         purity: input.purity,
         weight_min: input.weightMin,
         weight_max: input.weightMax,
+        make: input.make,
+        gross_weight: input.grossWeight,
+        stone_weight: input.stoneWeight,
+        net_weight: input.netWeight,
+        quantity: input.quantity,
         stone: input.stone,
         size: input.size,
         availability: input.availability,

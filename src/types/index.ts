@@ -45,6 +45,13 @@ export interface Product {
   purity: string;
   weightMin: number | null;
   weightMax: number | null;
+  /** How it's made, e.g. Handmade, Machine Made, Casting. */
+  make: string;
+  grossWeight: number | null;
+  stoneWeight: number | null;
+  netWeight: number | null;
+  /** Pieces available; null until entered (products created before this field). */
+  quantity: number | null;
   stone: string;
   size: string;
   availability: Availability;
@@ -52,6 +59,7 @@ export interface Product {
   showPrice: boolean;
   specifications: Spec[];
   isNew: boolean;
+  /** Trending (Yes/No): shown in the Trending Now row. */
   isFeatured: boolean;
   isPublished: boolean;
   views: number;

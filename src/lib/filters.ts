@@ -97,7 +97,7 @@ export function facetValue(p: Product, facet: ListFacet, l: Lookups): string {
 export function applyFilters(products: Product[], f: Filters, q: string, l: Lookups, ignore?: ListFacet) {
   return products.filter((p) => {
     if (f.newOnly && !p.isNew) return false;
-    if (f.maxWeight < MAX_WEIGHT && (p.weightMin ?? 0) > f.maxWeight) return false;
+    if (f.maxWeight < MAX_WEIGHT && (p.grossWeight ?? p.weightMin ?? 0) > f.maxWeight) return false;
     for (const facet of Object.keys(LIST_PARAMS) as ListFacet[]) {
       if (facet === ignore || !f[facet].length) continue;
       if (!f[facet].includes(facetValue(p, facet, l))) return false;

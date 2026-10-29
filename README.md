@@ -12,6 +12,18 @@ Vercel today and ships to iOS and Android from the same codebase with Capacitor.
   request", draft/publish; categories and collections with cover images; enquiry inbox
   with status and internal notes; customer list with admin promotion.
 
+### Product specifications
+
+Every product must have these, and the admin form won't save without them:
+**Category, Make, Purity, Gross weight, Stone weight, Net weight** (auto-filled as
+gross − stone, editable), **Qty** and **Trending (Yes/No)**. Trending products fill the
+"Trending Now" row on Home. Everything else (metal, style, weight range, size, stones,
+collection, price, extra spec rows) is optional.
+
+Purity includes **92 Melting** alongside 14K–24K. Home has one-tap **92 Melting** and
+**22 Carat** shortcuts, Search can be scoped to either, and the product list keeps both as
+chips at the front.
+
 ### App experience
 
 The UI is built mobile-first, following shopping apps such as Myntra and CaratLane and
@@ -83,6 +95,11 @@ Copy the printed API URL and anon key into `.env.local` (see `.env.example`).
 
    This one file creates the tables, security rules and image storage bucket, and loads the
    38 starter products. It's safe to run again if anything goes wrong part-way.
+
+   **Upgrading an existing database:** run the latest `setup.sql` again the same way. It
+   adds any new columns and rules, leaves your existing products and edits untouched, and
+   skips starter products you already have. Products created before a new required field
+   existed show it as empty until you next edit them.
 
    If you prefer the CLI:
    ```bash

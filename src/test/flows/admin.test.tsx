@@ -29,6 +29,10 @@ describe('Product editor', () => {
     await user.click(screen.getByRole('button', { name: 'Create product' }));
     expect(await screen.findByText('Name is required.')).toBeInTheDocument();
     expect(screen.getByText(/Add at least one photo before publishing/)).toBeInTheDocument();
+    // Required trade specifications
+    expect(screen.getByText('Choose a category.')).toBeInTheDocument();
+    expect(screen.getByText('Make is required.')).toBeInTheDocument();
+    expect(screen.getByText(/Gross weight is required/)).toBeInTheDocument();
 
     await user.type(name, 'Peacock Pendant');
     expect((screen.getByLabelText('URL slug') as HTMLInputElement).value).toMatch(/^peacock-pendant-\d+$/);
@@ -42,6 +46,19 @@ describe('Product editor', () => {
 
     await user.clear(screen.getByLabelText('Weight to (g)'));
     await user.type(screen.getByLabelText('Weight to (g)'), '12');
+    await user.selectOptions(screen.getByLabelText('Category', { exact: false }), 'Pendants');
+    await user.type(screen.getByLabelText('Make', { exact: false }), 'Handmade');
+    await user.type(screen.getByLabelText('Gross weight (g)', { exact: false }), '10.5');
+    await user.clear(screen.getByLabelText('Stone weight (g)', { exact: false }));
+    await user.type(screen.getByLabelText('Stone weight (g)', { exact: false }), '0.75');
+    // Screen readers hear "Gross weight (g)", not the visual asterisk
+    expect(screen.getByRole('spinbutton', { name: 'Gross weight (g)' })).toBeRequired();
+    expect(screen.getByRole('combobox', { name: 'Category' })).toBeRequired();
+    // Net weight fills in as gross − stone
+    expect(screen.getByLabelText('Net weight (g)', { exact: false })).toHaveValue(9.75);
+    await user.clear(screen.getByLabelText('Qty', { exact: false }));
+    await user.type(screen.getByLabelText('Qty', { exact: false }), '3');
+    await user.click(screen.getByRole('radio', { name: 'Yes' }));
     await user.type(screen.getByLabelText('Price (₹)'), '45000');
     await user.click(screen.getByRole('button', { name: 'Add specification' }));
     await user.type(screen.getByLabelText('Specification 2 label'), 'Gemstone');
@@ -50,9 +67,39 @@ describe('Product editor', () => {
 
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/admin\/products\/[0-9a-f-]{36}$/));
     const saved = (await api.listProducts()).find((p) => p.name === 'Peacock Pendant')!;
-    expect(saved).toMatchObject({ isPublished: false, price: 45000, showPrice: true, weightMin: 9, weightMax: 12 });
+    expect(saved).toMatchObject({
+      isPublished: false,
+      price: 45000,
+      showPrice: true,
+      weightMin: 9,
+      weightMax: 12,
+      make: 'Handmade',
+      grossWeight: 10.5,
+      stoneWeight: 0.75,
+      netWeight: 9.75,
+      quantity: 3,
+      isFeatured: true
+    });
     expect(saved.specifications).toContainEqual({ label: 'Gemstone', value: 'Emerald' });
     expect(await screen.findByRole('button', { name: 'Save changes' })).toBeInTheDocument();
+  });
+
+  it('rejects stone or net weight above the gross weight', async () => {
+    const user = userEvent.setup();
+    const product = (await api.listProducts())[0];
+    renderApp(`/admin/products/${product.id}`);
+    const gross = await screen.findByLabelText('Gross weight (g)', { exact: false });
+    await waitFor(() => expect(gross).toHaveValue(product.grossWeight));
+    await user.clear(screen.getByLabelText('Stone weight (g)', { exact: false }));
+    await user.type(screen.getByLabelText('Stone weight (g)', { exact: false }), '999');
+    await user.clear(screen.getByLabelText('Net weight (g)', { exact: false }));
+    await user.type(screen.getByLabelText('Net weight (g)', { exact: false }), '999');
+    await user.clear(screen.getByLabelText('Qty', { exact: false }));
+    await user.type(screen.getByLabelText('Qty', { exact: false }), '1.5');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    expect(await screen.findByText('Stone weight cannot exceed gross weight.')).toBeInTheDocument();
+    expect(screen.getByText('Net weight cannot exceed gross weight.')).toBeInTheDocument();
+    expect(screen.getByText(/Quantity must be a whole number/)).toBeInTheDocument();
   });
 
   it('edits an existing product', async () => {

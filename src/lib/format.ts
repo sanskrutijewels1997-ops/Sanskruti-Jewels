@@ -10,7 +10,9 @@ export function formatPrice(p: Pick<Product, 'price' | 'showPrice'>) {
   return p.showPrice && p.price !== null ? inr.format(p.price) : null;
 }
 
-export function formatWeight(p: Pick<Product, 'weightMin' | 'weightMax'>) {
+/** Gross weight when known, otherwise the optional min–max range. */
+export function formatWeight(p: Pick<Product, 'weightMin' | 'weightMax'> & Partial<Pick<Product, 'grossWeight'>>) {
+  if (p.grossWeight !== null && p.grossWeight !== undefined) return `${p.grossWeight} g`;
   const { weightMin: a, weightMax: b } = p;
   if (a === null && b === null) return '';
   if (a === null || b === null || a === b) return `${a ?? b} g`;

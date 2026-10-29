@@ -7,9 +7,10 @@ import {
   GemIcon,
   HeartIcon,
   MessageCircleIcon,
+  HammerIcon,
+  PackageIcon,
   PencilIcon,
   RefreshCwIcon,
-  RulerIcon,
   ScaleIcon,
   Share2Icon,
   ShieldCheckIcon,
@@ -78,14 +79,22 @@ export function ProductDetail() {
     .filter((p): p is NonNullable<typeof p> => !!p && p.isPublished)
     .slice(0, 10);
 
+  const grams = (v: number | null) => (v === null ? '' : `${v} g`);
+  const range = product.weightMin !== null || product.weightMax !== null ? formatWeight({ weightMin: product.weightMin, weightMax: product.weightMax }) : '';
+  // Core trade specs first, then the optional details.
   const specs = [
+    ['Product category', category],
+    ['Make', product.make],
+    ['Purity', product.purity],
+    ['Gross weight', grams(product.grossWeight)],
+    ['Stone weight', grams(product.stoneWeight)],
+    ['Net weight', grams(product.netWeight)],
+    ['Qty', product.quantity === null ? '' : String(product.quantity)],
     ['SKU', product.sku],
-    ['Category', category],
     ['Collection', collectionName(product.collectionId)],
     ['Style', product.style],
     ['Metal', product.metal],
-    ['Purity', product.purity],
-    ['Weight', formatWeight(product)],
+    ['Weight range', product.grossWeight === null ? range : ''],
     ['Size / length', product.size],
     ['Stones', product.stone],
     ['Availability', product.availability],
@@ -168,10 +177,12 @@ export function ProductDetail() {
           <dl className="mt-4 grid grid-cols-2 gap-2.5">
             {(
               [
-                [GemIcon, 'Metal', `${product.metal} · ${product.purity}`],
-                [ScaleIcon, 'Weight', formatWeight(product)],
-                [RulerIcon, 'Size', product.size],
-                [SparklesIcon, 'Stones', product.stone]
+                [GemIcon, 'Purity', product.purity],
+                [ScaleIcon, 'Gross weight', grams(product.grossWeight) || formatWeight(product)],
+                [ScaleIcon, 'Net weight', grams(product.netWeight)],
+                [SparklesIcon, 'Stone weight', grams(product.stoneWeight)],
+                [HammerIcon, 'Make', product.make],
+                [PackageIcon, 'Qty', product.quantity === null ? '' : String(product.quantity)]
               ] as const
             )
               .filter(([, , v]) => v)
@@ -205,10 +216,10 @@ export function ProductDetail() {
           </div>
 
           <div className="mt-5 divide-y divide-line border-y border-line">
-            <Accordion title="Product details" defaultOpen>
+            <Accordion title="Product details">
               <p className="whitespace-pre-line text-sm leading-relaxed text-ink-2">{product.description || 'Details coming soon.'}</p>
             </Accordion>
-            <Accordion title="Specifications">
+            <Accordion title="Specifications" defaultOpen>
               <dl className="space-y-2.5 text-sm">
                 {specs.map(([k, v]) => (
                   <div key={k} className="flex justify-between gap-6">
