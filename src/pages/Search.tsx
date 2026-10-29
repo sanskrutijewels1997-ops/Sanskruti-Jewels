@@ -36,15 +36,15 @@ export function Search() {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const goBack = useGoBack('/');
-  const { published, categories, categoryName } = useCatalogue();
+  const { published, topCategories, categoryPath } = useCatalogue();
 
   useEffect(() => inputRef.current?.focus(), []);
 
   const results = useMemo(() => {
     const term = q.trim();
     if (!term) return [];
-    return published.filter((p) => (!purity || p.purity === purity) && matchesQuery(p, term, categoryName(p.categoryId)));
-  }, [q, purity, published, categoryName]);
+    return published.filter((p) => (!purity || p.purity === purity) && matchesQuery(p, term, categoryPath(p.categoryId)));
+  }, [q, purity, published, categoryPath]);
 
   const submit = (term: string) => {
     const t = term.trim();
@@ -139,7 +139,7 @@ export function Search() {
           <section>
             <h2 className="text-sm font-semibold text-ink">Popular categories</h2>
             <div className="mt-3 flex flex-wrap gap-2">
-              {categories.map((c) => (
+              {topCategories.map((c) => (
                 <Link key={c.id} to={`/catalogue?category=${c.slug}`} className={chipClass(false)}>
                   {c.name}
                 </Link>
@@ -175,7 +175,7 @@ export function Search() {
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[14px] font-medium text-ink">{p.name}</span>
                     <span className="block truncate text-xs text-ink-3">
-                      {categoryName(p.categoryId)} · {formatPrice(p) ?? 'Price on request'}
+                      {categoryPath(p.categoryId)} · {formatPrice(p) ?? 'Price on request'}
                     </span>
                   </span>
                 </Link>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { EyeIcon, EyeOffIcon, PencilIcon, PlusIcon, SearchIcon, Trash2Icon } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { DashboardShell, adminNav } from '../../components/DashboardShell';
+import { CategoryOptions } from '../../components/admin/CategoryOptions';
 import { ProductImageFallback } from '../../components/ProductCard';
 import { EmptyState, ErrorNotice, PageLoader, inputClass, primaryButton } from '../../components/ui';
 import { useApp } from '../../contexts/AppContext';
@@ -14,7 +15,7 @@ import type { Product } from '../../types';
 type StatusFilter = 'all' | 'published' | 'draft';
 
 export function AdminProducts() {
-  const { products, categories, categoryName, loading, error } = useCatalogue();
+  const { products, categories, categoryPath, loading, error } = useCatalogue();
   const { notify } = useApp();
   const queryClient = useQueryClient();
   const [q, setQ] = useState('');
@@ -27,10 +28,11 @@ export function AdminProducts() {
     return products.filter((p) => {
       if (status === 'published' && !p.isPublished) return false;
       if (status === 'draft' && p.isPublished) return false;
-      if (category && p.categoryId !== category) return false;
+      // A main category also matches products in its sub-categories
+      if (category && p.categoryId !== category && categories.find((c) => c.id === p.categoryId)?.parentId !== category) return false;
       return !needle || `${p.name} ${p.sku}`.toLowerCase().includes(needle);
     });
-  }, [products, q, status, category]);
+  }, [products, categories, q, status, category]);
 
   const refresh = () => {
     queryClient.invalidateQueries({ queryKey: qk.products });
@@ -87,11 +89,7 @@ export function AdminProducts() {
         </div>
         <select value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Filter by category" className={`${inputClass} sm:w-48`}>
           <option value="">All categories</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
+          <CategoryOptions categories={categories} />
         </select>
         <select value={status} onChange={(e) => setStatus(e.target.value as StatusFilter)} aria-label="Filter by status" className={`${inputClass} sm:w-36`}>
           <option value="all">All</option>
@@ -132,7 +130,7 @@ export function AdminProducts() {
                     {p.name}
                   </Link>
                   <p className="mt-0.5 truncate text-xs text-ink-3">
-                    {[p.sku, categoryName(p.categoryId), p.purity, p.quantity === null ? 'Qty not set' : `Qty ${p.quantity}`, p.isFeatured ? 'Trending' : '', formatPrice(p) ?? 'On request'].filter(Boolean).join(' · ')}
+                    {[p.sku, categoryPath(p.categoryId), p.purity, p.quantity === null ? 'Qty not set' : `Qty ${p.quantity}`, p.isFeatured ? 'Trending' : '', formatPrice(p) ?? 'On request'].filter(Boolean).join(' · ')}
                   </p>
                 </div>
                 <span

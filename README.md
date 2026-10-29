@@ -24,6 +24,24 @@ Purity includes **92 Melting** alongside 14K–24K. Home has one-tap **92 Meltin
 **22 Carat** shortcuts, Search can be scoped to either, and the product list keeps both as
 chips at the front.
 
+### Categories
+
+Products are organised in the client's category tree: 16 main categories, some with
+sub-categories, one level deep:
+
+Short Necklace · Long Necklace · Pendant · **Rings** (Gents Rings, Ladies Rings, Karda) ·
+Kan Chains · Aring · **Tops** (Karwari Tops, Bangali Tops) · Tika · Nath · **Vati** (Rajkot
+Vati, Karwari Vati) · Sui Dhaga · **Rajkot Vali** (Vali, U V Vali, Singapore Vali, Ball Vali)
+· **Locket** (Casting Lockets, Patra Lockets) · Laxmi Har · **Zumka** (Coimbatore Zumka,
+Karwari Zumka) · **Casting Rings** (Gents Rings, Ladies Rings, Couple Band)
+
+- Choosing a main category also shows everything in its sub-categories, and the product
+  list shows tabs to narrow down (All Rings · Gents Rings · …).
+- In Admin → Categories, use **+** on a main category to add a sub-category, or set
+  "Parent category" when editing. Names, order and images are all editable there.
+- The Home page intro ("Quality you can trust…") lives in `src/data/brand.ts` under
+  `intro`, so the words can be changed without touching the layout.
+
 ### App experience
 
 The UI is built mobile-first, following shopping apps such as Myntra and CaratLane and
@@ -100,6 +118,13 @@ Copy the printed API URL and anon key into `.env.local` (see `.env.example`).
    adds any new columns and rules, leaves your existing products and edits untouched, and
    skips starter products you already have. Products created before a new required field
    existed show it as empty until you next edit them.
+
+   **Switching an existing database to the client's categories (one-off, optional):** after
+   running the latest `setup.sql`, run `supabase/scripts/switch-to-client-categories.sql`
+   the same way. It moves the starter products into the new categories, hides the starter
+   pieces that don't fit any (bangles, bracelets, chains, kids; hidden, not deleted), and
+   removes the old starter categories. Your own products in those old categories become
+   uncategorised (not deleted), so re-assign them in Admin → Products.
 
    If you prefer the CLI:
    ```bash

@@ -46,7 +46,7 @@ describe('Product editor', () => {
 
     await user.clear(screen.getByLabelText('Weight to (g)'));
     await user.type(screen.getByLabelText('Weight to (g)'), '12');
-    await user.selectOptions(screen.getByLabelText('Category', { exact: false }), 'Pendants');
+    await user.selectOptions(screen.getByLabelText('Category', { exact: false }), 'Pendant');
     await user.type(screen.getByLabelText('Make', { exact: false }), 'Handmade');
     await user.type(screen.getByLabelText('Gross weight (g)', { exact: false }), '10.5');
     await user.clear(screen.getByLabelText('Stone weight (g)', { exact: false }));

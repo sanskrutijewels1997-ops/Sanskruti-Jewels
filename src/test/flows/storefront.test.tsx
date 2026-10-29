@@ -3,7 +3,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderApp, signInAs } from '../utils';
 import { api } from '../../lib/api';
-import { seedProducts } from '../../data/seed';
+import { seedCategories, seedProducts } from '../../data/seed';
 
 const search = (router: ReturnType<typeof renderApp>['router']) => router.state.location.search;
 
@@ -14,7 +14,9 @@ describe('Home', () => {
     expect(screen.getByRole('heading', { name: 'Trending Now' })).toBeInTheDocument();
     expect(await screen.findByRole('heading', { name: 'Curated Collections' })).toBeInTheDocument();
     const cats = screen.getByRole('navigation', { name: 'Categories' });
-    expect(within(cats).getByText('Necklaces')).toBeInTheDocument();
+    expect(within(cats).getByText('Short Necklace')).toBeInTheDocument();
+    // Only main categories appear as circles, not sub-categories
+    expect(within(cats).queryByText('Gents Rings')).not.toBeInTheDocument();
     // Bottom tab bar is present on tab roots
     expect(screen.getByRole('navigation', { name: 'Main' })).toBeInTheDocument();
   });
@@ -41,7 +43,9 @@ describe('Product list', () => {
   it('filters by the category in the URL and shows the count', async () => {
     renderApp('/catalogue?category=rings');
     expect(await screen.findByRole('heading', { name: 'Rings', level: 1 })).toBeInTheDocument();
-    const rings = seedProducts.filter((p) => p.category === 'rings').length;
+    // "Rings" includes its sub-categories
+    const ringSubs = seedCategories.filter((c) => c.parent === 'rings').map((c) => c.slug);
+    const rings = seedProducts.filter((p) => p.category === 'rings' || ringSubs.includes(p.category)).length;
     expect(await screen.findByText(`${rings} items`)).toBeInTheDocument();
     expect(screen.getAllByRole('article')).toHaveLength(rings);
   });

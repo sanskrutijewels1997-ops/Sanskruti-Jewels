@@ -70,7 +70,7 @@ function toProfile(r: any): Profile {
 }
 
 function toCategory(r: any): Category {
-  return { id: r.id, slug: r.slug, name: r.name, imageUrl: r.image_url, sortOrder: r.sort_order };
+  return { id: r.id, slug: r.slug, name: r.name, parentId: r.parent_id ?? null, imageUrl: r.image_url, sortOrder: r.sort_order };
 }
 
 function toCollection(r: any): Collection {
@@ -252,6 +252,7 @@ export function createSupabaseBackend(url: string, anonKey: string): Backend {
       const row = {
         slug: input.slug,
         name: input.name,
+        parent_id: input.parentId,
         image_url: input.imageUrl,
         sort_order: input.sortOrder
       };

@@ -14,9 +14,20 @@ const lines: string[] = [
   '-- Starter catalogue. Image URLs are relative paths to files bundled with the app.',
   '-- Safe to re-run: existing categories, collections and products (by SKU) are skipped.',
   '',
+  '-- Main categories first, then sub-categories linked to their parent by slug.',
   'insert into public.categories (slug, name, image_url, sort_order) values',
-  seedCategories.map((c, i) => `  (${q(c.slug)}, ${q(c.name)}, ${q(c.image)}, ${i})`).join(',\n') +
-    '\non conflict (slug) do nothing;',
+  seedCategories
+    .map((c, i) => ({ c, i }))
+    .filter(({ c }) => !c.parent)
+    .map(({ c, i }) => `  (${q(c.slug)}, ${q(c.name)}, ${q(c.image)}, ${i})`)
+    .join(',\n') + '\non conflict (slug) do nothing;',
+  '',
+  'insert into public.categories (slug, name, image_url, sort_order, parent_id) values',
+  seedCategories
+    .map((c, i) => ({ c, i }))
+    .filter(({ c }) => c.parent)
+    .map(({ c, i }) => `  (${q(c.slug)}, ${q(c.name)}, ${q(c.image)}, ${i}, (select id from public.categories where slug = ${q(c.parent)}))`)
+    .join(',\n') + '\non conflict (slug) do nothing;',
   '',
   'insert into public.collections (slug, name, tagline, image_url, sort_order) values',
   seedCollections.map((c, i) => `  (${q(c.slug)}, ${q(c.name)}, ${q(c.tagline)}, ${q(c.image)}, ${i})`).join(',\n') +

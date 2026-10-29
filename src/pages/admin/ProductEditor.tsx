@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ExternalLinkIcon, PlusIcon, Trash2Icon, XIcon } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { DashboardShell, adminNav } from '../../components/DashboardShell';
+import { CategoryOptions } from '../../components/admin/CategoryOptions';
 import { ImageUploader, useCleanupUnsavedUploads, type UploadedImage } from '../../components/admin/ImageUploader';
 import { ProductImageFallback } from '../../components/ProductCard';
 import { ErrorNotice, Field, PageLoader, Panel, Spinner, inputClass, primaryButton, secondaryButton } from '../../components/ui';
@@ -115,7 +116,7 @@ export function ProductEditor() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { notify } = useApp();
-  const { products, categories, collections, loading } = useCatalogue();
+  const { products, categories, collections, categoryPath, loading } = useCatalogue();
   const existing = useMemo(() => products.find((p) => p.id === id), [products, id]);
   const { sessionUploads, markSaved } = useCleanupUnsavedUploads();
 
@@ -361,11 +362,7 @@ export function ProductEditor() {
               <Field label="Category" required>
                 <select required value={form.categoryId} onChange={text('categoryId')} className={inputClass}>
                   <option value="">Choose…</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
+                  <CategoryOptions categories={categories} />
                 </select>
               </Field>
               <Field label="Make" required>
@@ -572,7 +569,7 @@ export function ProductEditor() {
                 <p className="text-[11px] text-ink-3">{form.sku}</p>
                 <p className="mt-1 font-display text-lg text-ink">{form.name || 'Product name'}</p>
                 <p className="mt-1 text-xs text-ink-2">
-                  {[categories.find((c) => c.id === form.categoryId)?.name, form.purity, formatWeight(preview)].filter(Boolean).join(' · ')}
+                  {[categoryPath(form.categoryId || null), form.purity, formatWeight(preview)].filter(Boolean).join(' · ')}
                 </p>
                 <p className="mt-2 text-sm text-gold">{formatPrice(preview) ?? 'Price on request'}</p>
               </div>

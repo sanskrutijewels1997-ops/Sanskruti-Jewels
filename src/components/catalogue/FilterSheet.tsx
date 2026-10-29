@@ -6,7 +6,7 @@ import {
   MAX_WEIGHT,
   applyFilters,
   emptyFilters,
-  facetValue,
+  facetValues,
   type Filters,
   type ListFacet
 } from '../../lib/filters';
@@ -42,8 +42,14 @@ export function FilterSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const options: Record<ListFacet, { value: string; label: string }[]> = {
-    categories: categories.map((c) => ({ value: c.slug, label: c.name })),
+  const options: Record<ListFacet, { value: string; label: string; sub?: boolean }[]> = {
+    // Main categories, each followed by its sub-categories (indented)
+    categories: categories
+      .filter((c) => !c.parentId)
+      .flatMap((c) => [
+        { value: c.slug, label: c.name },
+        ...categories.filter((s) => s.parentId === c.id).map((s) => ({ value: s.slug, label: s.name, sub: true }))
+      ]),
     collections: collections.map((c) => ({ value: c.slug, label: c.name })),
     metals: metals.map((m) => ({ value: m, label: m })),
     purities: purities.map((m) => ({ value: m, label: m })),
@@ -70,8 +76,7 @@ export function FilterSheet({
     const base = applyFilters(published, draft, q, lookups, facet);
     const m = new Map<string, number>();
     base.forEach((p) => {
-      const v = facetValue(p, facet, lookups);
-      m.set(v, (m.get(v) ?? 0) + 1);
+      facetValues(p, facet, lookups).forEach((v) => m.set(v, (m.get(v) ?? 0) + 1));
     });
     return m;
   }, [facet, published, draft, q, lookups]);
@@ -166,6 +171,7 @@ export function FilterSheet({
             options[facet].map((o) => (
               <OptionRow
                 key={o.value}
+                sub={o.sub}
                 label={o.label}
                 count={counts.get(o.value) ?? 0}
                 checked={draft[facet].includes(o.value)}
@@ -179,7 +185,20 @@ export function FilterSheet({
   );
 }
 
-function OptionRow({ label, count, checked, onToggle }: { label: string; count?: number; checked: boolean; onToggle: () => void }) {
+function OptionRow({
+  label,
+  count,
+  checked,
+  onToggle,
+  sub = false
+}: {
+  label: string;
+  count?: number;
+  checked: boolean;
+  onToggle: () => void;
+  /** Indented sub-category under its parent. */
+  sub?: boolean;
+}) {
   const disabled = count === 0 && !checked;
   return (
     <button
@@ -188,7 +207,7 @@ function OptionRow({ label, count, checked, onToggle }: { label: string; count?:
       aria-checked={checked}
       onClick={onToggle}
       disabled={disabled}
-      className="flex w-full items-center gap-3 py-3 text-left disabled:opacity-40"
+      className={`flex w-full items-center gap-3 py-3 text-left disabled:opacity-40 ${sub ? 'pl-6' : ''}`}
     >
       <span
         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 ${

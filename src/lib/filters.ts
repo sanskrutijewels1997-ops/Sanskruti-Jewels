@@ -75,22 +75,40 @@ interface Lookups {
   categoryName: (id: string | null) => string;
 }
 
-/** The value a product has for a list facet (slug for categories/collections). */
-export function facetValue(p: Product, facet: ListFacet, l: Lookups): string {
+/**
+ * The values a product has for a list facet (slugs for categories/collections).
+ * A product in a sub-category also counts for its parent, so choosing "Rings" includes
+ * "Gents Rings" and "Ladies Rings".
+ */
+export function facetValues(p: Product, facet: ListFacet, l: Lookups): string[] {
   switch (facet) {
-    case 'categories':
-      return l.categories.find((c) => c.id === p.categoryId)?.slug ?? '';
-    case 'collections':
-      return l.collections.find((c) => c.id === p.collectionId)?.slug ?? '';
+    case 'categories': {
+      const own = l.categories.find((c) => c.id === p.categoryId);
+      if (!own) return [];
+      const parent = own.parentId ? l.categories.find((c) => c.id === own.parentId) : undefined;
+      return parent ? [own.slug, parent.slug] : [own.slug];
+    }
+    case 'collections': {
+      const slug = l.collections.find((c) => c.id === p.collectionId)?.slug;
+      return slug ? [slug] : [];
+    }
     case 'metals':
-      return p.metal;
+      return [p.metal];
     case 'purities':
-      return p.purity;
+      return [p.purity];
     case 'styles':
-      return p.style;
+      return [p.style];
     case 'availability':
-      return p.availability;
+      return [p.availability];
   }
+}
+
+/** "Rings › Gents Rings" for sub-categories, the plain name otherwise. */
+export function categoryPath(id: string | null, categories: Category[]) {
+  const own = categories.find((c) => c.id === id);
+  if (!own) return '';
+  const parent = own.parentId ? categories.find((c) => c.id === own.parentId) : undefined;
+  return parent ? `${parent.name} › ${own.name}` : own.name;
 }
 
 /** Applies filters, optionally ignoring one facet (used to compute option counts). */
@@ -100,9 +118,9 @@ export function applyFilters(products: Product[], f: Filters, q: string, l: Look
     if (f.maxWeight < MAX_WEIGHT && (p.grossWeight ?? p.weightMin ?? 0) > f.maxWeight) return false;
     for (const facet of Object.keys(LIST_PARAMS) as ListFacet[]) {
       if (facet === ignore || !f[facet].length) continue;
-      if (!f[facet].includes(facetValue(p, facet, l))) return false;
+      if (!facetValues(p, facet, l).some((v) => f[facet].includes(v))) return false;
     }
-    return !q.trim() || matchesQuery(p, q.trim(), l.categoryName(p.categoryId));
+    return !q.trim() || matchesQuery(p, q.trim(), categoryPath(p.categoryId, l.categories));
   });
 }
 

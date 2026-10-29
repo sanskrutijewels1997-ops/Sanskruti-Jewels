@@ -31,8 +31,9 @@ describe('Supabase adapter', () => {
       customerApi.listCategories(),
       customerApi.listCollections()
     ]);
-    expect(products.length).toBeGreaterThanOrEqual(38);
-    expect(categories.length).toBeGreaterThanOrEqual(12);
+    expect(products.length).toBeGreaterThanOrEqual(27);
+    expect(categories.length).toBeGreaterThanOrEqual(34);
+    expect(categories.filter((c) => c.parentId).length).toBeGreaterThanOrEqual(18);
     expect(collections.length).toBeGreaterThanOrEqual(6);
     const p = products.find((x) => x.sku.startsWith('SJ-1') && x.images.length > 1)!;
     expect(p.images.map((i) => i.sortOrder)).toEqual([...p.images.map((i) => i.sortOrder)].sort((a, b) => a - b));
@@ -89,14 +90,24 @@ describe('Supabase adapter', () => {
   it('blocks customers from admin actions', async () => {
     await expect(customerApi.adminStats()).rejects.toThrow(/Admins only/);
     await expect(customerApi.uploadImage(new Blob(['x'], { type: 'image/jpeg' }), 'products')).rejects.toThrow();
-    await expect(customerApi.saveCategory({ slug: `c-${run}`, name: 'c', imageUrl: null, sortOrder: 0 })).rejects.toThrow(/row-level security/);
+    await expect(customerApi.saveCategory({ slug: `c-${run}`, name: 'c', imageUrl: null, parentId: null, sortOrder: 0 })).rejects.toThrow(/row-level security/);
   });
 
   it('manages categories and collections as admin', async () => {
-    const cat = await adminApi.saveCategory({ slug: `cat-${run}`, name: 'Anklets', imageUrl: null, sortOrder: 50 });
+    const cat = await adminApi.saveCategory({ slug: `cat-${run}`, name: 'Anklets', imageUrl: null, parentId: null, sortOrder: 50 });
     const renamed = await adminApi.saveCategory({ ...cat, name: 'Payal' });
     expect(renamed.name).toBe('Payal');
+
+    // Sub-categories: one level deep, deleted with their parent
+    const sub = await adminApi.saveCategory({ slug: `sub-${run}`, name: 'Silver Payal', imageUrl: null, parentId: cat.id, sortOrder: 51 });
+    expect(sub.parentId).toBe(cat.id);
+    await expect(
+      adminApi.saveCategory({ slug: `subsub-${run}`, name: 'Too deep', imageUrl: null, parentId: sub.id, sortOrder: 52 })
+    ).rejects.toThrow(/one level deep/);
+    const [other] = (await adminApi.listCategories()).filter((c) => !c.parentId && c.id !== cat.id);
+    await expect(adminApi.saveCategory({ ...cat, parentId: other.id })).rejects.toThrow(/cannot become a sub-category/);
     await adminApi.deleteCategory(cat.id);
+    expect((await adminApi.listCategories()).some((c) => c.id === sub.id)).toBe(false);
     const col = await adminApi.saveCollection({ slug: `col-${run}`, name: 'Festive', tagline: 't', imageUrl: null, sortOrder: 50 });
     expect((await adminApi.saveCollection({ ...col, tagline: 'Diwali' })).tagline).toBe('Diwali');
     await adminApi.deleteCollection(col.id);

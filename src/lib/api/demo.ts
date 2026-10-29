@@ -16,7 +16,8 @@ import type { AuthUser, Backend } from './types';
  * schema so the UI behaves the same way.
  */
 
-const KEY = 'sanskruti-demo-db-v1';
+// Bump when the seed shape changes so browsers re-seed instead of loading stale data.
+const KEY = 'sanskruti-demo-db-v2';
 
 interface DemoUser {
   id: string;
@@ -46,10 +47,12 @@ const uid = () => crypto.randomUUID();
 const now = () => new Date().toISOString();
 
 function seed(): DB {
+  const ids = new Map(seedCategories.map((c) => [c.slug, uid()]));
   const categories: Category[] = seedCategories.map((c, i) => ({
-    id: uid(),
+    id: ids.get(c.slug)!,
     slug: c.slug,
     name: c.name,
+    parentId: c.parent ? ids.get(c.parent)! : null,
     imageUrl: c.image,
     sortOrder: i
   }));
@@ -313,6 +316,15 @@ export function createDemoBackend(): Backend {
       if (db.categories.some((c) => c.id !== input.id && c.slug === input.slug)) {
         throw new Error('A category with this slug already exists');
       }
+      if (input.parentId) {
+        if (input.parentId === input.id) throw new Error('A category cannot be its own parent');
+        if (db.categories.find((c) => c.id === input.parentId)?.parentId) {
+          throw new Error('Sub-categories can only be one level deep');
+        }
+        if (input.id && db.categories.some((c) => c.parentId === input.id)) {
+          throw new Error('A category with sub-categories cannot become a sub-category');
+        }
+      }
       let cat = db.categories.find((c) => c.id === input.id);
       if (cat) Object.assign(cat, input);
       else {
@@ -324,9 +336,11 @@ export function createDemoBackend(): Backend {
     },
     async deleteCategory(id) {
       requireAdmin();
-      db.categories = db.categories.filter((c) => c.id !== id);
+      // Sub-categories go with their parent (ON DELETE CASCADE in the database).
+      const removed = new Set([id, ...db.categories.filter((c) => c.parentId === id).map((c) => c.id)]);
+      db.categories = db.categories.filter((c) => !removed.has(c.id));
       db.products.forEach((p) => {
-        if (p.categoryId === id) p.categoryId = null;
+        if (p.categoryId && removed.has(p.categoryId)) p.categoryId = null;
       });
       persist();
     },

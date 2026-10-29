@@ -2,18 +2,20 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ChevronRightIcon,
+  ClockIcon,
   GemIcon,
-  RefreshCwIcon,
+  HandshakeIcon,
   SearchIcon,
   ShieldCheckIcon,
-  SparklesIcon,
-  TruckIcon
+  SmileIcon,
+  SparklesIcon
 } from 'lucide-react';
 import { ProductRail } from '../components/home/ProductRail';
 import { BrandStrip, Logo, SinceBadge } from '../components/Logo';
 import { SectionHeader } from '../components/ui';
 import { useApp } from '../contexts/AppContext';
 import { purityShortcuts } from '../data/options';
+import { BRAND } from '../data/brand';
 import { useCatalogue } from '../lib/queries';
 
 const metalTiles = [
@@ -23,15 +25,8 @@ const metalTiles = [
   { metal: 'Platinum', note: 'PT 950', tone: 'from-[#e3e1dd] to-[#8d8a85]' }
 ];
 
-const promises = [
-  { icon: ShieldCheckIcon, label: 'BIS Hallmarked' },
-  { icon: GemIcon, label: 'Certified diamonds' },
-  { icon: RefreshCwIcon, label: 'Lifetime exchange' },
-  { icon: TruckIcon, label: 'Insured delivery' }
-];
-
 export function Home() {
-  const { published, categories, collections, byId, loading } = useCatalogue();
+  const { published, topCategories, collections, byId, loading } = useCatalogue();
   const { recentlyViewed, openEnquiry } = useApp();
   const recent = recentlyViewed
     .map((id) => byId(id))
@@ -72,7 +67,7 @@ export function Home() {
         </CategoryCircle>
         {loading
           ? Array.from({ length: 6 }).map((_, i) => <span key={i} className="skeleton h-[68px] w-[68px] shrink-0 rounded-full" />)
-          : categories.map((c) => (
+          : topCategories.map((c) => (
               <CategoryCircle key={c.id} to={`/catalogue?category=${c.slug}`} label={c.name.replace(' Jewellery', '')}>
                 {c.imageUrl ? <img src={c.imageUrl} alt="" className="h-full w-full object-cover" /> : <GemIcon className="m-auto h-6 w-6 text-ink-3" />}
               </CategoryCircle>
@@ -81,13 +76,7 @@ export function Home() {
 
       <HeroCarousel />
 
-      <ul className="no-scrollbar mt-5 flex gap-2 overflow-x-auto px-4 lg:px-0" aria-label="Our promise">
-        {promises.map(({ icon: Icon, label }) => (
-          <li key={label} className="flex shrink-0 items-center gap-1.5 rounded-full bg-gold-wash px-3 py-1.5 text-[11.5px] font-medium text-ink-2">
-            <Icon className="h-3.5 w-3.5 text-gold" /> {label}
-          </li>
-        ))}
-      </ul>
+      <Intro />
 
       <ProductRail
         title="New Arrivals"
@@ -204,6 +193,45 @@ function PurityShortcuts() {
         );
       })}
     </nav>
+  );
+}
+
+const pillarIcons = [ShieldCheckIcon, ClockIcon, HandshakeIcon, SmileIcon];
+
+/** The brand introduction: quality, punctuality, relationships, tension-free ordering. */
+function Intro() {
+  const { intro } = BRAND;
+  const years = new Date().getFullYear() - BRAND.since;
+  return (
+    <section aria-labelledby="intro-title" className="px-4 pt-6 lg:px-0 lg:pt-12">
+      <div className="overflow-hidden rounded-2xl border border-gold-pale bg-surface shadow-card lg:grid lg:grid-cols-[1.15fr_1fr]">
+        <div className="p-5 lg:p-10">
+          <p className="eyebrow flex items-center gap-2 text-gold">
+            <span className="h-px w-6 bg-gold" aria-hidden="true" /> Since {BRAND.since} · {years} years of trust
+          </p>
+          <h2 id="intro-title" className="mt-3 font-display text-[26px] font-semibold leading-tight text-ink lg:text-4xl">
+            {intro.title}
+          </h2>
+          {intro.paragraphs.map((p) => (
+            <p key={p.slice(0, 20)} className="mt-3 text-[14px] leading-relaxed text-ink-2 lg:text-base">
+              {p}
+            </p>
+          ))}
+        </div>
+        <ul className="grid grid-cols-2 gap-px bg-gold-pale/60 lg:content-stretch">
+          {intro.pillars.map((pillar, i) => {
+            const Icon = pillarIcons[i % pillarIcons.length];
+            return (
+              <li key={pillar.title} className="flex flex-col bg-gold-wash p-4 lg:justify-center lg:p-6">
+                <Icon className="h-5 w-5 text-brand" aria-hidden="true" />
+                <p className="mt-2 text-[14px] font-semibold text-ink">{pillar.title}</p>
+                <p className="mt-0.5 text-[12px] leading-snug text-ink-2">{pillar.text}</p>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
   );
 }
 

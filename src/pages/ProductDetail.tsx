@@ -31,7 +31,7 @@ import type { Product } from '../types';
 
 export function ProductDetail() {
   const { slug } = useParams();
-  const { products, categories, loading, categoryName, collectionName, byId } = useCatalogue();
+  const { products, categories, loading, categoryName, categoryPath, collectionName, byId } = useCatalogue();
   const { isAdmin } = useAuth();
   const { isWishlisted, toggleWishlist, openEnquiry, openListPicker, markViewed, recentlyViewed, notify } = useApp();
   const goBack = useGoBack('/catalogue');
@@ -83,7 +83,7 @@ export function ProductDetail() {
   const range = product.weightMin !== null || product.weightMax !== null ? formatWeight({ weightMin: product.weightMin, weightMax: product.weightMax }) : '';
   // Core trade specs first, then the optional details.
   const specs = [
-    ['Product category', category],
+    ['Product category', categoryPath(product.categoryId)],
     ['Make', product.make],
     ['Purity', product.purity],
     ['Gross weight', grams(product.grossWeight)],

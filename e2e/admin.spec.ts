@@ -24,7 +24,7 @@ test('admin creates, publishes and unpublishes a product with photos', async ({ 
   await page.getByLabel('Weight to (g)').fill('7');
   await page.getByLabel('Price (₹)').fill('45000');
   await page.getByText('Show price to customers').click();
-  await page.getByLabel('Category').selectOption({ label: 'Pendants' });
+  await page.getByLabel('Category').selectOption({ label: 'Pendant' });
   await page.getByRole('combobox', { name: 'Make', exact: true }).fill('Handmade');
   await page.getByLabel('Gross weight (g)').fill('6.4');
   await page.getByLabel('Stone weight (g)').fill('0.4');

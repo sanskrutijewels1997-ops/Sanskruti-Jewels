@@ -2,7 +2,13 @@
 // Image paths point at files bundled in /public so they work on web and in Capacitor.
 // Weights, make and quantities are placeholder sample values.
 
-export interface SeedCategory { slug: string; name: string; image: string; }
+export interface SeedCategory {
+  slug: string;
+  name: string;
+  image: string | null;
+  /** Slug of the parent category for sub-categories. */
+  parent: string | null;
+}
 export interface SeedCollection { slug: string; name: string; tagline: string; image: string; }
 export interface SeedProduct {
   sku: string;
@@ -37,64 +43,208 @@ export interface SeedProduct {
 
 export const seedCategories: SeedCategory[] = [
   {
-    "slug": "necklaces",
-    "name": "Necklaces",
-    "image": "/images/gold-necklace.jpg"
+    "slug": "short-necklace",
+    "name": "Short Necklace",
+    "image": "/images/gold-necklace.jpg",
+    "parent": null
   },
   {
-    "slug": "earrings",
-    "name": "Earrings",
-    "image": "/images/jhumka.jpg"
+    "slug": "long-necklace",
+    "name": "Long Necklace",
+    "image": "/images/editorial-bridal.jpg",
+    "parent": null
+  },
+  {
+    "slug": "pendant",
+    "name": "Pendant",
+    "image": "/images/pendant.jpg",
+    "parent": null
   },
   {
     "slug": "rings",
     "name": "Rings",
-    "image": "/images/gold-ring.jpg"
+    "image": "/images/gold-ring.jpg",
+    "parent": null
   },
   {
-    "slug": "bangles",
-    "name": "Bangles",
-    "image": "/images/bangles.jpg"
+    "slug": "gents-rings",
+    "name": "Gents Rings",
+    "image": null,
+    "parent": "rings"
   },
   {
-    "slug": "bracelets",
-    "name": "Bracelets",
-    "image": "/images/bracelet.jpg"
+    "slug": "ladies-rings",
+    "name": "Ladies Rings",
+    "image": null,
+    "parent": "rings"
   },
   {
-    "slug": "chains",
-    "name": "Chains",
-    "image": "/images/chain.jpg"
+    "slug": "karda",
+    "name": "Karda",
+    "image": null,
+    "parent": "rings"
   },
   {
-    "slug": "pendants",
-    "name": "Pendants",
-    "image": "/images/pendant.jpg"
+    "slug": "kan-chains",
+    "name": "Kan Chains",
+    "image": "/images/chain.jpg",
+    "parent": null
   },
   {
-    "slug": "mangalsutras",
-    "name": "Mangalsutras",
-    "image": "/images/mangalsutra.jpg"
+    "slug": "aring",
+    "name": "Aring",
+    "image": "/images/diamond-earrings.jpg",
+    "parent": null
   },
   {
-    "slug": "jewellery-sets",
-    "name": "Jewellery Sets",
-    "image": "/images/bridal-set.jpg"
+    "slug": "tops",
+    "name": "Tops",
+    "image": "/images/diamond-earrings.jpg",
+    "parent": null
   },
   {
-    "slug": "bridal",
-    "name": "Bridal",
-    "image": "/images/editorial-bridal.jpg"
+    "slug": "karwari-tops",
+    "name": "Karwari Tops",
+    "image": null,
+    "parent": "tops"
   },
   {
-    "slug": "mens",
-    "name": "Men's Jewellery",
-    "image": "/images/mens.jpg"
+    "slug": "bangali-tops",
+    "name": "Bangali Tops",
+    "image": null,
+    "parent": "tops"
   },
   {
-    "slug": "kids",
-    "name": "Kids",
-    "image": "/images/lightweight.jpg"
+    "slug": "tika",
+    "name": "Tika",
+    "image": "/images/bridal-set.jpg",
+    "parent": null
+  },
+  {
+    "slug": "nath",
+    "name": "Nath",
+    "image": null,
+    "parent": null
+  },
+  {
+    "slug": "vati",
+    "name": "Vati",
+    "image": "/images/mangalsutra.jpg",
+    "parent": null
+  },
+  {
+    "slug": "rajkot-vati",
+    "name": "Rajkot Vati",
+    "image": null,
+    "parent": "vati"
+  },
+  {
+    "slug": "karwari-vati",
+    "name": "Karwari Vati",
+    "image": null,
+    "parent": "vati"
+  },
+  {
+    "slug": "sui-dhaga",
+    "name": "Sui Dhaga",
+    "image": null,
+    "parent": null
+  },
+  {
+    "slug": "rajkot-vali",
+    "name": "Rajkot Vali",
+    "image": null,
+    "parent": null
+  },
+  {
+    "slug": "vali",
+    "name": "Vali",
+    "image": null,
+    "parent": "rajkot-vali"
+  },
+  {
+    "slug": "uv-vali",
+    "name": "U V Vali",
+    "image": null,
+    "parent": "rajkot-vali"
+  },
+  {
+    "slug": "singapore-vali",
+    "name": "Singapore Vali",
+    "image": null,
+    "parent": "rajkot-vali"
+  },
+  {
+    "slug": "ball-vali",
+    "name": "Ball Vali",
+    "image": null,
+    "parent": "rajkot-vali"
+  },
+  {
+    "slug": "locket",
+    "name": "Locket",
+    "image": "/images/pendant.jpg",
+    "parent": null
+  },
+  {
+    "slug": "casting-lockets",
+    "name": "Casting Lockets",
+    "image": null,
+    "parent": "locket"
+  },
+  {
+    "slug": "patra-lockets",
+    "name": "Patra Lockets",
+    "image": null,
+    "parent": "locket"
+  },
+  {
+    "slug": "laxmi-har",
+    "name": "Laxmi Har",
+    "image": "/images/temple.jpg",
+    "parent": null
+  },
+  {
+    "slug": "zumka",
+    "name": "Zumka",
+    "image": "/images/jhumka.jpg",
+    "parent": null
+  },
+  {
+    "slug": "coimbatore-zumka",
+    "name": "Coimbatore Zumka",
+    "image": null,
+    "parent": "zumka"
+  },
+  {
+    "slug": "karwari-zumka",
+    "name": "Karwari Zumka",
+    "image": null,
+    "parent": "zumka"
+  },
+  {
+    "slug": "casting-rings",
+    "name": "Casting Rings",
+    "image": "/images/diamond-ring.jpg",
+    "parent": null
+  },
+  {
+    "slug": "casting-gents-rings",
+    "name": "Gents Rings",
+    "image": null,
+    "parent": "casting-rings"
+  },
+  {
+    "slug": "casting-ladies-rings",
+    "name": "Ladies Rings",
+    "image": null,
+    "parent": "casting-rings"
+  },
+  {
+    "slug": "couple-band",
+    "name": "Couple Band",
+    "image": null,
+    "parent": "casting-rings"
   }
 ];
 
@@ -143,7 +293,7 @@ export const seedProducts: SeedProduct[] = [
     "slug": "rajwadi-antique-bridal-choker-2847",
     "name": "Rajwadi Antique Bridal Choker",
     "description": "A ceremonial choker built on hand-drawn gold wire filigree with kundan setting across the central motif. Finished in matte antique with hanging pearl drops.",
-    "category": "necklaces",
+    "category": "short-necklace",
     "collection": "bridal",
     "style": "Bridal",
     "metal": "Gold",
@@ -186,7 +336,7 @@ export const seedProducts: SeedProduct[] = [
     "slug": "kundan-grand-bridal-set-2853",
     "name": "Kundan Grand Bridal Set",
     "description": "Complete bridal ensemble with choker, long haar, jhumkas and maang tikka. Nizami-inspired layout with graduated polki plates.",
-    "category": "jewellery-sets",
+    "category": "long-necklace",
     "collection": "bridal",
     "style": "Bridal",
     "metal": "Gold",
@@ -229,7 +379,7 @@ export const seedProducts: SeedProduct[] = [
     "slug": "pearl-drop-temple-jhumkas-2861",
     "name": "Pearl Drop Temple Jhumkas",
     "description": "Classic dome jhumka with nakshi rim, laxmi motif top and a full row of pearl drops. Screw-back closure for daily comfort.",
-    "category": "earrings",
+    "category": "coimbatore-zumka",
     "collection": "traditional",
     "style": "Temple",
     "metal": "Gold",
@@ -272,7 +422,7 @@ export const seedProducts: SeedProduct[] = [
     "slug": "engraved-band-signet-ring-2872",
     "name": "Engraved Band Signet Ring",
     "description": "Sculptural band with hand-engraved chevron detailing and a high-polish inner shank. Sits flush with stacking rings.",
-    "category": "rings",
+    "category": "gents-rings",
     "collection": "modern",
     "style": "Modern",
     "metal": "Gold",
@@ -315,7 +465,7 @@ export const seedProducts: SeedProduct[] = [
     "slug": "solitaire-halo-engagement-ring-2884",
     "name": "Solitaire Halo Engagement Ring",
     "description": "Four-prong solitaire mount with a micro-pave halo and split shank. Available with lab-grown or natural centre stones.",
-    "category": "rings",
+    "category": "casting-ladies-rings",
     "collection": "modern",
     "style": "Modern",
     "metal": "Diamond",
@@ -358,144 +508,11 @@ export const seedProducts: SeedProduct[] = [
     "ageDays": 4
   },
   {
-    "sku": "SJ-102890",
-    "slug": "nakshi-carved-bangle-set-of-6-2890",
-    "name": "Nakshi Carved Bangle Set of 6",
-    "description": "Six-piece bangle stack with alternating floral and paisley carving. Antique matte finish with selective stone setting.",
-    "category": "bangles",
-    "collection": "traditional",
-    "style": "Traditional",
-    "metal": "Gold",
-    "purity": "92 Melting",
-    "weightMin": 46,
-    "weightMax": 58,
-    "make": "Handmade",
-    "grossWeight": 58,
-    "stoneWeight": 4.64,
-    "netWeight": 53.36,
-    "quantity": 1,
-    "stone": "Ruby & emerald cabochon accents",
-    "size": "2.4 / 2.6 / 2.8",
-    "availability": "Ready Stock",
-    "price": null,
-    "showPrice": false,
-    "specifications": [
-      {
-        "label": "Hallmark",
-        "value": "BIS hallmarked (HUID)"
-      },
-      {
-        "label": "Finish",
-        "value": "High polish"
-      }
-    ],
-    "isNew": false,
-    "isFeatured": true,
-    "views": 7420,
-    "images": [
-      "/images/bangles.jpg",
-      "/images/diamond-bangle.jpg",
-      "/images/gold-necklace.jpg",
-      "/images/temple.jpg"
-    ],
-    "ageDays": 5
-  },
-  {
-    "sku": "SJ-102903",
-    "slug": "diamond-line-tennis-bracelet-2903",
-    "name": "Diamond Line Tennis Bracelet",
-    "description": "Slim four-prong tennis line with box clasp and safety latch. A timeless gift that goes with everything.",
-    "category": "bracelets",
-    "collection": "everyday",
-    "style": "Daily Wear",
-    "metal": "Diamond",
-    "purity": "18K",
-    "weightMin": 8,
-    "weightMax": 11,
-    "make": "Casting",
-    "grossWeight": 11,
-    "stoneWeight": 0.44,
-    "netWeight": 10.56,
-    "quantity": 2,
-    "stone": "1.10 ct total, SI-GH",
-    "size": "6.5 / 7 inch",
-    "availability": "Ready Stock",
-    "price": null,
-    "showPrice": false,
-    "specifications": [
-      {
-        "label": "Hallmark",
-        "value": "BIS hallmarked (HUID)"
-      },
-      {
-        "label": "Diamond certification",
-        "value": "IGI certified"
-      },
-      {
-        "label": "Finish",
-        "value": "High polish"
-      }
-    ],
-    "isNew": true,
-    "isFeatured": false,
-    "views": 5890,
-    "images": [
-      "/images/bracelet.jpg",
-      "/images/diamond-bangle.jpg",
-      "/images/diamond-earrings.jpg",
-      "/images/chain.jpg"
-    ],
-    "ageDays": 6
-  },
-  {
-    "sku": "SJ-102911",
-    "slug": "classic-rope-chain-20-inch-2911",
-    "name": "Classic Rope Chain 20 inch",
-    "description": "Machine-made hollow rope chain with a laser-soldered lobster clasp. Consistent gauge across the full length run.",
-    "category": "chains",
-    "collection": "everyday",
-    "style": "Daily Wear",
-    "metal": "Gold",
-    "purity": "22K",
-    "weightMin": 9,
-    "weightMax": 12,
-    "make": "Machine Made",
-    "grossWeight": 12,
-    "stoneWeight": 0,
-    "netWeight": 12,
-    "quantity": 3,
-    "stone": "None",
-    "size": "18 / 20 / 22 inch",
-    "availability": "Ready Stock",
-    "price": 84900,
-    "showPrice": true,
-    "specifications": [
-      {
-        "label": "Hallmark",
-        "value": "BIS hallmarked (HUID)"
-      },
-      {
-        "label": "Finish",
-        "value": "High polish"
-      }
-    ],
-    "isNew": false,
-    "isFeatured": true,
-    "views": 9320,
-    "images": [
-      "/images/chain.jpg",
-      "/images/pendant.jpg",
-      "/images/mens.jpg",
-      "/images/bracelet.jpg"
-    ],
-    "ageDays": 7
-  },
-  {
     "sku": "SJ-102925",
     "slug": "teardrop-diamond-pendant-2925",
     "name": "Teardrop Diamond Pendant",
     "description": "A single pear-cut stone in a bezel-and-prong hybrid setting. Supplied with or without an 18 inch cable chain.",
-    "category": "pendants",
+    "category": "pendant",
     "collection": "everyday",
     "style": "Minimal",
     "metal": "Diamond",
@@ -535,14 +552,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/diamond-ring.jpg",
       "/images/lightweight.jpg"
     ],
-    "ageDays": 8
+    "ageDays": 5
   },
   {
     "sku": "SJ-102938",
     "slug": "contemporary-diamond-mangalsutra-2938",
     "name": "Contemporary Diamond Mangalsutra",
     "description": "Double-line black bead mangalsutra with a compact diamond floral pendant designed for daily office wear.",
-    "category": "mangalsutras",
+    "category": "rajkot-vati",
     "collection": "everyday",
     "style": "Modern",
     "metal": "Diamond",
@@ -582,14 +599,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/chain.jpg",
       "/images/lightweight.jpg"
     ],
-    "ageDays": 9
+    "ageDays": 6
   },
   {
     "sku": "SJ-102944",
     "slug": "mens-textured-gold-kada-2944",
     "name": "Men's Textured Gold Kada",
     "description": "Hinged kada with hand-chiselled chevron texture and a concealed push clasp. Heavy gauge, hollow core construction.",
-    "category": "mens",
+    "category": "karda",
     "collection": "mens",
     "style": "Modern",
     "metal": "Gold",
@@ -625,14 +642,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/chain.jpg",
       "/images/gold-ring.jpg"
     ],
-    "ageDays": 10
+    "ageDays": 7
   },
   {
     "sku": "SJ-102957",
     "slug": "featherlight-geometric-necklace-2957",
     "name": "Featherlight Geometric Necklace",
     "description": "Hollow-form gold necklace under 5 grams with a small geometric charm. Light enough for every day.",
-    "category": "necklaces",
+    "category": "short-necklace",
     "collection": "modern",
     "style": "Lightweight",
     "metal": "Gold",
@@ -668,14 +685,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/chain.jpg",
       "/images/editorial-everyday.jpg"
     ],
-    "ageDays": 11
+    "ageDays": 8
   },
   {
     "sku": "SJ-102968",
     "slug": "lakshmi-temple-haaram-2968",
     "name": "Lakshmi Temple Haaram",
     "description": "Long temple haaram with repeating Lakshmi and peacock plates, hand-set with cabochon rubies through the frame.",
-    "category": "necklaces",
+    "category": "laxmi-har",
     "collection": "traditional",
     "style": "Temple",
     "metal": "Gold",
@@ -711,14 +728,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/bridal-set.jpg",
       "/images/jhumka.jpg"
     ],
-    "ageDays": 12
+    "ageDays": 9
   },
   {
     "sku": "SJ-102979",
     "slug": "diamond-drop-cocktail-earrings-2979",
     "name": "Diamond Drop Cocktail Earrings",
     "description": "Detachable stud-and-drop construction giving you two looks from one pair.",
-    "category": "earrings",
+    "category": "aring",
     "collection": "statement",
     "style": "Modern",
     "metal": "Diamond",
@@ -758,61 +775,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/pendant.jpg",
       "/images/editorial-statement.jpg"
     ],
-    "ageDays": 13
-  },
-  {
-    "sku": "SJ-102986",
-    "slug": "rose-gold-diamond-bangle-2986",
-    "name": "Rose Gold Diamond Bangle",
-    "description": "Openable rose gold bangle with a continuous pave face and matte side walls for contrast.",
-    "category": "bangles",
-    "collection": "everyday",
-    "style": "Modern",
-    "metal": "Diamond",
-    "purity": "18K",
-    "weightMin": 16,
-    "weightMax": 21,
-    "make": "Casting",
-    "grossWeight": 21,
-    "stoneWeight": 0.84,
-    "netWeight": 20.16,
-    "quantity": 5,
-    "stone": "0.86 ct pave",
-    "size": "2.4 / 2.6",
-    "availability": "Ready Stock",
-    "price": null,
-    "showPrice": false,
-    "specifications": [
-      {
-        "label": "Hallmark",
-        "value": "BIS hallmarked (HUID)"
-      },
-      {
-        "label": "Diamond certification",
-        "value": "IGI certified"
-      },
-      {
-        "label": "Finish",
-        "value": "High polish"
-      }
-    ],
-    "isNew": false,
-    "isFeatured": false,
-    "views": 5410,
-    "images": [
-      "/images/diamond-bangle.jpg",
-      "/images/bangles.jpg",
-      "/images/bracelet.jpg",
-      "/images/diamond-earrings.jpg"
-    ],
-    "ageDays": 14
+    "ageDays": 10
   },
   {
     "sku": "SJ-102994",
     "slug": "filigree-bridal-long-necklace-2994",
     "name": "Filigree Bridal Long Necklace",
     "description": "Jaipur filigree work across a graduated collar with a detachable central pendant that can be worn separately.",
-    "category": "bridal",
+    "category": "long-necklace",
     "collection": "bridal",
     "style": "Bridal",
     "metal": "Gold",
@@ -848,14 +818,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/bridal-set.jpg",
       "/images/temple.jpg"
     ],
-    "ageDays": 15
+    "ageDays": 11
   },
   {
     "sku": "SJ-103002",
     "slug": "everyday-diamond-studs-3002",
     "name": "Everyday Diamond Studs",
     "description": "Classic four-prong diamond studs with secure screw backs. An everyday essential.",
-    "category": "earrings",
+    "category": "karwari-tops",
     "collection": "everyday",
     "style": "Daily Wear",
     "metal": "Diamond",
@@ -895,57 +865,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/diamond-ring.jpg",
       "/images/lightweight.jpg"
     ],
-    "ageDays": 16
-  },
-  {
-    "sku": "SJ-103015",
-    "slug": "cuban-link-chain-22-inch-3015",
-    "name": "Cuban Link Chain 22 inch",
-    "description": "Heavy solid cuban link with a diamond-cut face and box-tongue clasp. The strongest performer in the men’s catalogue.",
-    "category": "chains",
-    "collection": "mens",
-    "style": "Modern",
-    "metal": "Gold",
-    "purity": "22K",
-    "weightMin": 28,
-    "weightMax": 36,
-    "make": "Machine Made",
-    "grossWeight": 36,
-    "stoneWeight": 0,
-    "netWeight": 36,
-    "quantity": 3,
-    "stone": "None",
-    "size": "20 / 22 / 24 inch",
-    "availability": "Ready Stock",
-    "price": null,
-    "showPrice": false,
-    "specifications": [
-      {
-        "label": "Hallmark",
-        "value": "BIS hallmarked (HUID)"
-      },
-      {
-        "label": "Finish",
-        "value": "High polish"
-      }
-    ],
-    "isNew": true,
-    "isFeatured": true,
-    "views": 8830,
-    "images": [
-      "/images/mens.jpg",
-      "/images/chain.jpg",
-      "/images/bracelet.jpg",
-      "/images/gold-ring.jpg"
-    ],
-    "ageDays": 17
+    "ageDays": 12
   },
   {
     "sku": "SJ-103021",
     "slug": "antique-peacock-pendant-3021",
     "name": "Antique Peacock Pendant",
     "description": "Antique-finish peacock motif pendant with fine nakshi border and a single pearl drop at the base.",
-    "category": "pendants",
+    "category": "pendant",
     "collection": "traditional",
     "style": "Antique",
     "metal": "Gold",
@@ -981,14 +908,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/gold-necklace.jpg",
       "/images/jhumka.jpg"
     ],
-    "ageDays": 18
+    "ageDays": 13
   },
   {
     "sku": "SJ-103038",
     "slug": "slim-beaded-mangalsutra-3038",
     "name": "Slim Beaded Mangalsutra",
     "description": "Single-line lightweight mangalsutra with an understated gold vati. Designed for the sub-5 gram price band.",
-    "category": "mangalsutras",
+    "category": "karwari-vati",
     "collection": "everyday",
     "style": "Lightweight",
     "metal": "Gold",
@@ -1024,14 +951,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/lightweight.jpg",
       "/images/pendant.jpg"
     ],
-    "ageDays": 19
+    "ageDays": 14
   },
   {
     "sku": "SJ-103044",
     "slug": "statement-emerald-collar-3044",
     "name": "Statement Emerald Collar",
     "description": "A bold collar with graduated emerald cabochons framed in uncut diamond. Built for flagship display windows.",
-    "category": "necklaces",
+    "category": "short-necklace",
     "collection": "statement",
     "style": "Traditional",
     "metal": "Gold",
@@ -1067,57 +994,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/bridal-set.jpg",
       "/images/temple.jpg"
     ],
-    "ageDays": 20
-  },
-  {
-    "sku": "SJ-103057",
-    "slug": "twisted-gold-cuff-bracelet-3057",
-    "name": "Twisted Gold Cuff Bracelet",
-    "description": "Two-tone twisted cuff finished in alternating matte and mirror polish. Adjustable open-back form.",
-    "category": "bracelets",
-    "collection": "modern",
-    "style": "Modern",
-    "metal": "Gold",
-    "purity": "18K",
-    "weightMin": 12,
-    "weightMax": 16,
-    "make": "Machine Made",
-    "grossWeight": 16,
-    "stoneWeight": 0,
-    "netWeight": 16,
-    "quantity": 2,
-    "stone": "None",
-    "size": "Free size cuff",
-    "availability": "Ready Stock",
-    "price": null,
-    "showPrice": false,
-    "specifications": [
-      {
-        "label": "Hallmark",
-        "value": "BIS hallmarked (HUID)"
-      },
-      {
-        "label": "Finish",
-        "value": "High polish"
-      }
-    ],
-    "isNew": false,
-    "isFeatured": false,
-    "views": 3110,
-    "images": [
-      "/images/bracelet.jpg",
-      "/images/bangles.jpg",
-      "/images/mens.jpg",
-      "/images/chain.jpg"
-    ],
-    "ageDays": 21
+    "ageDays": 15
   },
   {
     "sku": "SJ-103063",
     "slug": "polki-bridal-jhumka-3063",
     "name": "Polki Bridal Jhumka",
     "description": "Oversized bridal jhumka with detachable ear-chain sahara and a triple row of pearl fringe.",
-    "category": "earrings",
+    "category": "karwari-zumka",
     "collection": "bridal",
     "style": "Bridal",
     "metal": "Gold",
@@ -1153,14 +1037,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/editorial-bridal.jpg",
       "/images/temple.jpg"
     ],
-    "ageDays": 22
+    "ageDays": 16
   },
   {
     "sku": "SJ-103071",
     "slug": "minimal-stacking-ring-trio-3071",
     "name": "Minimal Stacking Ring Trio",
     "description": "Three slim bands — plain, twisted and single-stone — sold as a coordinated stack or individually.",
-    "category": "rings",
+    "category": "ladies-rings",
     "collection": "modern",
     "style": "Minimal",
     "metal": "Gold",
@@ -1196,57 +1080,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/lightweight.jpg",
       "/images/pendant.jpg"
     ],
-    "ageDays": 23
-  },
-  {
-    "sku": "SJ-103085",
-    "slug": "heritage-kada-pair-3085",
-    "name": "Heritage Kada Pair",
-    "description": "Broad temple-style kada pair with deep repoussé work and a screw-open hinge for easy wear.",
-    "category": "bangles",
-    "collection": "traditional",
-    "style": "Antique",
-    "metal": "Gold",
-    "purity": "22K",
-    "weightMin": 68,
-    "weightMax": 82,
-    "make": "Handmade",
-    "grossWeight": 82,
-    "stoneWeight": 6.56,
-    "netWeight": 75.44,
-    "quantity": 5,
-    "stone": "Ruby accents",
-    "size": "2.6 / 2.8",
-    "availability": "Made to Order",
-    "price": null,
-    "showPrice": false,
-    "specifications": [
-      {
-        "label": "Hallmark",
-        "value": "BIS hallmarked (HUID)"
-      },
-      {
-        "label": "Finish",
-        "value": "Antique matte"
-      }
-    ],
-    "isNew": false,
-    "isFeatured": false,
-    "views": 5010,
-    "images": [
-      "/images/bangles.jpg",
-      "/images/temple.jpg",
-      "/images/gold-necklace.jpg",
-      "/images/diamond-bangle.jpg"
-    ],
-    "ageDays": 24
+    "ageDays": 17
   },
   {
     "sku": "SJ-103096",
     "slug": "diamond-cluster-cocktail-ring-3096",
     "name": "Diamond Cluster Cocktail Ring",
     "description": "Flower cluster head with illusion setting that reads two sizes larger than its carat weight.",
-    "category": "rings",
+    "category": "ladies-rings",
     "collection": "statement",
     "style": "Modern",
     "metal": "Diamond",
@@ -1286,57 +1127,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/gold-ring.jpg",
       "/images/editorial-statement.jpg"
     ],
-    "ageDays": 25
-  },
-  {
-    "sku": "SJ-103108",
-    "slug": "sleek-box-chain-18-inch-3108",
-    "name": "Sleek Box Chain 18 inch",
-    "description": "Fine box chain suitable for pendant pairing. Supplied in bulk packs with individual poly sleeves.",
-    "category": "chains",
-    "collection": "everyday",
-    "style": "Minimal",
-    "metal": "Gold",
-    "purity": "18K",
-    "weightMin": 4,
-    "weightMax": 7,
-    "make": "Machine Made",
-    "grossWeight": 7,
-    "stoneWeight": 0,
-    "netWeight": 7,
-    "quantity": 2,
-    "stone": "None",
-    "size": "16 / 18 / 20 inch",
-    "availability": "Ready Stock",
-    "price": null,
-    "showPrice": false,
-    "specifications": [
-      {
-        "label": "Hallmark",
-        "value": "BIS hallmarked (HUID)"
-      },
-      {
-        "label": "Finish",
-        "value": "High polish"
-      }
-    ],
-    "isNew": false,
-    "isFeatured": false,
-    "views": 7020,
-    "images": [
-      "/images/chain.jpg",
-      "/images/lightweight.jpg",
-      "/images/pendant.jpg",
-      "/images/bracelet.jpg"
-    ],
-    "ageDays": 26
+    "ageDays": 18
   },
   {
     "sku": "SJ-103117",
     "slug": "bridal-maang-tikka-set-3117",
     "name": "Bridal Maang Tikka & Set",
     "description": "Coordinated tikka, passa and choker trio finished to match a bride’s primary necklace order.",
-    "category": "bridal",
+    "category": "tika",
     "collection": "bridal",
     "style": "Bridal",
     "metal": "Gold",
@@ -1372,14 +1170,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/jhumka.jpg",
       "/images/gold-necklace.jpg"
     ],
-    "ageDays": 27
+    "ageDays": 19
   },
   {
     "sku": "SJ-103126",
     "slug": "mens-signet-gold-ring-3126",
     "name": "Men's Signet Gold Ring",
     "description": "Broad-face signet with a brushed top plate, available blank or with your own engraving.",
-    "category": "mens",
+    "category": "casting-gents-rings",
     "collection": "mens",
     "style": "Modern",
     "metal": "Gold",
@@ -1415,14 +1213,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/chain.jpg",
       "/images/bracelet.jpg"
     ],
-    "ageDays": 28
+    "ageDays": 20
   },
   {
     "sku": "SJ-103139",
     "slug": "delicate-layering-necklace-3139",
     "name": "Delicate Layering Necklace",
     "description": "Ultra-fine layering chain designed to be sold in threes. A strong entry price-point for younger buyers.",
-    "category": "necklaces",
+    "category": "long-necklace",
     "collection": "modern",
     "style": "Minimal",
     "metal": "Gold",
@@ -1458,14 +1256,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/chain.jpg",
       "/images/pendant.jpg"
     ],
-    "ageDays": 29
+    "ageDays": 21
   },
   {
     "sku": "SJ-103147",
     "slug": "emerald-drop-temple-necklace-3147",
     "name": "Emerald Drop Temple Necklace",
     "description": "Temple plates strung with graduated emerald beads and finished with a hand-knotted silk cord back.",
-    "category": "necklaces",
+    "category": "laxmi-har",
     "collection": "traditional",
     "style": "Temple",
     "metal": "Gold",
@@ -1501,14 +1299,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/gold-necklace.jpg",
       "/images/bridal-set.jpg"
     ],
-    "ageDays": 30
+    "ageDays": 22
   },
   {
     "sku": "SJ-103155",
     "slug": "diamond-bezel-pendant-set-3155",
     "name": "Diamond Bezel Pendant Set",
     "description": "Bezel-set pendant with matching studs, packaged as a ready gifting set with certificate.",
-    "category": "jewellery-sets",
+    "category": "casting-lockets",
     "collection": "everyday",
     "style": "Daily Wear",
     "metal": "Diamond",
@@ -1548,14 +1346,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/chain.jpg",
       "/images/lightweight.jpg"
     ],
-    "ageDays": 31
+    "ageDays": 23
   },
   {
     "sku": "SJ-103168",
     "slug": "broad-gold-choker-necklace-3168",
     "name": "Broad Gold Choker Necklace",
     "description": "Wide gold choker with a dense floral field and hidden hook closure at the nape.",
-    "category": "necklaces",
+    "category": "short-necklace",
     "collection": "traditional",
     "style": "Traditional",
     "metal": "Gold",
@@ -1591,57 +1389,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/temple.jpg",
       "/images/bridal-set.jpg"
     ],
-    "ageDays": 32
-  },
-  {
-    "sku": "SJ-103174",
-    "slug": "kids-adjustable-gold-bangles-3174",
-    "name": "Kids Adjustable Gold Bangles",
-    "description": "Adjustable-screw kids bangle pair with rounded edges and a soft matte finish.",
-    "category": "kids",
-    "collection": "everyday",
-    "style": "Lightweight",
-    "metal": "Gold",
-    "purity": "18K",
-    "weightMin": 3,
-    "weightMax": 5,
-    "make": "Machine Made",
-    "grossWeight": 5,
-    "stoneWeight": 0,
-    "netWeight": 5,
-    "quantity": 4,
-    "stone": "None",
-    "size": "1.8 / 2.0 adjustable",
-    "availability": "Ready Stock",
-    "price": null,
-    "showPrice": false,
-    "specifications": [
-      {
-        "label": "Hallmark",
-        "value": "BIS hallmarked (HUID)"
-      },
-      {
-        "label": "Finish",
-        "value": "High polish"
-      }
-    ],
-    "isNew": false,
-    "isFeatured": false,
-    "views": 2410,
-    "images": [
-      "/images/bangles.jpg",
-      "/images/lightweight.jpg",
-      "/images/bracelet.jpg",
-      "/images/chain.jpg"
-    ],
-    "ageDays": 33
+    "ageDays": 24
   },
   {
     "sku": "SJ-103186",
     "slug": "platinum-eternity-band-3186",
     "name": "Platinum Eternity Band",
     "description": "Channel-set platinum eternity band with a comfort-fit profile, produced to exact finger size.",
-    "category": "rings",
+    "category": "couple-band",
     "collection": "modern",
     "style": "Minimal",
     "metal": "Platinum",
@@ -1673,53 +1428,14 @@ export const seedProducts: SeedProduct[] = [
       "/images/diamond-earrings.jpg",
       "/images/pendant.jpg"
     ],
-    "ageDays": 34
-  },
-  {
-    "sku": "SJ-103195",
-    "slug": "silver-oxidised-statement-cuff-3195",
-    "name": "Silver Oxidised Statement Cuff",
-    "description": "Oxidised 92.5 silver cuff with tribal-inspired chiselling for a bold, fashion-forward look.",
-    "category": "bracelets",
-    "collection": "statement",
-    "style": "Antique",
-    "metal": "Silver",
-    "purity": "14K",
-    "weightMin": 24,
-    "weightMax": 32,
-    "make": "Handmade",
-    "grossWeight": 32,
-    "stoneWeight": 0,
-    "netWeight": 32,
-    "quantity": 1,
-    "stone": "None",
-    "size": "Free size",
-    "availability": "Ready Stock",
-    "price": 6400,
-    "showPrice": true,
-    "specifications": [
-      {
-        "label": "Finish",
-        "value": "Antique matte"
-      }
-    ],
-    "isNew": false,
-    "isFeatured": false,
-    "views": 2180,
-    "images": [
-      "/images/bracelet.jpg",
-      "/images/bangles.jpg",
-      "/images/editorial-statement.jpg",
-      "/images/mens.jpg"
-    ],
-    "ageDays": 35
+    "ageDays": 25
   },
   {
     "sku": "SJ-103203",
     "slug": "layered-pearl-gold-haar-3203",
     "name": "Layered Pearl & Gold Haar",
     "description": "Three-layer pearl haar with polki spacers and a detachable central plate.",
-    "category": "necklaces",
+    "category": "long-necklace",
     "collection": "bridal",
     "style": "Traditional",
     "metal": "Gold",
@@ -1755,49 +1471,6 @@ export const seedProducts: SeedProduct[] = [
       "/images/temple.jpg",
       "/images/editorial-bridal.jpg"
     ],
-    "ageDays": 36
-  },
-  {
-    "sku": "SJ-103217",
-    "slug": "rudraksha-gold-fusion-bracelet-3217",
-    "name": "Rudraksha Gold Fusion Bracelet",
-    "description": "Alternating rudraksha and gold cap beads on a reinforced steel core with gold clasp.",
-    "category": "mens",
-    "collection": "mens",
-    "style": "Traditional",
-    "metal": "Gold",
-    "purity": "22K",
-    "weightMin": 14,
-    "weightMax": 19,
-    "make": "Handmade",
-    "grossWeight": 19,
-    "stoneWeight": 1.52,
-    "netWeight": 17.48,
-    "quantity": 3,
-    "stone": "Rudraksha beads",
-    "size": "7.5 / 8 inch",
-    "availability": "Ready Stock",
-    "price": null,
-    "showPrice": false,
-    "specifications": [
-      {
-        "label": "Hallmark",
-        "value": "BIS hallmarked (HUID)"
-      },
-      {
-        "label": "Finish",
-        "value": "High polish"
-      }
-    ],
-    "isNew": true,
-    "isFeatured": false,
-    "views": 3760,
-    "images": [
-      "/images/mens.jpg",
-      "/images/bracelet.jpg",
-      "/images/gold-ring.jpg",
-      "/images/chain.jpg"
-    ],
-    "ageDays": 37
+    "ageDays": 26
   }
 ];

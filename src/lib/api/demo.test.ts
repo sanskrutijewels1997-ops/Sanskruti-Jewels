@@ -96,7 +96,7 @@ describe('permissions (mirror the database RLS rules)', () => {
       await login();
       await expect(api.saveProduct(input())).rejects.toThrow('Admins only');
       await expect(api.deleteProduct('x')).rejects.toThrow('Admins only');
-      await expect(api.saveCategory({ slug: 'x', name: 'X', imageUrl: null, sortOrder: 0 })).rejects.toThrow('Admins only');
+      await expect(api.saveCategory({ slug: 'x', name: 'X', imageUrl: null, parentId: null, sortOrder: 0 })).rejects.toThrow('Admins only');
       await expect(api.listCustomers()).rejects.toThrow('Admins only');
       await expect(api.listAllEnquiries()).rejects.toThrow('Admins only');
       await expect(api.adminStats()).rejects.toThrow('Admins only');
@@ -158,15 +158,31 @@ describe('admin catalogue management', () => {
   });
 
   it('creates and renames categories and collections, rejecting duplicate slugs', async () => {
-    const cat = await api.saveCategory({ slug: 'anklets', name: 'Anklets', imageUrl: null, sortOrder: 99 });
+    const cat = await api.saveCategory({ slug: 'anklets', name: 'Anklets', imageUrl: null, parentId: null, sortOrder: 99 });
     await api.saveCategory({ ...cat, name: 'Payal' });
     expect((await api.listCategories()).find((c) => c.id === cat.id)?.name).toBe('Payal');
-    await expect(api.saveCategory({ slug: 'anklets', name: 'Dup', imageUrl: null, sortOrder: 0 })).rejects.toThrow('already exists');
+    await expect(api.saveCategory({ slug: 'anklets', name: 'Dup', imageUrl: null, parentId: null, sortOrder: 0 })).rejects.toThrow('already exists');
 
     const col = await api.saveCollection({ slug: 'festive', name: 'Festive', tagline: 't', imageUrl: null, sortOrder: 9 });
     await api.saveCollection({ ...col, tagline: 'Diwali' });
     expect((await api.listCollections()).find((c) => c.id === col.id)?.tagline).toBe('Diwali');
     await expect(api.saveCollection({ slug: 'festive', name: 'x', tagline: '', imageUrl: null, sortOrder: 0 })).rejects.toThrow('already exists');
+  });
+
+  it('keeps sub-categories one level deep and deletes them with their parent', async () => {
+    const all = await api.listCategories();
+    const rings = all.find((c) => c.slug === 'rings')!;
+    const gents = all.find((c) => c.slug === 'gents-rings')!;
+    expect(gents.parentId).toBe(rings.id);
+    await expect(api.saveCategory({ slug: 'deep', name: 'Deep', imageUrl: null, parentId: gents.id, sortOrder: 0 })).rejects.toThrow('one level deep');
+    await expect(api.saveCategory({ ...rings, parentId: all.find((c) => c.slug === 'tika')!.id })).rejects.toThrow('cannot become a sub-category');
+    await expect(api.saveCategory({ ...gents, parentId: gents.id })).rejects.toThrow('own parent');
+
+    const productInGents = (await api.listProducts()).find((p) => p.categoryId === gents.id)!;
+    await api.deleteCategory(rings.id);
+    const after = await api.listCategories();
+    expect(after.some((c) => c.id === rings.id || c.parentId === rings.id)).toBe(false);
+    expect((await api.listProducts()).find((p) => p.id === productInGents.id)?.categoryId).toBeNull();
   });
 
   it('inlines uploaded images as data URLs', async () => {

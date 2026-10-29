@@ -116,7 +116,7 @@ jobs:
         run: |
           psql "$DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/setup.sql
           psql "$DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/setup.sql
-          test "$(psql "$DB_URL" -tAc 'select count(*) from public.products')" -ge 38
+          test "$(psql "$DB_URL" -tAc 'select count(*) from public.products')" -ge 27
 
       - name: Security rules & Supabase adapter tests
         run: npm run test:db

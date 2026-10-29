@@ -3,7 +3,9 @@ import {
   MAX_WEIGHT,
   activeCount,
   applyFilters,
+  categoryPath,
   emptyFilters,
+  facetValues,
   matchesQuery,
   parseParams,
   sortProducts,
@@ -12,8 +14,9 @@ import {
 import type { Category, Collection, Product } from '../types';
 
 const categories: Category[] = [
-  { id: 'c-ring', slug: 'rings', name: 'Rings', imageUrl: null, sortOrder: 0 },
-  { id: 'c-neck', slug: 'necklaces', name: 'Necklaces', imageUrl: null, sortOrder: 1 }
+  { id: 'c-ring', slug: 'rings', name: 'Rings', parentId: null, imageUrl: null, sortOrder: 0 },
+  { id: 'c-neck', slug: 'necklaces', name: 'Necklaces', parentId: null, imageUrl: null, sortOrder: 1 },
+  { id: 'c-gents', slug: 'gents-rings', name: 'Gents Rings', parentId: 'c-ring', imageUrl: null, sortOrder: 2 }
 ];
 const collections: Collection[] = [{ id: 'k-bridal', slug: 'bridal', name: 'Bridal', tagline: '', imageUrl: null, sortOrder: 0 }];
 const lookups = {
@@ -126,6 +129,29 @@ describe('applyFilters', () => {
     const f = { ...emptyFilters, categories: ['rings'], metals: ['Gold'] };
     expect(applyFilters(all, f, '', lookups).map((p) => p.sku)).toEqual([]);
     expect(applyFilters(all, f, '', lookups, 'metals').map((p) => p.sku)).toEqual(['R1']);
+  });
+});
+
+describe('sub-categories', () => {
+  const gents = product({ sku: 'G1', name: 'Bold Signet', categoryId: 'c-gents' });
+
+  it('includes sub-category products when the parent is chosen, but not the reverse', () => {
+    const list = [ring, gents, chain];
+    expect(applyFilters(list, { ...emptyFilters, categories: ['rings'] }, '', lookups).map((p) => p.sku)).toEqual(['R1', 'G1']);
+    expect(applyFilters(list, { ...emptyFilters, categories: ['gents-rings'] }, '', lookups).map((p) => p.sku)).toEqual(['G1']);
+  });
+
+  it('reports a sub-category product under both its own slug and its parent', () => {
+    expect(facetValues(gents, 'categories', lookups)).toEqual(['gents-rings', 'rings']);
+    expect(facetValues(ring, 'categories', lookups)).toEqual(['rings']);
+    expect(facetValues(product({ categoryId: null }), 'categories', lookups)).toEqual([]);
+  });
+
+  it('builds a readable path and lets search match the parent name', () => {
+    expect(categoryPath('c-gents', categories)).toBe('Rings › Gents Rings');
+    expect(categoryPath('c-ring', categories)).toBe('Rings');
+    expect(categoryPath(null, categories)).toBe('');
+    expect(applyFilters([gents], emptyFilters, 'rings bold', lookups)).toHaveLength(1);
   });
 });
 

@@ -19,6 +19,8 @@ export interface Category {
   id: string;
   slug: string;
   name: string;
+  /** Set for sub-categories (one level deep). */
+  parentId: string | null;
   imageUrl: string | null;
   sortOrder: number;
 }

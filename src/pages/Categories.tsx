@@ -8,9 +8,12 @@ type Tab = 'categories' | 'collections';
 
 export function Categories({ initialTab = 'categories' }: { initialTab?: Tab }) {
   const [tab, setTab] = useState<Tab>(initialTab);
-  const { categories, collections, published, loading } = useCatalogue();
+  const { topCategories, subcategoriesOf, collections, published, loading } = useCatalogue();
   const navigate = useNavigate();
   const countBy = (key: 'categoryId' | 'collectionId', id: string) => published.filter((p) => p[key] === id).length;
+  // A main category's count includes its sub-categories.
+  const categoryCount = (id: string) =>
+    countBy('categoryId', id) + subcategoriesOf(id).reduce((n, s) => n + countBy('categoryId', s.id), 0);
 
   return (
     <div className="mx-auto max-w-site lg:px-6">
@@ -51,11 +54,11 @@ export function Categories({ initialTab = 'categories' }: { initialTab?: Tab }) 
               <GemIcon className="h-8 w-8" />
             </span>
             <span className="mt-2 text-center text-[12.5px] font-semibold text-ink">All Jewellery</span>
-            <span className="text-[11px] text-ink-3">{published.length} designs</span>
+            <span className="text-[11px] text-ink-3">{published.length} {published.length === 1 ? 'design' : 'designs'}</span>
           </Link>
           {loading
             ? Array.from({ length: 8 }).map((_, i) => <span key={i} className="skeleton aspect-square rounded-2xl" />)
-            : categories.map((c) => (
+            : topCategories.map((c) => (
                 <Link key={c.id} to={`/catalogue?category=${c.slug}`} className="pressable flex flex-col items-center">
                   <span className="block aspect-square w-full overflow-hidden rounded-2xl bg-surface-2">
                     {c.imageUrl ? (
@@ -65,7 +68,10 @@ export function Categories({ initialTab = 'categories' }: { initialTab?: Tab }) 
                     )}
                   </span>
                   <span className="mt-2 line-clamp-1 text-center text-[12.5px] font-semibold text-ink">{c.name}</span>
-                  <span className="text-[11px] text-ink-3">{countBy('categoryId', c.id)} designs</span>
+                  <span className="text-[11px] text-ink-3">
+                    {subcategoriesOf(c.id).length > 0 ? `${subcategoriesOf(c.id).length} types · ` : ''}
+                    {categoryCount(c.id)} {categoryCount(c.id) === 1 ? 'design' : 'designs'}
+                  </span>
                 </Link>
               ))}
         </div>

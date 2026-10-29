@@ -70,9 +70,16 @@ export function Catalogue() {
 
   const collection = filters.collections.length === 1 ? collections.find((c) => c.slug === filters.collections[0]) : undefined;
   const category = filters.categories.length === 1 ? categories.find((c) => c.slug === filters.categories[0]) : undefined;
+  // Sub-category tabs when browsing a category that has them (or one of its children).
+  const parentCategory = category ? (category.parentId ? categories.find((c) => c.id === category.parentId) : category) : undefined;
+  const subcategories = parentCategory ? categories.filter((c) => c.parentId === parentCategory.id) : [];
+  const showSubTabs = !!parentCategory && subcategories.length > 0;
+  const pickCategory = (slug: string) => update({ ...filters, categories: [slug] });
+
   const purityTitle =
     filters.purities.length === 1 ? purityShortcuts.find((s) => s.value === filters.purities[0])?.label : undefined;
   const title = q ? `“${q}”` : collection?.name ?? category?.name ?? purityTitle ?? (filters.newOnly ? 'New Arrivals' : 'All Jewellery');
+
   const count = activeCount(filters);
 
   // Removable chips for every applied filter (Baymard: show applied filters).
@@ -81,7 +88,8 @@ export function Catalogue() {
     filters[facet].forEach((v) =>
       applied.push({ label: label(v), remove: () => update({ ...filters, [facet]: filters[facet].filter((x) => x !== v) }) })
     );
-  listChip('categories', (v) => categories.find((c) => c.slug === v)?.name ?? v);
+  // With sub-category tabs showing, the category is already visible there.
+  if (!showSubTabs) listChip('categories', (v) => categories.find((c) => c.slug === v)?.name ?? v);
   listChip('collections', (v) => collections.find((c) => c.slug === v)?.name ?? v);
   listChip('metals', (v) => v);
   filters.purities
@@ -127,7 +135,11 @@ export function Catalogue() {
     <div className="mx-auto max-w-site pb-[calc(56px+env(safe-area-inset-bottom))] lg:px-6 lg:pb-0">
       <PageHeader
         title={title}
-        subtitle={loading ? 'Loading…' : `${results.length} ${results.length === 1 ? 'item' : 'items'}`}
+        subtitle={
+          loading
+            ? 'Loading…'
+            : `${category?.parentId && parentCategory ? `${parentCategory.name} · ` : ''}${results.length} ${results.length === 1 ? 'item' : 'items'}`
+        }
         fallback="/categories"
         actions={
           <HeaderIconButton label="Search" onClick={() => navigate('/search')}>
@@ -135,6 +147,27 @@ export function Catalogue() {
           </HeaderIconButton>
         }
       />
+
+      {showSubTabs && parentCategory && (
+        <nav aria-label={`${parentCategory.name} types`} className="no-scrollbar flex gap-5 overflow-x-auto border-b border-line px-4 lg:px-0">
+          {[parentCategory, ...subcategories].map((c) => {
+            const active = category?.id === c.id;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => pickCategory(c.slug)}
+                aria-current={active ? 'true' : undefined}
+                className={`shrink-0 border-b-2 py-3 text-[13.5px] ${
+                  active ? 'border-brand font-semibold text-brand' : 'border-transparent font-medium text-ink-2'
+                }`}
+              >
+                {c.id === parentCategory.id ? `All ${c.name}` : c.name}
+              </button>
+            );
+          })}
+        </nav>
+      )}
 
       <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-3 lg:px-0">
         {/* Desktop keeps sort/filter inline instead of the bottom bar */}
