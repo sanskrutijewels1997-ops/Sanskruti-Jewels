@@ -79,8 +79,8 @@ export const seedCategories: SeedCategory[] = [
     "parent": "rings"
   },
   {
-    "slug": "karda",
-    "name": "Karda",
+    "slug": "kada",
+    "name": "Kada",
     "image": null,
     "parent": "rings"
   },
@@ -91,8 +91,8 @@ export const seedCategories: SeedCategory[] = [
     "parent": null
   },
   {
-    "slug": "aring",
-    "name": "Aring",
+    "slug": "earring",
+    "name": "Earring",
     "image": "/images/diamond-earrings.jpg",
     "parent": null
   },
@@ -606,7 +606,7 @@ export const seedProducts: SeedProduct[] = [
     "slug": "mens-textured-gold-kada-2944",
     "name": "Men's Textured Gold Kada",
     "description": "Hinged kada with hand-chiselled chevron texture and a concealed push clasp. Heavy gauge, hollow core construction.",
-    "category": "karda",
+    "category": "kada",
     "collection": "mens",
     "style": "Modern",
     "metal": "Gold",
@@ -735,7 +735,7 @@ export const seedProducts: SeedProduct[] = [
     "slug": "diamond-drop-cocktail-earrings-2979",
     "name": "Diamond Drop Cocktail Earrings",
     "description": "Detachable stud-and-drop construction giving you two looks from one pair.",
-    "category": "aring",
+    "category": "earring",
     "collection": "statement",
     "style": "Modern",
     "metal": "Diamond",

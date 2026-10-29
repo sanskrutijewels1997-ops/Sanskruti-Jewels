@@ -29,8 +29,8 @@ chips at the front.
 Products are organised in the client's category tree: 16 main categories, some with
 sub-categories, one level deep:
 
-Short Necklace · Long Necklace · Pendant · **Rings** (Gents Rings, Ladies Rings, Karda) ·
-Kan Chains · Aring · **Tops** (Karwari Tops, Bangali Tops) · Tika · Nath · **Vati** (Rajkot
+Short Necklace · Long Necklace · Pendant · **Rings** (Gents Rings, Ladies Rings, Kada) ·
+Kan Chains · Earring · **Tops** (Karwari Tops, Bangali Tops) · Tika · Nath · **Vati** (Rajkot
 Vati, Karwari Vati) · Sui Dhaga · **Rajkot Vali** (Vali, U V Vali, Singapore Vali, Ball Vali)
 · **Locket** (Casting Lockets, Patra Lockets) · Laxmi Har · **Zumka** (Coimbatore Zumka,
 Karwari Zumka) · **Casting Rings** (Gents Rings, Ladies Rings, Couple Band)

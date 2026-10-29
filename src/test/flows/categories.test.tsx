@@ -18,7 +18,7 @@ describe("Client's category tree", () => {
       'Pendant',
       'Rings',
       'Kan Chains',
-      'Aring',
+      'Earring',
       'Tops',
       'Tika',
       'Nath',
@@ -31,7 +31,7 @@ describe("Client's category tree", () => {
       'Casting Rings'
     ]);
     const names = (slug: string) => seedCategories.filter((c) => c.parent === slug).map((c) => c.name);
-    expect(names('rings')).toEqual(['Gents Rings', 'Ladies Rings', 'Karda']);
+    expect(names('rings')).toEqual(['Gents Rings', 'Ladies Rings', 'Kada']);
     expect(names('tops')).toEqual(['Karwari Tops', 'Bangali Tops']);
     expect(names('vati')).toEqual(['Rajkot Vati', 'Karwari Vati']);
     expect(names('rajkot-vali')).toEqual(['Vali', 'U V Vali', 'Singapore Vali', 'Ball Vali']);
