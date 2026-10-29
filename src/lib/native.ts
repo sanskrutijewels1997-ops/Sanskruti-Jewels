@@ -24,16 +24,13 @@ export function pushBackHandler(fn: () => void) {
   };
 }
 
-export function setStatusBarDark(dark: boolean) {
+export function initNative() {
   if (!isNative) return;
-  void StatusBar.setStyle({ style: dark ? Style.Dark : Style.Light }).catch(() => undefined);
+  // Dark status-bar icons on the light app background.
+  void StatusBar.setStyle({ style: Style.Light }).catch(() => undefined);
   if (Capacitor.getPlatform() === 'android') {
     void StatusBar.setOverlaysWebView({ overlay: true }).catch(() => undefined);
   }
-}
-
-export function initNative() {
-  if (!isNative) return;
   void SplashScreen.hide().catch(() => undefined);
   void App.addListener('backButton', ({ canGoBack }) => {
     const top = backHandlers[backHandlers.length - 1];

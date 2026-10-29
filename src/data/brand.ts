@@ -1,7 +1,8 @@
 export const BRAND = {
   name: 'Sanskruti Jewels',
   shortName: 'Sanskruti',
-  slogan: 'Heritage, handcrafted for you.',
+  slogan: 'Sell More. Stock Less.',
+  since: 1977,
   logo: '/brand/logo.png',
   /** Optional WhatsApp number in international format without "+", e.g. 919876543210. */
   whatsapp: (import.meta.env.VITE_WHATSAPP_NUMBER ?? ''),

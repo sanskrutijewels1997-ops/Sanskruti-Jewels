@@ -10,9 +10,10 @@ import {
   TruckIcon
 } from 'lucide-react';
 import { ProductRail } from '../components/home/ProductRail';
-import { Logo } from '../components/Logo';
+import { BrandStrip, Logo, SinceBadge } from '../components/Logo';
 import { SectionHeader } from '../components/ui';
 import { useApp } from '../contexts/AppContext';
+import { purityShortcuts } from '../data/options';
 import { useCatalogue } from '../lib/queries';
 
 const metalTiles = [
@@ -38,11 +39,17 @@ export function Home() {
 
   return (
     <div className="mx-auto max-w-site lg:px-6">
-      {/* Phone app bar: logo + tap-to-search, like Myntra / CaratLane */}
-      <header className="pt-safe sticky top-0 z-30 bg-bg/95 backdrop-blur-md lg:hidden">
-        <div className="flex h-14 items-center justify-between px-4">
-          <Logo size="sm" />
-        </div>
+      {/* Phone: slogan strip and logo row scroll away; the search bar stays pinned.
+          The status-bar shield keeps the pinned bar clear of the notch. */}
+      <div className="pt-safe fixed inset-x-0 top-0 z-40 bg-bg lg:hidden" aria-hidden="true" />
+      <div className="pt-safe bg-brand lg:hidden">
+        <BrandStrip />
+      </div>
+      <div className="flex h-16 items-center justify-between px-4 lg:hidden">
+        <Logo />
+        <SinceBadge />
+      </div>
+      <header className="sticky top-[env(safe-area-inset-top)] z-30 bg-bg/95 backdrop-blur-md lg:hidden">
         <div className="px-4 pb-3">
           <Link
             to="/search"
@@ -54,8 +61,10 @@ export function Home() {
         </div>
       </header>
 
+      <PurityShortcuts />
+
       {/* Story-style category circles */}
-      <nav aria-label="Categories" className="no-scrollbar flex gap-4 overflow-x-auto px-4 pb-2 pt-2 lg:px-0 lg:pt-8">
+      <nav aria-label="Categories" className="no-scrollbar flex gap-4 overflow-x-auto px-4 pb-2 pt-4 lg:px-0 lg:pt-8">
         <CategoryCircle to="/catalogue?filter=new" label="New In">
           <span className="flex h-full w-full items-center justify-center bg-brand text-brand-on">
             <SparklesIcon className="h-6 w-6" />
@@ -164,6 +173,37 @@ export function Home() {
 
       <p className="pb-6 text-center text-[11px] text-ink-3 lg:hidden">Sanskruti Jewels · {published.length} designs to explore</p>
     </div>
+  );
+}
+
+/** The two purity shortcuts customers asked for, right at the top of Home. */
+function PurityShortcuts() {
+  const { published, loading } = useCatalogue();
+  return (
+    <nav aria-label="Shop by purity" className="grid grid-cols-2 gap-3 px-4 pt-1 lg:mx-auto lg:max-w-3xl lg:gap-5 lg:px-0 lg:pt-8">
+      {purityShortcuts.map((s, i) => {
+        const count = published.filter((p) => p.purity === s.value).length;
+        return (
+          <Link
+            key={s.value}
+            to={`/catalogue?purity=${encodeURIComponent(s.value)}`}
+            className={`pressable relative flex h-[88px] flex-col justify-between overflow-hidden rounded-2xl p-3.5 text-black shadow-card lg:h-28 lg:p-5 ${
+              i === 0 ? 'bg-gradient-to-br from-[#f7e3a3] to-[#d4a23f]' : 'bg-gradient-to-br from-[#f3d27a] to-[#b98318]'
+            }`}
+          >
+            <GemIcon className="absolute -right-3 -top-3 h-16 w-16 opacity-15" aria-hidden="true" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.16em] opacity-70">Shop</span>
+            <span>
+              <span className="block font-display text-[26px] font-bold leading-none lg:text-4xl">{s.label}</span>
+              <span className="mt-1 flex items-center gap-0.5 text-[11.5px] font-semibold opacity-80">
+                {loading ? 'Loading…' : `${count} ${count === 1 ? 'design' : 'designs'}`}
+                <ChevronRightIcon className="h-3.5 w-3.5" />
+              </span>
+            </span>
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
 

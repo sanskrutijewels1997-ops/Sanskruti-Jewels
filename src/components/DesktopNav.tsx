@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { HeartIcon, LayoutDashboardIcon, SearchIcon, UserIcon } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
-import { Logo } from './Logo';
+import { Logo, SinceBadge } from './Logo';
 
 const links = [
   { label: 'Home', to: '/' },
@@ -25,8 +25,9 @@ export function DesktopNav() {
   return (
     <header className="sticky top-0 z-40 hidden border-b border-line bg-surface/95 backdrop-blur-md lg:block">
       <div className="mx-auto flex h-16 max-w-site items-center gap-8 px-6">
-        <Link to="/" aria-label="Sanskruti Jewels home">
+        <Link to="/" aria-label="Sanskruti Jewels home" className="flex items-center gap-3">
           <Logo />
+          <SinceBadge size="sm" />
         </Link>
         <nav className="flex items-center gap-6" aria-label="Primary">
           {links.map((l) => (

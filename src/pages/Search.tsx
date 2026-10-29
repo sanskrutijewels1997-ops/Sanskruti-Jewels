@@ -6,6 +6,7 @@ import { ProductImageFallback } from '../components/ProductCard';
 import { chipClass } from '../components/ui';
 import { formatPrice } from '../lib/format';
 import { matchesQuery } from '../lib/filters';
+import { purityShortcuts } from '../data/options';
 import { useCatalogue } from '../lib/queries';
 
 const RECENT_KEY = 'sanskruti-recent-searches';
@@ -29,6 +30,8 @@ function saveRecent(list: string[]) {
 /** Full-screen search, opened from the search bar on Home and the search icons. */
 export function Search() {
   const [q, setQ] = useState('');
+  // Purity scope: '' searches everything, otherwise one of the purity shortcuts.
+  const [purity, setPurity] = useState('');
   const [recent, setRecent] = useState(readRecent);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -40,8 +43,8 @@ export function Search() {
   const results = useMemo(() => {
     const term = q.trim();
     if (!term) return [];
-    return published.filter((p) => matchesQuery(p, term, categoryName(p.categoryId)));
-  }, [q, published, categoryName]);
+    return published.filter((p) => (!purity || p.purity === purity) && matchesQuery(p, term, categoryName(p.categoryId)));
+  }, [q, purity, published, categoryName]);
 
   const submit = (term: string) => {
     const t = term.trim();
@@ -49,7 +52,9 @@ export function Search() {
     const next = [t, ...recent.filter((r) => r.toLowerCase() !== t.toLowerCase())].slice(0, 8);
     setRecent(next);
     saveRecent(next);
-    navigate(`/catalogue?q=${encodeURIComponent(t)}`);
+    const params = new URLSearchParams({ q: t });
+    if (purity) params.set('purity', purity);
+    navigate(`/catalogue?${params}`);
   };
 
   return (
@@ -85,6 +90,20 @@ export function Search() {
             )}
           </div>
         </form>
+        <div role="radiogroup" aria-label="Search in" className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-3">
+          {[{ value: '', label: 'All jewellery' }, ...purityShortcuts].map((o) => (
+            <button
+              key={o.value || 'all'}
+              type="button"
+              role="radio"
+              aria-checked={purity === o.value}
+              onClick={() => setPurity(o.value)}
+              className={chipClass(purity === o.value)}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
       </header>
 
       {!q.trim() ? (

@@ -20,6 +20,7 @@ import {
   type SortKey
 } from '../lib/filters';
 import { useCatalogue } from '../lib/queries';
+import { purityShortcuts } from '../data/options';
 
 const PAGE_SIZE = 24;
 
@@ -69,7 +70,9 @@ export function Catalogue() {
 
   const collection = filters.collections.length === 1 ? collections.find((c) => c.slug === filters.collections[0]) : undefined;
   const category = filters.categories.length === 1 ? categories.find((c) => c.slug === filters.categories[0]) : undefined;
-  const title = q ? `“${q}”` : collection?.name ?? category?.name ?? (filters.newOnly ? 'New Arrivals' : 'All Jewellery');
+  const purityTitle =
+    filters.purities.length === 1 ? purityShortcuts.find((s) => s.value === filters.purities[0])?.label : undefined;
+  const title = q ? `“${q}”` : collection?.name ?? category?.name ?? purityTitle ?? (filters.newOnly ? 'New Arrivals' : 'All Jewellery');
   const count = activeCount(filters);
 
   // Removable chips for every applied filter (Baymard: show applied filters).
@@ -81,7 +84,9 @@ export function Catalogue() {
   listChip('categories', (v) => categories.find((c) => c.slug === v)?.name ?? v);
   listChip('collections', (v) => collections.find((c) => c.slug === v)?.name ?? v);
   listChip('metals', (v) => v);
-  listChip('purities', (v) => v);
+  filters.purities
+    .filter((v) => !purityShortcuts.some((s) => s.value === v))
+    .forEach((v) => applied.push({ label: v, remove: () => update({ ...filters, purities: filters.purities.filter((x) => x !== v) }) }));
   listChip('styles', (v) => v);
   listChip('availability', (v) => v);
   if (filters.maxWeight < MAX_WEIGHT) applied.push({ label: `Under ${filters.maxWeight} g`, remove: () => update({ ...filters, maxWeight: MAX_WEIGHT }) });
@@ -89,6 +94,16 @@ export function Catalogue() {
 
   // One-tap quick filters shown when nothing is applied yet.
   const quick: { label: string; on: boolean; toggle: () => void }[] = [
+    // The two purities customers shop by most come first.
+    ...purityShortcuts.map((s) => ({
+      label: s.label,
+      on: filters.purities.includes(s.value),
+      toggle: () =>
+        update({
+          ...filters,
+          purities: filters.purities.includes(s.value) ? filters.purities.filter((x) => x !== s.value) : [...filters.purities, s.value]
+        })
+    })),
     { label: 'New', on: filters.newOnly, toggle: () => update({ ...filters, newOnly: !filters.newOnly }) },
     {
       label: 'Ready Stock',
@@ -129,6 +144,12 @@ export function Catalogue() {
         <button type="button" onClick={() => setSheet('sort')} className={`${chipClass(sort !== 'newest')} hidden lg:inline-flex`}>
           <ArrowDownUpIcon className="h-3.5 w-3.5" /> {sorts[sort]}
         </button>
+        {/* The purity shortcuts stay in front so customers can switch between them directly */}
+        {quick.slice(0, purityShortcuts.length).map((c) => (
+          <button key={c.label} type="button" onClick={c.toggle} aria-pressed={c.on} className={chipClass(c.on)}>
+            {c.label}
+          </button>
+        ))}
         {applied.length > 0 ? (
           <>
             {applied.map((a) => (
@@ -141,7 +162,7 @@ export function Catalogue() {
             </button>
           </>
         ) : (
-          quick.map((c) => (
+          quick.slice(purityShortcuts.length).map((c) => (
             <button key={c.label} type="button" onClick={c.toggle} aria-pressed={c.on} className={chipClass(c.on)}>
               {c.label}
             </button>

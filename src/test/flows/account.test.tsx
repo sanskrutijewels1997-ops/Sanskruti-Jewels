@@ -104,14 +104,14 @@ describe('Profile', () => {
     expect(screen.getByText('Demo mode')).toBeInTheDocument();
   });
 
-  it('switches theme, edits the profile and signs out', async () => {
+  it('edits the profile and signs out', async () => {
     await signInAs('customer');
     const user = userEvent.setup();
     const { router } = renderApp('/account');
     expect(await screen.findByText('Ananya Kulkarni')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('radio', { name: 'Dark' }));
-    expect(document.documentElement.dataset.theme).toBe('dark');
+    // Light theme only: there is no appearance switcher any more
+    expect(screen.queryByRole('radiogroup', { name: 'Theme' })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('link', { name: 'Edit profile' }));
     const city = await screen.findByLabelText('City');

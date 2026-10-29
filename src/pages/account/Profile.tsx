@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -10,9 +9,6 @@ import {
   LogOutIcon,
   MailIcon,
   MessageCircleIcon,
-  MonitorSmartphoneIcon,
-  MoonIcon,
-  SunIcon,
   UserRoundPenIcon
 } from 'lucide-react';
 import { DemoNotice } from '../../components/DemoBanner';
@@ -23,7 +19,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { BRAND } from '../../data/brand';
 import { api } from '../../lib/api';
 import { qk } from '../../lib/queries';
-import { getThemePref, setThemePref, type ThemePref } from '../../lib/theme';
 
 /** Profile tab: account header, menu rows, appearance and sign out. */
 export function Profile() {
@@ -84,10 +79,6 @@ export function Profile() {
             <MenuRow to="/admin" icon={LayoutDashboardIcon} label="Admin console" accent />
           </MenuGroup>
         )}
-
-        <MenuGroup title="Appearance">
-          <ThemeSwitcher />
-        </MenuGroup>
 
         <MenuGroup title="Help">
           <MenuRow icon={MessageCircleIcon} label="Ask us anything" onClick={() => openEnquiry(null)} />
@@ -159,36 +150,5 @@ function MenuRow({
     <button type="button" onClick={onClick} className={cls}>
       {inner}
     </button>
-  );
-}
-
-function ThemeSwitcher() {
-  const [pref, setPref] = useState<ThemePref>(getThemePref);
-  const options: { value: ThemePref; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { value: 'system', label: 'System', icon: MonitorSmartphoneIcon },
-    { value: 'light', label: 'Light', icon: SunIcon },
-    { value: 'dark', label: 'Dark', icon: MoonIcon }
-  ];
-  return (
-    <div role="radiogroup" aria-label="Theme" className="grid grid-cols-3 gap-2 p-2">
-      {options.map(({ value, label, icon: Icon }) => (
-        <button
-          key={value}
-          type="button"
-          role="radio"
-          aria-checked={pref === value}
-          onClick={() => {
-            setPref(value);
-            setThemePref(value);
-          }}
-          className={`pressable flex flex-col items-center gap-1.5 rounded-xl py-3 text-[12.5px] font-medium ${
-            pref === value ? 'bg-brand-soft text-brand ring-1 ring-brand' : 'text-ink-2'
-          }`}
-        >
-          <Icon className="h-5 w-5" />
-          {label}
-        </button>
-      ))}
-    </div>
   );
 }

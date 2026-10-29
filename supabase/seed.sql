@@ -50,7 +50,7 @@ with p as (
   values ('SJ-102853', 'kundan-grand-bridal-set-2853', 'Kundan Grand Bridal Set', 'Complete bridal ensemble with choker, long haar, jhumkas and maang tikka. Nizami-inspired layout with graduated polki plates.',
     (select id from public.categories where slug = 'jewellery-sets'),
     (select id from public.collections where slug = 'bridal'),
-    'Bridal', 'Gold', '22K', 88, 104, 'Uncut polki, ruby, emerald, south sea pearl', 'Necklace 15in, earrings 5.2cm, tikka included',
+    'Bridal', 'Gold', '92 Melting', 88, 104, 'Uncut polki, ruby, emerald, south sea pearl', 'Necklace 15in, earrings 5.2cm, tikka included',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     true, true, true, 11240, now() - interval '1 days', now() - interval '1 days')
   on conflict (sku) do nothing
@@ -118,7 +118,7 @@ with p as (
   values ('SJ-102890', 'nakshi-carved-bangle-set-of-6-2890', 'Nakshi Carved Bangle Set of 6', 'Six-piece bangle stack with alternating floral and paisley carving. Antique matte finish with selective stone setting.',
     (select id from public.categories where slug = 'bangles'),
     (select id from public.collections where slug = 'traditional'),
-    'Traditional', 'Gold', '22K', 46, 58, 'Ruby & emerald cabochon accents', '2.4 / 2.6 / 2.8',
+    'Traditional', 'Gold', '92 Melting', 46, 58, 'Ruby & emerald cabochon accents', '2.4 / 2.6 / 2.8',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     false, true, true, 7420, now() - interval '5 days', now() - interval '5 days')
   on conflict (sku) do nothing
@@ -203,7 +203,7 @@ with p as (
   values ('SJ-102944', 'mens-textured-gold-kada-2944', 'Men''s Textured Gold Kada', 'Hinged kada with hand-chiselled chevron texture and a concealed push clasp. Heavy gauge, hollow core construction.',
     (select id from public.categories where slug = 'mens'),
     (select id from public.collections where slug = 'mens'),
-    'Modern', 'Gold', '22K', 34, 42, 'None', '2.6 / 2.8 inch',
+    'Modern', 'Gold', '92 Melting', 34, 42, 'None', '2.6 / 2.8 inch',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     false, true, true, 6220, now() - interval '10 days', now() - interval '10 days')
   on conflict (sku) do nothing
@@ -288,7 +288,7 @@ with p as (
   values ('SJ-102994', 'filigree-bridal-long-necklace-2994', 'Filigree Bridal Long Necklace', 'Jaipur filigree work across a graduated collar with a detachable central pendant that can be worn separately.',
     (select id from public.categories where slug = 'bridal'),
     (select id from public.collections where slug = 'bridal'),
-    'Bridal', 'Gold', '22K', 71, 84, 'Kundan with pearl fringe', '18 inch',
+    'Bridal', 'Gold', '92 Melting', 71, 84, 'Kundan with pearl fringe', '18 inch',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     false, true, true, 9010, now() - interval '15 days', now() - interval '15 days')
   on conflict (sku) do nothing
@@ -339,7 +339,7 @@ with p as (
   values ('SJ-103021', 'antique-peacock-pendant-3021', 'Antique Peacock Pendant', 'Antique-finish peacock motif pendant with fine nakshi border and a single pearl drop at the base.',
     (select id from public.categories where slug = 'pendants'),
     (select id from public.collections where slug = 'traditional'),
-    'Antique', 'Gold', '22K', 11, 15, 'Ruby, emerald, pearl drop', '3.6 cm',
+    'Antique', 'Gold', '92 Melting', 11, 15, 'Ruby, emerald, pearl drop', '3.6 cm',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     false, false, true, 4320, now() - interval '18 days', now() - interval '18 days')
   on conflict (sku) do nothing
@@ -407,7 +407,7 @@ with p as (
   values ('SJ-103063', 'polki-bridal-jhumka-3063', 'Polki Bridal Jhumka', 'Oversized bridal jhumka with detachable ear-chain sahara and a triple row of pearl fringe.',
     (select id from public.categories where slug = 'earrings'),
     (select id from public.collections where slug = 'bridal'),
-    'Bridal', 'Gold', '22K', 22, 28, 'Uncut polki, pearl', '6.8 cm drop with sahara',
+    'Bridal', 'Gold', '92 Melting', 22, 28, 'Uncut polki, pearl', '6.8 cm drop with sahara',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     true, true, true, 8410, now() - interval '22 days', now() - interval '22 days')
   on conflict (sku) do nothing
@@ -492,7 +492,7 @@ with p as (
   values ('SJ-103117', 'bridal-maang-tikka-set-3117', 'Bridal Maang Tikka & Set', 'Coordinated tikka, passa and choker trio finished to match a bride’s primary necklace order.',
     (select id from public.categories where slug = 'bridal'),
     (select id from public.collections where slug = 'bridal'),
-    'Bridal', 'Gold', '22K', 44, 55, 'Polki, pearl, emerald bead', 'Coordinated three-piece',
+    'Bridal', 'Gold', '92 Melting', 44, 55, 'Polki, pearl, emerald bead', 'Coordinated three-piece',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     true, true, true, 6890, now() - interval '27 days', now() - interval '27 days')
   on conflict (sku) do nothing
@@ -543,7 +543,7 @@ with p as (
   values ('SJ-103147', 'emerald-drop-temple-necklace-3147', 'Emerald Drop Temple Necklace', 'Temple plates strung with graduated emerald beads and finished with a hand-knotted silk cord back.',
     (select id from public.categories where slug = 'necklaces'),
     (select id from public.collections where slug = 'traditional'),
-    'Temple', 'Gold', '22K', 54, 66, 'Emerald bead drops', '17 inch',
+    'Temple', 'Gold', '92 Melting', 54, 66, 'Emerald bead drops', '17 inch',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     false, false, true, 4970, now() - interval '30 days', now() - interval '30 days')
   on conflict (sku) do nothing
@@ -645,7 +645,7 @@ with p as (
   values ('SJ-103203', 'layered-pearl-gold-haar-3203', 'Layered Pearl & Gold Haar', 'Three-layer pearl haar with polki spacers and a detachable central plate.',
     (select id from public.categories where slug = 'necklaces'),
     (select id from public.collections where slug = 'bridal'),
-    'Traditional', 'Gold', '22K', 64, 76, 'South sea pearl, polki', '22 inch',
+    'Traditional', 'Gold', '92 Melting', 64, 76, 'South sea pearl, polki', '22 inch',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, true, true, 6440, now() - interval '36 days', now() - interval '36 days')
   on conflict (sku) do nothing

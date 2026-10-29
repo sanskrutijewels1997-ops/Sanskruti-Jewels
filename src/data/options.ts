@@ -1,6 +1,19 @@
 // Fixed option lists used by catalogue filters and the admin product form.
 export const metals = ['Gold', 'Diamond', 'Platinum', 'Silver'];
-export const purities = ['14K', '18K', '22K', '24K', '925', '950'];
+
+/** Trade purity marking. Stored as-is on products and used in URLs (?purity=…). */
+export const MELTING_92 = '92 Melting';
+export const purities = [MELTING_92, '14K', '18K', '22K', '24K', '925', '950'];
+
+/**
+ * The two purities customers shop by most, promoted as one-tap shortcuts on Home,
+ * in Search and on the product list.
+ */
+export const purityShortcuts = [
+  { value: MELTING_92, label: '92 Melting', short: '92 Melting' },
+  { value: '22K', label: '22 Carat', short: '22 Carat' }
+] as const;
+
 export const styles = [
   'Traditional',
   'Modern',

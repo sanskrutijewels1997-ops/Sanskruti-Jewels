@@ -23,7 +23,6 @@ beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
   resetDemoData();
-  document.documentElement.removeAttribute('data-theme');
 });
 
 afterEach(() => cleanup());

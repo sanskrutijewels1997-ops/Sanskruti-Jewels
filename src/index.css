@@ -8,7 +8,8 @@
 
 /* END TAILWIND IMPORTS — ALL OTHER CSS MUST GO BELOW THIS LINE */
 
-/* ---- Theme tokens (space-separated RGB so Tailwind can apply alpha) ---- */
+/* ---- Colour tokens: a single warm off-white light theme.
+   Space-separated RGB so Tailwind can apply alpha. ---- */
 :root {
   color-scheme: light;
   --bg: 250 247 242;
@@ -27,48 +28,6 @@
   --gold-pale: 231 213 174;
   --success: 22 128 61;
   --danger: 185 28 28;
-}
-
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --bg: 10 9 8;
-  --surface: 21 19 15;
-  --surface-2: 30 27 22;
-  --surface-3: 44 40 32;
-  --ink: 245 241 234;
-  --ink-2: 194 186 173;
-  --ink-3: 143 135 123;
-  --line: 44 40 32;
-  --brand: 201 162 77;
-  --on-brand: 10 9 8;
-  --brand-soft: 36 29 18;
-  --gold: 226 194 117;
-  --gold-wash: 36 29 18;
-  --gold-pale: 92 74 38;
-  --success: 74 222 128;
-  --danger: 248 113 113;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    color-scheme: dark;
-    --bg: 10 9 8;
-    --surface: 21 19 15;
-    --surface-2: 30 27 22;
-    --surface-3: 44 40 32;
-    --ink: 245 241 234;
-    --ink-2: 194 186 173;
-    --ink-3: 143 135 123;
-    --line: 44 40 32;
-    --brand: 201 162 77;
-    --on-brand: 10 9 8;
-    --brand-soft: 36 29 18;
-    --gold: 226 194 117;
-    --gold-wash: 36 29 18;
-    --gold-pale: 92 74 38;
-    --success: 74 222 128;
-    --danger: 248 113 113;
-  }
 }
 
 /* ---- App-like base ---- */

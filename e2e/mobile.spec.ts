@@ -56,9 +56,23 @@ test('product list: sort/filter bar, filters in the URL and back restores positi
   check();
 });
 
-test('theme switch persists across reloads', async ({ page }) => {
-  await page.goto('/account');
-  await page.getByRole('radio', { name: 'Dark' }).click();
-  await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+test('slogan, Since 1977 badge and purity shortcuts at the top of Home', async ({ page }) => {
+  const check = failOnErrors(page);
+  await page.goto('/');
+  await expect(page.getByText('Sell More · Stock Less').filter({ visible: true })).toBeVisible();
+  await expect(page.getByRole('img', { name: 'Since 1977' }).filter({ visible: true })).toBeVisible();
+
+  const shortcuts = page.getByRole('navigation', { name: 'Shop by purity' });
+  // Both shortcuts sit in the first screenful
+  const box = await shortcuts.boundingBox();
+  expect(box!.y + box!.height).toBeLessThan(page.viewportSize()!.height / 2);
+
+  await shortcuts.getByRole('link', { name: /22 Carat/ }).click();
+  await expect(page).toHaveURL(/purity=22K/);
+  await expect(page.getByRole('heading', { name: '22 Carat', level: 1 })).toBeVisible();
+  await page.getByRole('button', { name: '22 Carat' }).click();
+  await page.getByRole('button', { name: '92 Melting' }).click();
+  await expect(page).toHaveURL(/purity=92(\+|%20)Melting/);
+  await expect(page.getByRole('article').first()).toBeVisible();
+  check();
 });

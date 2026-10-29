@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
   ios: { contentInset: 'never' },
   android: { allowMixedContent: false },
   plugins: {
-    SplashScreen: { launchShowDuration: 600, launchAutoHide: true, backgroundColor: '#0A0908', showSpinner: false },
+    SplashScreen: { launchShowDuration: 600, launchAutoHide: true, backgroundColor: '#FAF7F2', showSpinner: false },
     StatusBar: { overlaysWebView: true }
   }
 };
