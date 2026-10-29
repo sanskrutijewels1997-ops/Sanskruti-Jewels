@@ -34,18 +34,19 @@ export function Home() {
 
   return (
     <div className="mx-auto max-w-site lg:px-6">
-      {/* Phone: slogan strip and logo row scroll away; the search bar stays pinned.
-          The status-bar shield keeps the pinned bar clear of the notch. */}
-      <div className="pt-safe fixed inset-x-0 top-0 z-40 bg-bg lg:hidden" aria-hidden="true" />
-      <div className="pt-safe bg-brand lg:hidden">
+      {/* Phone: the slogan strip stays pinned under the status bar, the logo row scrolls
+          away and the search bar pins below the strip. iOS paints the status bar in the
+          colour of a bar pinned at the very top; without one it blurs whatever is under
+          it, which smeared the slogan at launch. */}
+      <div className="pt-safe sticky top-0 z-40 bg-brand lg:hidden">
         <BrandStrip />
       </div>
       <div className="flex h-16 items-center justify-between px-4 lg:hidden">
         <Logo />
         <SinceBadge />
       </div>
-      <header className="sticky top-[env(safe-area-inset-top)] z-30 bg-bg lg:hidden">
-        <div className="px-4 pb-3">
+      <header className="sticky top-[calc(env(safe-area-inset-top)+2rem)] z-30 bg-bg lg:hidden">
+        <div className="px-4 pb-3 pt-2">
           <Link
             to="/search"
             className="pressable flex h-11 items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 text-[14px] text-ink-3"

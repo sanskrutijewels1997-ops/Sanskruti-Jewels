@@ -93,6 +93,14 @@ input[type='radio'] {
   border-radius: 999px;
 }
 
+/* Make product photos harder to save: no long-press menu or dragging. Browsers can't
+   block screenshots; the native apps do that (see MainActivity and AppDelegate). */
+img {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
 /* Safe areas for notches and the home indicator */
 .pt-safe {
   padding-top: env(safe-area-inset-top);

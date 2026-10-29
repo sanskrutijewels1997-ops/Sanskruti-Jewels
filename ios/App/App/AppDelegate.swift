@@ -5,9 +5,12 @@ import Capacitor
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    private var captureProtected = false
+    private var captureCover: UIView?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(captureChanged), name: UIScreen.capturedDidChangeNotification, object: nil)
         return true
     }
 
@@ -27,6 +30,54 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        if let window = window, !captureProtected {
+            captureProtected = true
+            hideFromScreenshots(window)
+        }
+        captureChanged()
+    }
+
+    /// iOS has no API to block screenshots. Content drawn inside a secure text field's
+    /// layer is left out of screenshots and recordings, so the window is hosted there.
+    private func hideFromScreenshots(_ window: UIWindow) {
+        let field = UITextField()
+        field.isSecureTextEntry = true
+        field.isUserInteractionEnabled = false
+        window.addSubview(field)
+        window.layer.superlayer?.addSublayer(field.layer)
+        // The secure canvas is the last sublayer from iOS 17, the first before that.
+        let canvas = ProcessInfo.processInfo.isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 17, minorVersion: 0, patchVersion: 0))
+            ? field.layer.sublayers?.last
+            : field.layer.sublayers?.first
+        canvas?.addSublayer(window.layer)
+    }
+
+    /// Fallback for recording and mirroring: cover the app while the screen is captured.
+    @objc private func captureChanged() {
+        guard let window = window else { return }
+        if UIScreen.main.isCaptured {
+            guard captureCover == nil else { return }
+            let cover = UIView(frame: window.bounds)
+            cover.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            cover.backgroundColor = UIColor(red: 0.98, green: 0.97, blue: 0.95, alpha: 1)
+            let label = UILabel()
+            label.text = "Screen recording isn't allowed in Sanskruti Jewels"
+            label.textColor = UIColor(red: 0.48, green: 0.12, blue: 0.17, alpha: 1)
+            label.numberOfLines = 0
+            label.textAlignment = .center
+            label.translatesAutoresizingMaskIntoConstraints = false
+            cover.addSubview(label)
+            NSLayoutConstraint.activate([
+                label.centerXAnchor.constraint(equalTo: cover.centerXAnchor),
+                label.centerYAnchor.constraint(equalTo: cover.centerYAnchor),
+                label.widthAnchor.constraint(lessThanOrEqualTo: cover.widthAnchor, constant: -48)
+            ])
+            window.addSubview(cover)
+            captureCover = cover
+        } else {
+            captureCover?.removeFromSuperview()
+            captureCover = nil
+        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
