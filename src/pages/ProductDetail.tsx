@@ -102,7 +102,7 @@ export function ProductDetail() {
   ].filter(([, v]) => v);
 
   const share = async () => {
-    const url = window.location.href;
+    const url = `${BRAND.siteUrl || window.location.origin}/product/${product.slug}`;
     try {
       if (navigator.share) await navigator.share({ title: product.name, text: `${product.name} — ${BRAND.name}`, url });
       else {
@@ -114,7 +114,7 @@ export function ProductDetail() {
     }
   };
 
-  const floating = 'pressable flex h-10 w-10 items-center justify-center rounded-full bg-surface/90 text-ink shadow-card backdrop-blur';
+  const floating = 'pressable flex h-10 w-10 items-center justify-center rounded-full bg-surface text-ink shadow-card';
 
   return (
     <div className="mx-auto max-w-site pb-[calc(76px+env(safe-area-inset-bottom))] lg:px-6 lg:pb-10 lg:pt-8">

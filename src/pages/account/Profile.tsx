@@ -23,7 +23,7 @@ import { qk } from '../../lib/queries';
 /** Profile tab: account header, menu rows, appearance and sign out. */
 export function Profile() {
   const { user, profile, isAdmin, signOut } = useAuth();
-  const { wishlist, lists, openEnquiry } = useApp();
+  const { wishlist, lists, openEnquiry, notify } = useApp();
   const navigate = useNavigate();
   const enquiries = useQuery({
     queryKey: qk.myEnquiries(user?.id ?? ''),
@@ -93,7 +93,9 @@ export function Profile() {
               label="Sign out"
               danger
               onClick={async () => {
+                if (!window.confirm('Sign out of Sanskruti Jewels?')) return;
                 await signOut();
+                notify('Signed out');
                 navigate('/', { replace: true });
               }}
             />

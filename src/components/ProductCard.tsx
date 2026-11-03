@@ -46,7 +46,7 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
           )}
         </span>
         {product.availability === 'Made to Order' && (
-          <span className="absolute bottom-2 left-2 rounded bg-surface/90 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-ink-2 backdrop-blur">
+          <span className="absolute bottom-2 left-2 rounded bg-surface px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-ink-2">
             Made to order
           </span>
         )}
@@ -57,7 +57,7 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
         onClick={() => toggleWishlist(product.id)}
         aria-pressed={saved}
         aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}
-        className="pressable absolute right-1.5 top-1.5 flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 shadow-card backdrop-blur"
+        className="pressable absolute right-1.5 top-1.5 flex h-9 w-9 items-center justify-center rounded-full bg-surface shadow-card"
       >
         <HeartIcon className={`h-[18px] w-[18px] ${saved ? 'fill-brand text-brand' : 'text-ink-2'}`} />
       </button>

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderApp, signInAs } from '../utils';
@@ -23,6 +23,7 @@ describe('Sign in / sign up', () => {
     await user.type(screen.getByLabelText('Password'), DEMO_ACCOUNTS.customer.password);
     await user.click(screen.getByRole('button', { name: 'Sign in' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/wishlist'));
+    expect(await screen.findByText(`Signed in as ${DEMO_ACCOUNTS.customer.email}`)).toBeInTheDocument();
   });
 
   it('never redirects off-site after login', async () => {
@@ -123,8 +124,17 @@ describe('Profile', () => {
     const me = await api.getUser();
     expect((await api.getProfile(me!.id))?.city).toBe('Nashik');
 
+    // Cancelling the confirmation keeps you signed in
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
     await user.click(await screen.findByRole('button', { name: 'Sign out' }));
+    expect(confirm).toHaveBeenCalledWith('Sign out of Sanskruti Jewels?');
+    expect(router.state.location.pathname).toBe('/account');
+    expect(await api.getUser()).not.toBeNull();
+
+    confirm.mockReturnValue(true);
+    await user.click(screen.getByRole('button', { name: 'Sign out' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/'));
+    expect(await screen.findByText('Signed out')).toBeInTheDocument();
     expect(await api.getUser()).toBeNull();
   });
 

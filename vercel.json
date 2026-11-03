@@ -3,7 +3,10 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/((?!assets/|images/|brand/|manifest.webmanifest).*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/product/:slug", "destination": "/api/product-share?slug=:slug" },
+    { "source": "/((?!api/|assets/|images/|brand/|manifest.webmanifest).*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",

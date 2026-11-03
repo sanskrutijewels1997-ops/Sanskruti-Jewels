@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { friendlyError } from '../../lib/format';
 import { ErrorNotice, Field, Spinner, inputClass, primaryButton } from '../../components/ui';
@@ -7,6 +8,7 @@ import { AuthCard, safeNext } from './AuthCard';
 
 export function Login() {
   const { signIn, user } = useAuth();
+  const { notify } = useApp();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const next = safeNext(params.get('next'));
@@ -25,6 +27,7 @@ export function Login() {
     setError(null);
     try {
       await signIn(email.trim(), password);
+      notify(`Signed in as ${email.trim()}`);
     } catch (err) {
       setError(friendlyError(err));
     } finally {

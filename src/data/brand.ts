@@ -20,5 +20,7 @@ export const BRAND = {
   },
   /** Optional WhatsApp number in international format without "+", e.g. 919876543210. */
   whatsapp: (import.meta.env.VITE_WHATSAPP_NUMBER ?? ''),
-  email: (import.meta.env.VITE_CONTACT_EMAIL ?? '')
+  email: (import.meta.env.VITE_CONTACT_EMAIL ?? ''),
+  /** Public website address, used for shared links (the native apps have no web address of their own). */
+  siteUrl: (import.meta.env.VITE_SITE_URL ?? '').replace(/\/$/, '')
 };

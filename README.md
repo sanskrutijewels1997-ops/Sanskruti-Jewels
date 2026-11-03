@@ -154,6 +154,7 @@ Import the repo in Vercel (it auto-detects Vite). Add these environment variable
 | `VITE_SUPABASE_ANON_KEY` | Project Settings → API → `anon` public key |
 | `VITE_WHATSAPP_NUMBER` | optional, e.g. `919876543210`; adds WhatsApp buttons |
 | `VITE_CONTACT_EMAIL` | optional, shown in the footer |
+| `VITE_SITE_URL` | your website address, e.g. `https://sanskrutijewels.com`; used for product links shared from the apps |
 
 The anon key is safe to ship in the browser because RLS protects the data. Never put the
 `service_role` key in a `VITE_` variable.

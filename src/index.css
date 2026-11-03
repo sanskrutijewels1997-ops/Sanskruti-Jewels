@@ -61,6 +61,23 @@ input[type='radio'] {
   accent-color: rgb(var(--brand));
 }
 
+/* iOS zooms the page in when a field under 16px gets focus, and the zoom stays after
+   moving to another screen. 16px on phones stops that without blocking pinch zoom. */
+@media (max-width: 1023px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Solid cover over the status bar on screens with no pinned top bar (e.g. product pages).
+   Without a solid bar pinned at the top, iOS blurs whatever scrolls under the status bar. */
+.status-bar-cover {
+  height: env(safe-area-inset-top);
+  min-height: 1px;
+}
+
 /* Press feedback like a native button */
 .pressable {
   transition: transform 120ms ease, opacity 120ms ease;
