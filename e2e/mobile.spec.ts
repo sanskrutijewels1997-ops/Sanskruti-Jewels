@@ -71,8 +71,8 @@ test('slogan, Since 1997 badge and purity shortcuts at the top of Home', async (
   await expect(page).toHaveURL(/purity=22K/);
   await expect(page.getByRole('heading', { name: '22 Carat', level: 1 })).toBeVisible();
   await page.getByRole('button', { name: '22 Carat' }).click();
-  await page.getByRole('button', { name: '92 Melting' }).click();
-  await expect(page).toHaveURL(/purity=92(\+|%20)Melting/);
+  await page.getByRole('button', { name: '92 Carat' }).click();
+  await expect(page).toHaveURL(/purity=92(\+|%20)Carat/);
   await expect(page.getByRole('article').first()).toBeVisible();
   check();
 });

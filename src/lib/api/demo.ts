@@ -16,7 +16,7 @@ import type { AuthUser, Backend } from './types';
  */
 
 // Bump when the seed shape changes so browsers re-seed instead of loading stale data.
-const KEY = 'sanskruti-demo-db-v4';
+const KEY = 'sanskruti-demo-db-v5';
 
 interface DemoUser {
   id: string;

@@ -21,7 +21,7 @@ stones?" shows **Stone weight**, which is then required; No saves it as 0 and th
 page shows "No stones". Trending products fill the "Trending Now" row on Home. Everything
 else (metal, style, weight range, size, stone details, price, extra spec rows) is optional.
 
-Purity includes **92 Melting** alongside 14K–24K. Home has one-tap **92 Melting** and
+Purity includes **92 Carat** alongside 14K–24K. Home has one-tap **92 Carat** and
 **22 Carat** shortcuts, Search can be scoped to either, and the product list keeps both as
 chips at the front.
 
@@ -112,7 +112,7 @@ Copy the printed API URL and anon key into `.env.local` (see `.env.example`).
    - Paste it into the empty query and click **Run**. You should see `Success`.
 
    This one file creates the tables, security rules and image storage bucket, and loads the
-   38 starter products. It's safe to run again if anything goes wrong part-way.
+   27 starter products. It's safe to run again if anything goes wrong part-way.
 
    **Upgrading an existing database:** run the latest `setup.sql` again the same way. It
    adds any new columns and rules, leaves your existing products and edits untouched, and
