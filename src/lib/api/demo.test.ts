@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEMO_ACCOUNTS, createDemoBackend } from './demo';
 import { seedCategories, seedProducts } from '../../data/seed';
 import type { ProductInput } from '../../types';
@@ -131,6 +131,13 @@ describe('admin catalogue management', () => {
 
     await api.deleteProduct(created.id);
     expect((await api.listProducts()).find((p) => p.id === created.id)).toBeUndefined();
+    // Recoverable until removed for good
+    expect(await api.listDeleted()).toContainEqual(expect.objectContaining({ kind: 'product', id: created.id, sku: created.sku }));
+    await api.restoreDeleted('product', created.id);
+    expect((await api.listProducts()).find((p) => p.id === created.id)).toBeDefined();
+    await api.deleteProduct(created.id);
+    await api.purgeDeleted('product', created.id);
+    expect(await api.listDeleted()).toEqual([]);
   });
 
   it('rejects a duplicate SKU or slug', async () => {
@@ -146,11 +153,17 @@ describe('admin catalogue management', () => {
     expect(again?.name).not.toBe('Mutated');
   });
 
-  it('un-links products when their category is deleted', async () => {
-    const [cat] = await api.listCategories();
-    await api.deleteCategory(cat.id);
-    const products = await api.listProducts();
-    expect(products.some((p) => p.categoryId === cat.id)).toBe(false);
+  it('un-links products only when a deleted category is removed for good', async () => {
+    const product = (await api.listProducts()).find((p) => p.categoryId)!;
+    const id = product.categoryId!;
+    await api.deleteCategory(id);
+    expect((await api.listCategories()).some((c) => c.id === id)).toBe(false);
+    expect((await api.listProducts()).find((p) => p.id === product.id)?.categoryId).toBe(id);
+    await api.restoreDeleted('category', id);
+    expect((await api.listCategories()).some((c) => c.id === id)).toBe(true);
+    await api.deleteCategory(id);
+    await api.purgeDeleted('category', id);
+    expect((await api.listProducts()).find((p) => p.id === product.id)?.categoryId).toBeNull();
   });
 
   it('creates and renames categories, rejecting duplicate slugs', async () => {
@@ -173,7 +186,65 @@ describe('admin catalogue management', () => {
     await api.deleteCategory(rings.id);
     const after = await api.listCategories();
     expect(after.some((c) => c.id === rings.id || c.parentId === rings.id)).toBe(false);
+    // Only the parent is listed, and restoring it brings its sub-categories back
+    expect((await api.listDeleted()).map((d) => d.id)).toEqual([rings.id]);
+    await api.restoreDeleted('category', rings.id);
+    expect((await api.listCategories()).some((c) => c.id === gents.id)).toBe(true);
+    await api.deleteCategory(rings.id);
+    await api.purgeDeleted('category', rings.id);
     expect((await api.listProducts()).find((p) => p.id === productInGents.id)?.categoryId).toBeNull();
+  });
+
+  it('restoring a sub-category also restores its deleted parent', async () => {
+    const cats = await api.listCategories();
+    const sub = cats.find((c) => c.parentId)!;
+    await api.deleteCategory(sub.id);
+    await new Promise((r) => setTimeout(r, 2));
+    await api.deleteCategory(sub.parentId!);
+    await api.restoreDeleted('category', sub.id);
+    const ids = (await api.listCategories()).map((c) => c.id);
+    expect(ids).toEqual(expect.arrayContaining([sub.id, sub.parentId!]));
+  });
+
+  it('removes deleted items after the 30 day recovery window', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      const [p] = await api.listProducts();
+      await api.deleteProduct(p.id);
+      vi.setSystemTime(Date.now() + 29 * 24 * 60 * 60 * 1000);
+      expect((await api.listDeleted()).map((d) => d.id)).toEqual([p.id]);
+      vi.setSystemTime(Date.now() + 2 * 24 * 60 * 60 * 1000);
+      expect(await api.listDeleted()).toEqual([]);
+      await expect(api.restoreDeleted('product', p.id)).resolves.toBeUndefined();
+      expect((await api.listProducts()).some((x) => x.id === p.id)).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('hides a deleted product from wishlists and a deleted enquiry from the customer', async () => {
+    await asCustomer();
+    const me = (await api.getUser())!.id;
+    const [p] = await api.listProducts();
+    await api.setWishlisted(me, p.id, true);
+    await api.createEnquiry(me, { productId: p.id, name: 'Riya', phone: '9876543210', email: '', size: '', quantity: 1, message: '' });
+    await asAdmin();
+    await api.deleteProduct(p.id);
+    const [enquiry] = await api.listAllEnquiries();
+    await api.deleteEnquiry(enquiry.id);
+    expect(await api.listAllEnquiries()).toEqual([]);
+    expect((await api.adminStats()).enquiriesOpen).toBe(0);
+    expect((await api.adminStats()).wishlistAdds).toBe(0);
+    await asCustomer();
+    expect(await api.listWishlist(me)).toEqual([]);
+    expect(await api.listMyEnquiries(me)).toEqual([]);
+    await expect(api.listDeleted()).rejects.toThrow('Admins only');
+    await asAdmin();
+    await api.restoreDeleted('enquiry', enquiry.id);
+    await api.restoreDeleted('product', p.id);
+    await asCustomer();
+    expect(await api.listWishlist(me)).toEqual([p.id]);
+    expect(await api.listMyEnquiries(me)).toHaveLength(1);
   });
 
   it('inlines uploaded images as data URLs', async () => {

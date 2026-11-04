@@ -29,6 +29,7 @@ const AdminProducts = lazy(() => import('./pages/admin/AdminProducts').then((m) 
 const ProductEditor = lazy(() => import('./pages/admin/ProductEditor').then((m) => ({ default: m.ProductEditor })));
 const AdminCategories = lazy(() => import('./pages/admin/AdminCategories').then((m) => ({ default: m.AdminCategories })));
 const AdminEnquiries = lazy(() => import('./pages/admin/AdminEnquiries').then((m) => ({ default: m.AdminEnquiries })));
+const AdminDeleted = lazy(() => import('./pages/admin/AdminDeleted').then((m) => ({ default: m.AdminDeleted })));
 const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers').then((m) => ({ default: m.AdminCustomers })));
 
 export const createQueryClient = () =>
@@ -94,6 +95,7 @@ export const routes: RouteObject[] = [
           { path: '/admin/collections', element: <Navigate to="/admin/categories" replace /> },
           { path: '/admin/enquiries', element: admin(<AdminEnquiries />) },
           { path: '/admin/customers', element: admin(<AdminCustomers />) },
+          { path: '/admin/deleted', element: admin(<AdminDeleted />) },
 
           { path: '*', element: <NotFound /> }
         ]

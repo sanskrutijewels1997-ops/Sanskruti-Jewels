@@ -69,7 +69,6 @@ describe('URL params', () => {
     const f = {
       ...emptyFilters,
       categories: ['rings', 'necklaces'],
-      metals: ['Gold'],
       purities: ['22K'],
       styles: ['Temple'],
       availability: ['Ready Stock'],
@@ -93,7 +92,7 @@ describe('URL params', () => {
 
   it('counts active filters', () => {
     expect(activeCount(emptyFilters)).toBe(0);
-    expect(activeCount({ ...emptyFilters, metals: ['Gold', 'Silver'], maxWeight: 10, newOnly: true })).toBe(4);
+    expect(activeCount({ ...emptyFilters, purities: ['22K', '18K'], maxWeight: 10, newOnly: true })).toBe(4);
   });
 });
 
@@ -106,7 +105,7 @@ describe('applyFilters', () => {
   });
 
   it('combines values within a facet with OR and across facets with AND', () => {
-    expect(run({ metals: ['Gold', 'Diamond'] })).toHaveLength(4);
+    expect(run({ purities: ['22K', '18K'] })).toHaveLength(4);
     expect(run({ categories: ['necklaces'], availability: ['Made to Order'] })).toEqual(['N1']);
   });
 
@@ -121,9 +120,9 @@ describe('applyFilters', () => {
   });
 
   it('can ignore one facet (used for option counts)', () => {
-    const f = { ...emptyFilters, categories: ['rings'], metals: ['Gold'] };
+    const f = { ...emptyFilters, categories: ['rings'], purities: ['22K'] };
     expect(applyFilters(all, f, '', lookups).map((p) => p.sku)).toEqual([]);
-    expect(applyFilters(all, f, '', lookups, 'metals').map((p) => p.sku)).toEqual(['R1']);
+    expect(applyFilters(all, f, '', lookups, 'purities').map((p) => p.sku)).toEqual(['R1']);
   });
 });
 

@@ -37,7 +37,7 @@ describe('friendlyError', () => {
     ['Invalid login credentials', 'Incorrect email or password.'],
     ['User already registered', 'An account with this email already exists. Try signing in.'],
     ['Email not confirmed', 'Please confirm your email address first — check your inbox.'],
-    ['duplicate key value violates unique constraint', 'That SKU or URL slug is already used by another item.'],
+    ['duplicate key value violates unique constraint', 'That SKU or URL slug is already used by another item, possibly one in Recently deleted.'],
     ['Failed to fetch', 'Network problem — check your connection and try again.']
   ])('maps "%s"', (raw, friendly) => {
     expect(friendlyError(new Error(raw))).toBe(friendly);

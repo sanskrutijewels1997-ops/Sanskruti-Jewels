@@ -60,12 +60,12 @@ describe('Product list', () => {
     const user = userEvent.setup();
     const { router } = renderApp('/catalogue');
     await screen.findByText(`${seedProducts.length} items`);
-    await user.click(screen.getByRole('button', { name: 'Gold' }));
-    expect(search(router)).toContain('metal=Gold');
-    const gold = seedProducts.filter((p) => p.metal === 'Gold').length;
-    expect(await screen.findByText(`${gold} items`)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Remove filter Gold' }));
-    expect(search(router)).not.toContain('metal=');
+    await user.click(screen.getByRole('button', { name: 'Ready Stock' }));
+    expect(search(router)).toContain('avail=Ready');
+    const ready = seedProducts.filter((p) => p.availability === 'Ready Stock').length;
+    expect(await screen.findByText(`${ready} items`)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Remove filter Ready Stock' }));
+    expect(search(router)).not.toContain('avail=');
   });
 
   it('sorts from the sort sheet', async () => {
@@ -86,13 +86,15 @@ describe('Product list', () => {
     await screen.findByText(`${seedProducts.length} items`);
     await user.click(screen.getAllByRole('button', { name: /Filter/ })[0]);
     const sheet = await screen.findByRole('dialog', { name: 'Filters' });
-    await user.click(within(sheet).getByRole('tab', { name: 'Metal' }));
-    const diamond = seedProducts.filter((p) => p.metal === 'Diamond').length;
-    const option = within(sheet).getByRole('checkbox', { name: new RegExp(`Diamond\\s*${diamond}`) });
+    // Everything is gold, so there is no metal filter
+    expect(within(sheet).queryByRole('tab', { name: 'Metal' })).not.toBeInTheDocument();
+    await user.click(within(sheet).getByRole('tab', { name: 'Purity' }));
+    const k18 = seedProducts.filter((p) => p.purity === '18K').length;
+    const option = within(sheet).getByRole('checkbox', { name: new RegExp(`18K\\s*${k18}`) });
     await user.click(option);
-    await user.click(within(sheet).getByRole('button', { name: `Show ${diamond} items` }));
-    await waitFor(() => expect(search(router)).toContain('metal=Diamond'));
-    expect(await screen.findByText(`${diamond} items`)).toBeInTheDocument();
+    await user.click(within(sheet).getByRole('button', { name: `Show ${k18} items` }));
+    await waitFor(() => expect(search(router)).toContain('purity=18K'));
+    expect(await screen.findByText(`${k18} items`)).toBeInTheDocument();
   });
 
   it('shows an empty state that clears everything', async () => {

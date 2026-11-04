@@ -5,6 +5,7 @@ import {
   MessageSquareIcon,
   PackageIcon,
   TagsIcon,
+  Trash2Icon,
   UsersIcon
 } from 'lucide-react';
 import { PageHeader } from './PageHeader';
@@ -20,7 +21,8 @@ export const adminNav: NavItem[] = [
   { label: 'Products', to: '/admin/products', icon: PackageIcon },
   { label: 'Categories', to: '/admin/categories', icon: TagsIcon },
   { label: 'Enquiries', to: '/admin/enquiries', icon: MessageSquareIcon },
-  { label: 'Customers', to: '/admin/customers', icon: UsersIcon }
+  { label: 'Customers', to: '/admin/customers', icon: UsersIcon },
+  { label: 'Recently deleted', to: '/admin/deleted', icon: Trash2Icon }
 ];
 
 interface Props {

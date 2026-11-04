@@ -118,7 +118,7 @@ with p as (
     is_published, views, created_at, updated_at)
   values ('SJ-102884', 'solitaire-halo-engagement-ring-2884', 'Solitaire Halo Engagement Ring', 'Four-prong solitaire mount with a micro-pave halo and split shank. Available with lab-grown or natural centre stones.',
     (select id from public.categories where slug = 'casting-ladies-rings'),
-    'Modern', 'Diamond', '18K', 3, 5,
+    'Modern', 'Gold', '18K', 3, 5,
     'Casting', 5, 0.2, 4.8, 5, '0.70 ct centre, 0.34 ct pave (IGI certified)', 'US 5 – 12',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, true, true, 14210, now() - interval '4 days', now() - interval '4 days')
@@ -135,7 +135,7 @@ with p as (
     is_published, views, created_at, updated_at)
   values ('SJ-102925', 'teardrop-diamond-pendant-2925', 'Teardrop Diamond Pendant', 'A single pear-cut stone in a bezel-and-prong hybrid setting. Supplied with or without an 18 inch cable chain.',
     (select id from public.categories where slug = 'pendant'),
-    'Minimal', 'Diamond', '18K', 2, 4,
+    'Minimal', 'Gold', '18K', 2, 4,
     'Casting', 4, 0.16, 3.84, 4, '0.25 ct pear cut', '1.8 cm with bail',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, false, true, 4780, now() - interval '5 days', now() - interval '5 days')
@@ -152,7 +152,7 @@ with p as (
     is_published, views, created_at, updated_at)
   values ('SJ-102938', 'contemporary-diamond-mangalsutra-2938', 'Contemporary Diamond Mangalsutra', 'Double-line black bead mangalsutra with a compact diamond floral pendant designed for daily office wear.',
     (select id from public.categories where slug = 'rajkot-vati'),
-    'Modern', 'Diamond', '18K', 6, 9,
+    'Modern', 'Gold', '18K', 6, 9,
     'Casting', 9, 0.36, 8.64, 5, '0.18 ct round brilliant cluster', '24 inch',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, true, true, 8140, now() - interval '6 days', now() - interval '6 days')
@@ -220,7 +220,7 @@ with p as (
     is_published, views, created_at, updated_at)
   values ('SJ-102979', 'diamond-drop-cocktail-earrings-2979', 'Diamond Drop Cocktail Earrings', 'Detachable stud-and-drop construction giving you two looks from one pair.',
     (select id from public.categories where slug = 'earring'),
-    'Modern', 'Diamond', '18K', 7, 10,
+    'Modern', 'Gold', '18K', 7, 10,
     'Casting', 10, 0.4, 9.6, 4, '1.42 ct total, VS-GH', '3.2 cm drop',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, true, true, 6650, now() - interval '10 days', now() - interval '10 days')
@@ -254,7 +254,7 @@ with p as (
     is_published, views, created_at, updated_at)
   values ('SJ-103002', 'everyday-diamond-studs-3002', 'Everyday Diamond Studs', 'Classic four-prong diamond studs with secure screw backs. An everyday essential.',
     (select id from public.categories where slug = 'karwari-tops'),
-    'Daily Wear', 'Diamond', '14K', 1, 3,
+    'Daily Wear', 'Gold', '14K', 1, 3,
     'Casting', 3, 0.12, 2.88, 2, '0.20 ct pair', '4 mm',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     false, true, true, 12100, now() - interval '12 days', now() - interval '12 days')
@@ -356,7 +356,7 @@ with p as (
     is_published, views, created_at, updated_at)
   values ('SJ-103096', 'diamond-cluster-cocktail-ring-3096', 'Diamond Cluster Cocktail Ring', 'Flower cluster head with illusion setting that reads two sizes larger than its carat weight.',
     (select id from public.categories where slug = 'ladies-rings'),
-    'Modern', 'Diamond', '18K', 5, 8,
+    'Modern', 'Gold', '18K', 5, 8,
     'Casting', 8, 0.32, 7.68, 1, '0.94 ct cluster', 'US 6 – 13',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     false, false, true, 4460, now() - interval '18 days', now() - interval '18 days')
@@ -441,7 +441,7 @@ with p as (
     is_published, views, created_at, updated_at)
   values ('SJ-103155', 'diamond-bezel-pendant-set-3155', 'Diamond Bezel Pendant Set', 'Bezel-set pendant with matching studs, packaged as a ready gifting set with certificate.',
     (select id from public.categories where slug = 'casting-lockets'),
-    'Daily Wear', 'Diamond', '18K', 5, 8,
+    'Daily Wear', 'Gold', '18K', 5, 8,
     'Casting', 8, 0.32, 7.68, 2, '0.32 ct total', 'Pendant + studs + 18in chain',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, false, true, 6120, now() - interval '23 days', now() - interval '23 days')
@@ -468,23 +468,6 @@ with p as (
 insert into public.product_images (product_id, url, alt, sort_order)
 select p.id, img.url, 'Broad Gold Choker Necklace', img.ord - 1
 from p, unnest(array['/images/gold-necklace.jpg', '/images/bangles.jpg', '/images/temple.jpg', '/images/bridal-set.jpg']) with ordinality as img(url, ord);
-
-with p as (
-  insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
-    is_published, views, created_at, updated_at)
-  values ('SJ-103186', 'platinum-eternity-band-3186', 'Platinum Eternity Band', 'Channel-set platinum eternity band with a comfort-fit profile, produced to exact finger size.',
-    (select id from public.categories where slug = 'couple-band'),
-    'Minimal', 'Platinum', '18K', 4, 6,
-    'Machine Made', 6, 0.48, 5.52, 5, '0.52 ct full eternity', 'US 5 – 12',
-    'Made to Order', null, false, '[{"label":"Finish","value":"High polish"}]'::jsonb,
-    true, false, true, 3890, now() - interval '25 days', now() - interval '25 days')
-  on conflict (sku) do nothing
-  returning id
-)
-insert into public.product_images (product_id, url, alt, sort_order)
-select p.id, img.url, 'Platinum Eternity Band', img.ord - 1
-from p, unnest(array['/images/diamond-ring.jpg', '/images/gold-ring.jpg', '/images/diamond-earrings.jpg', '/images/pendant.jpg']) with ordinality as img(url, ord);
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,

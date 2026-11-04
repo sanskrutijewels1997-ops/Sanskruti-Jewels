@@ -12,18 +12,10 @@ import {
 } from 'lucide-react';
 import { ProductRail } from '../components/home/ProductRail';
 import { BrandStrip, Logo, SinceBadge } from '../components/Logo';
-import { SectionHeader } from '../components/ui';
 import { useApp } from '../contexts/AppContext';
 import { purityShortcuts } from '../data/options';
 import { BRAND } from '../data/brand';
 import { useCatalogue } from '../lib/queries';
-
-const metalTiles = [
-  { metal: 'Gold', note: '22K & 18K', tone: 'from-[#f5d77a] to-[#c9962e]' },
-  { metal: 'Diamond', note: 'Certified', tone: 'from-[#e8eef5] to-[#9fb2c8]' },
-  { metal: 'Silver', note: '92.5 sterling', tone: 'from-[#eceae6] to-[#a9a49b]' },
-  { metal: 'Platinum', note: 'PT 950', tone: 'from-[#e3e1dd] to-[#8d8a85]' }
-];
 
 export function Home() {
   const { published, topCategories, byId, loading } = useCatalogue();
@@ -85,22 +77,6 @@ export function Home() {
         products={published.filter((p) => p.isNew).slice(0, 12)}
         viewAllTo="/catalogue?filter=new"
       />
-
-      <section className="py-6 lg:py-10">
-        <SectionHeader title="Shop by Metal" />
-        <div className="mt-4 grid grid-cols-4 gap-2.5 px-4 lg:gap-5 lg:px-0">
-          {metalTiles.map((m) => (
-            <Link
-              key={m.metal}
-              to={`/catalogue?metal=${m.metal}`}
-              className={`pressable flex aspect-[3/4] flex-col justify-end rounded-xl bg-gradient-to-br p-2.5 text-black ${m.tone} lg:aspect-[16/9] lg:p-5`}
-            >
-              <span className="text-[13px] font-bold lg:text-lg">{m.metal}</span>
-              <span className="text-[10px] opacity-70 lg:text-xs">{m.note}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
 
       <ProductRail
         title="Trending Now"

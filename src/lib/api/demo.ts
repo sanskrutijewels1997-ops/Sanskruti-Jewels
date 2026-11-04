@@ -1,11 +1,14 @@
 import { seedCategories, seedProducts } from '../../data/seed';
 import type {
   Category,
+  DeletedItem,
+  DeletedKind,
   Enquiry,
   Product,
   Profile,
   SavedList
 } from '../../types';
+import { splitExpired } from '../recovery';
 import type { AuthUser, Backend } from './types';
 
 /**
@@ -16,7 +19,7 @@ import type { AuthUser, Backend } from './types';
  */
 
 // Bump when the seed shape changes so browsers re-seed instead of loading stale data.
-const KEY = 'sanskruti-demo-db-v5';
+const KEY = 'sanskruti-demo-db-v6';
 
 interface DemoUser {
   id: string;
@@ -24,16 +27,20 @@ interface DemoUser {
   password: string;
 }
 
+/** Set while an item is in Recently deleted. */
+type Trashable<T> = T & { deletedAt?: string };
+const live = <T extends { deletedAt?: string }>(x: T) => !x.deletedAt;
+
 interface DB {
   users: DemoUser[];
   profiles: Profile[];
   session: string | null;
-  categories: Category[];
-  products: Product[];
+  categories: Trashable<Category>[];
+  products: Trashable<Product>[];
   wishlist: { userId: string; productId: string; createdAt: string }[];
   lists: (Omit<SavedList, 'productIds'> & { userId: string })[];
   listItems: { listId: string; productId: string; createdAt: string }[];
-  enquiries: Enquiry[];
+  enquiries: Trashable<Enquiry>[];
 }
 
 export const DEMO_ACCOUNTS = {
@@ -180,6 +187,30 @@ function blobToDataUrl(file: Blob) {
   });
 }
 
+const isTrashedProduct = (id: string) => db.products.some((p) => p.id === id && !live(p));
+
+/** Removes a deleted item for good, as the database's foreign keys would. */
+function purge(kind: DeletedKind, id: string) {
+  if (kind === 'product') {
+    db.products = db.products.filter((p) => p.id !== id);
+    db.wishlist = db.wishlist.filter((w) => w.productId !== id);
+    db.listItems = db.listItems.filter((w) => w.productId !== id);
+    db.enquiries.forEach((e) => {
+      if (e.productId === id) e.productId = null;
+    });
+  } else if (kind === 'category') {
+    // Sub-categories go with their parent (ON DELETE CASCADE in the database).
+    const removed = new Set([id, ...db.categories.filter((c) => c.parentId === id).map((c) => c.id)]);
+    db.categories = db.categories.filter((c) => !removed.has(c.id));
+    db.products.forEach((p) => {
+      if (p.categoryId && removed.has(p.categoryId)) p.categoryId = null;
+    });
+  } else {
+    db.enquiries = db.enquiries.filter((e) => e.id !== id);
+  }
+  persist();
+}
+
 export function createDemoBackend(): Backend {
   return {
     mode: 'demo',
@@ -254,12 +285,12 @@ export function createDemoBackend(): Backend {
       const admin = isAdmin();
       return tick(
         db.products
-          .filter((p) => p.isPublished || admin)
+          .filter((p) => live(p) && (p.isPublished || admin))
           .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       );
     },
     async listCategories() {
-      return tick([...db.categories].sort((a, b) => a.sortOrder - b.sortOrder));
+      return tick(db.categories.filter(live).sort((a, b) => a.sortOrder - b.sortOrder));
     },
     async recordView(productId) {
       const p = db.products.find((x) => x.id === productId);
@@ -291,9 +322,8 @@ export function createDemoBackend(): Backend {
     },
     async deleteProduct(id) {
       requireAdmin();
-      db.products = db.products.filter((p) => p.id !== id);
-      db.wishlist = db.wishlist.filter((w) => w.productId !== id);
-      db.listItems = db.listItems.filter((w) => w.productId !== id);
+      const p = db.products.find((x) => x.id === id);
+      if (p) p.deletedAt = now();
       persist();
     },
     async saveCategory(input) {
@@ -321,11 +351,10 @@ export function createDemoBackend(): Backend {
     },
     async deleteCategory(id) {
       requireAdmin();
-      // Sub-categories go with their parent (ON DELETE CASCADE in the database).
-      const removed = new Set([id, ...db.categories.filter((c) => c.parentId === id).map((c) => c.id)]);
-      db.categories = db.categories.filter((c) => !removed.has(c.id));
-      db.products.forEach((p) => {
-        if (p.categoryId && removed.has(p.categoryId)) p.categoryId = null;
+      // Sub-categories go with their parent, sharing its timestamp so they return with it.
+      const at = now();
+      db.categories.forEach((c) => {
+        if ((c.id === id || c.parentId === id) && live(c)) c.deletedAt = at;
       });
       persist();
     },
@@ -339,24 +368,26 @@ export function createDemoBackend(): Backend {
     async adminStats() {
       requireAdmin();
       const counts = new Map<string, number>();
-      db.wishlist.forEach((w) => counts.set(w.productId, (counts.get(w.productId) ?? 0) + 1));
+      const products = db.products.filter(live);
+      const wishlist = db.wishlist.filter((w) => products.some((p) => p.id === w.productId));
+      wishlist.forEach((w) => counts.set(w.productId, (counts.get(w.productId) ?? 0) + 1));
       const byCat = new Map<string, number>();
-      db.products.forEach((p) => {
-        const name = db.categories.find((c) => c.id === p.categoryId)?.name ?? 'Uncategorised';
+      products.forEach((p) => {
+        const name = db.categories.find((c) => c.id === p.categoryId && live(c))?.name ?? 'Uncategorised';
         byCat.set(name, (byCat.get(name) ?? 0) + 1);
       });
       return tick({
-        products: db.products.length,
-        published: db.products.filter((p) => p.isPublished).length,
+        products: products.length,
+        published: products.filter((p) => p.isPublished).length,
         customers: db.profiles.filter((p) => p.role === 'customer').length,
-        enquiriesOpen: db.enquiries.filter((e) => e.status !== 'Closed').length,
-        wishlistAdds: db.wishlist.length,
-        totalViews: db.products.reduce((s, p) => s + p.views, 0),
+        enquiriesOpen: db.enquiries.filter((e) => live(e) && e.status !== 'Closed').length,
+        wishlistAdds: wishlist.length,
+        totalViews: products.reduce((s, p) => s + p.views, 0),
         topWishlisted: [...counts.entries()]
           .sort((a, b) => b[1] - a[1])
           .slice(0, 5)
           .flatMap(([id, count]) => {
-            const p = db.products.find((x) => x.id === id);
+            const p = products.find((x) => x.id === id);
             return p ? [{ id, name: p.name, sku: p.sku, count }] : [];
           }),
         byCategory: [...byCat.entries()]
@@ -369,7 +400,7 @@ export function createDemoBackend(): Backend {
       requireUser(userId);
       return tick(
         db.wishlist
-          .filter((w) => w.userId === userId)
+          .filter((w) => w.userId === userId && !isTrashedProduct(w.productId))
           .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
           .map((w) => w.productId)
       );
@@ -392,7 +423,7 @@ export function createDemoBackend(): Backend {
             return {
               ...l,
               productIds: db.listItems
-                .filter((i) => i.listId === l.id)
+                .filter((i) => i.listId === l.id && !isTrashedProduct(i.productId))
                 .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
                 .map((i) => i.productId)
             };
@@ -442,19 +473,86 @@ export function createDemoBackend(): Backend {
       requireUser(userId);
       return tick(
         db.enquiries
-          .filter((e) => e.userId === userId)
+          .filter((e) => e.userId === userId && live(e))
           .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       );
     },
     async listAllEnquiries() {
       requireAdmin();
-      return tick([...db.enquiries].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+      return tick(db.enquiries.filter(live).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
     },
     async updateEnquiry(id, patch) {
       requireAdmin();
       const e = db.enquiries.find((x) => x.id === id);
       if (e) Object.assign(e, patch);
       persist();
+    },
+    async deleteEnquiry(id) {
+      requireAdmin();
+      const e = db.enquiries.find((x) => x.id === id);
+      if (e) e.deletedAt = now();
+      persist();
+    },
+
+    async listDeleted() {
+      requireAdmin();
+      const deletedWithParent = (c: Trashable<Category>) =>
+        db.categories.some((p) => p.id === c.parentId && p.deletedAt && p.deletedAt === c.deletedAt);
+      const items: DeletedItem[] = [
+        ...db.products
+          .filter((p) => !live(p))
+          .map((p) => ({
+            kind: 'product' as const,
+            id: p.id,
+            title: p.name,
+            detail: p.sku,
+            sku: p.sku,
+            imageUrl: p.images[0]?.url ?? null,
+            deletedAt: p.deletedAt!
+          })),
+        ...db.categories
+          .filter((c) => !live(c) && !deletedWithParent(c))
+          .map((c) => ({
+            kind: 'category' as const,
+            id: c.id,
+            title: c.name,
+            detail: db.categories.some((s) => s.parentId === c.id && !live(s)) ? 'Includes its sub-categories' : '',
+            imageUrl: c.imageUrl,
+            deletedAt: c.deletedAt!
+          })),
+        ...db.enquiries
+          .filter((e) => !live(e))
+          .map((e) => ({ kind: 'enquiry' as const, id: e.id, title: e.name, detail: e.phone, imageUrl: null, deletedAt: e.deletedAt! }))
+      ];
+      const { active, expired } = splitExpired(items);
+      expired.forEach((i) => purge(i.kind, i.id));
+      return tick(active);
+    },
+    async restoreDeleted(kind, id) {
+      requireAdmin();
+      if (kind === 'product') {
+        const p = db.products.find((x) => x.id === id);
+        if (p) delete p.deletedAt;
+      } else if (kind === 'enquiry') {
+        const e = db.enquiries.find((x) => x.id === id);
+        if (e) delete e.deletedAt;
+      } else {
+        const cat = db.categories.find((c) => c.id === id);
+        if (!cat) return;
+        // A sub-category can't come back without its parent.
+        const parent = db.categories.find((c) => c.id === cat.parentId && !live(c));
+        [cat, ...(parent ? [parent] : [])].forEach((t) => {
+          const at = t.deletedAt;
+          db.categories.forEach((c) => {
+            if ((c.id === t.id || c.parentId === t.id) && c.deletedAt === at) delete c.deletedAt;
+          });
+        });
+      }
+      persist();
+    },
+    async purgeDeleted(kind, id) {
+      requireAdmin();
+      purge(kind, id);
     }
   };
 }

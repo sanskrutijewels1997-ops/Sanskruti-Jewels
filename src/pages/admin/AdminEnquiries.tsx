@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MailIcon, MessageCircleIcon, PhoneIcon } from 'lucide-react';
+import { MailIcon, MessageCircleIcon, PhoneIcon, Trash2Icon } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DashboardShell, adminNav } from '../../components/DashboardShell';
 import { EmptyState, ErrorNotice, PageLoader, inputClass } from '../../components/ui';
@@ -8,6 +8,7 @@ import { useApp } from '../../contexts/AppContext';
 import { api } from '../../lib/api';
 import { formatDate, friendlyError } from '../../lib/format';
 import { qk, useCatalogue } from '../../lib/queries';
+import { RECOVERY_DAYS } from '../../lib/recovery';
 import type { Enquiry, EnquiryStatus } from '../../types';
 import { enquiryTone } from '../account/MyEnquiries';
 
@@ -74,6 +75,19 @@ function EnquiryRow({ enquiry: e }: { enquiry: Enquiry }) {
     }
   };
 
+  const remove = async () => {
+    if (!window.confirm(`Delete the enquiry from ${e.name}? You can restore it from Recently deleted for ${RECOVERY_DAYS} days.`)) return;
+    try {
+      await api.deleteEnquiry(e.id);
+      queryClient.invalidateQueries({ queryKey: ['enquiries'] });
+      queryClient.invalidateQueries({ queryKey: qk.stats });
+      queryClient.invalidateQueries({ queryKey: qk.deleted });
+      notify('Enquiry moved to Recently deleted', 'info');
+    } catch (err) {
+      notify(friendlyError(err), 'error');
+    }
+  };
+
   return (
     <li className="rounded-xl border border-line bg-surface p-4 sm:p-5">
       <div className="flex flex-wrap items-start gap-4">
@@ -129,6 +143,14 @@ function EnquiryRow({ enquiry: e }: { enquiry: Enquiry }) {
             <MailIcon className="h-3.5 w-3.5 text-gold" /> {e.email}
           </a>
         )}
+        <button
+          type="button"
+          onClick={remove}
+          aria-label={`Delete enquiry from ${e.name}`}
+          className="ml-auto flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-danger hover:border-danger"
+        >
+          <Trash2Icon className="h-3.5 w-3.5" /> Delete
+        </button>
       </div>
       <input
         value={note}

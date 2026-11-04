@@ -10,6 +10,7 @@ import { useApp } from '../../contexts/AppContext';
 import { api } from '../../lib/api';
 import { formatPrice, friendlyError } from '../../lib/format';
 import { qk, useCatalogue } from '../../lib/queries';
+import { RECOVERY_DAYS } from '../../lib/recovery';
 import type { Product } from '../../types';
 
 type StatusFilter = 'all' | 'published' | 'draft';
@@ -37,6 +38,7 @@ export function AdminProducts() {
   const refresh = () => {
     queryClient.invalidateQueries({ queryKey: qk.products });
     queryClient.invalidateQueries({ queryKey: qk.stats });
+    queryClient.invalidateQueries({ queryKey: qk.deleted });
   };
 
   const togglePublish = async (p: Product) => {
@@ -57,11 +59,11 @@ export function AdminProducts() {
   };
 
   const remove = async (p: Product) => {
-    if (!window.confirm(`Delete “${p.name}” permanently? Its images will be deleted too.`)) return;
+    if (!window.confirm(`Delete “${p.name}”? You can restore it from Recently deleted for ${RECOVERY_DAYS} days.`)) return;
     setBusyId(p.id);
     try {
       await api.deleteProduct(p.id);
-      notify('Product deleted', 'info');
+      notify('Product moved to Recently deleted', 'info');
       refresh();
     } catch (e) {
       notify(friendlyError(e), 'error');

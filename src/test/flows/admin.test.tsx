@@ -24,6 +24,10 @@ describe('Admin dashboard', () => {
 describe('Product editor', () => {
   it('validates, then creates a draft product and opens it for editing', async () => {
     const user = userEvent.setup();
+    // A deleted product still holds its SKU, so the new one must not reuse it
+    const products = await api.listProducts();
+    const highest = products.reduce((a, b) => (Number(b.sku.replace(/\D/g, '')) > Number(a.sku.replace(/\D/g, '')) ? b : a));
+    await api.deleteProduct(highest.id);
     const { router } = renderApp('/admin/products/new');
     const name = await screen.findByLabelText('Product name');
     await user.click(screen.getByRole('button', { name: 'Create product' }));
@@ -73,6 +77,7 @@ describe('Product editor', () => {
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/admin\/products\/[0-9a-f-]{36}$/));
     const saved = (await api.listProducts()).find((p) => p.name === 'Peacock Pendant')!;
     expect(saved.sku).toMatch(/^SJ-\d+$/);
+    expect(saved.sku).not.toBe(highest.sku);
     expect(saved.slug).toBe(`peacock-pendant-${saved.sku.replace('SJ-', '')}`);
     expect(saved).toMatchObject({
       isPublished: false,
@@ -227,4 +232,33 @@ describe('Enquiries & customers', () => {
     await user.click(within(row).getByRole('button', { name: 'Make admin' }));
     expect(await screen.findByText('Admin access granted')).toBeInTheDocument();
   });
+});
+
+describe('Recently deleted', () => {
+  beforeEach(() => signInAs('admin'));
+
+  it('deletes an enquiry, restores it, then removes it for good', async () => {
+    const user = userEvent.setup();
+    const me = (await api.getUser())!.id;
+    await api.createEnquiry(me, { productId: null, name: 'Riya Patil', phone: '9876543210', email: '', size: '', quantity: 1, message: 'Hello' });
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    renderApp('/admin/enquiries');
+
+    await user.click(await screen.findByRole('button', { name: 'Delete enquiry from Riya Patil' }));
+    await screen.findByText('Enquiry moved to Recently deleted');
+    expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining('30 days'));
+    await waitFor(() => expect(screen.queryByText('Riya Patil')).not.toBeInTheDocument());
+
+    await user.click(screen.getAllByRole('link', { name: 'Recently deleted' })[0]);
+    expect(await screen.findByText(/30 days left/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Restore Riya Patil' }));
+    expect(await screen.findByText('Nothing here')).toBeInTheDocument();
+    expect(await api.listAllEnquiries()).toHaveLength(1);
+
+    await api.deleteEnquiry((await api.listAllEnquiries())[0].id);
+    renderApp('/admin/deleted');
+    await user.click(await screen.findByRole('button', { name: 'Permanently delete Riya Patil' }));
+    await waitFor(async () => expect(await api.listDeleted()).toEqual([]));
+  });
+
 });

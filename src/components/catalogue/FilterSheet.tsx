@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CheckIcon } from 'lucide-react';
 import { BottomSheet } from '../BottomSheet';
-import { availabilities, metals, purities, styles } from '../../data/options';
+import { availabilities, purities, styles } from '../../data/options';
 import {
   MAX_WEIGHT,
   applyFilters,
@@ -50,7 +50,6 @@ export function FilterSheet({
         { value: c.slug, label: c.name },
         ...categories.filter((s) => s.parentId === c.id).map((s) => ({ value: s.slug, label: s.name, sub: true }))
       ]),
-    metals: metals.map((m) => ({ value: m, label: m })),
     purities: purities.map((m) => ({ value: m, label: m })),
     styles: styles.map((m) => ({ value: m, label: m })),
     availability: availabilities.map((m) => ({ value: m, label: m }))
@@ -58,7 +57,6 @@ export function FilterSheet({
 
   const facets: { key: Facet; label: string; count: number }[] = [
     { key: 'categories', label: 'Category', count: draft.categories.length },
-    { key: 'metals', label: 'Metal', count: draft.metals.length },
     { key: 'purities', label: 'Purity', count: draft.purities.length },
     { key: 'styles', label: 'Style', count: draft.styles.length },
     { key: 'availability', label: 'Availability', count: draft.availability.length },

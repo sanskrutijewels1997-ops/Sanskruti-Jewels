@@ -159,7 +159,7 @@ export function Search() {
         </div>
       ) : results.length === 0 ? (
         <p className="px-6 py-16 text-center text-sm text-ink-2">
-          No matches for “{q.trim()}”. Try a category, metal or stone.
+          No matches for “{q.trim()}”. Try a category or stone.
         </p>
       ) : (
         <div className="pb-6">

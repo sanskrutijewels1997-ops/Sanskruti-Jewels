@@ -25,10 +25,10 @@ test('product list: sort/filter bar, filters in the URL and back restores positi
   const total = Number((await count.innerText()).split(' ')[0]);
 
   await page.getByRole('button', { name: /^Filter/ }).click();
-  await page.getByRole('tab', { name: 'Metal' }).click();
-  await page.getByRole('checkbox', { name: /Gold/ }).click();
+  await page.getByRole('tab', { name: 'Purity' }).click();
+  await page.getByRole('checkbox', { name: /18K/ }).click();
   await page.getByRole('button', { name: /^Show \d+ items?$/ }).click();
-  await expect(page).toHaveURL(/metal=Gold/);
+  await expect(page).toHaveURL(/purity=18K/);
   const filtered = Number((await count.innerText()).split(' ')[0]);
   expect(filtered).toBeLessThan(total);
 
@@ -51,7 +51,7 @@ test('product list: sort/filter bar, filters in the URL and back restores positi
   expect(bar!.y).toBeGreaterThan(vh - 120);
 
   await page.getByRole('button', { name: 'Back' }).click();
-  await expect(page).toHaveURL(/metal=Gold.*sort=price-asc|sort=price-asc.*metal=Gold/);
+  await expect(page).toHaveURL(/purity=18K.*sort=price-asc|sort=price-asc.*purity=18K/);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before - 60);
   check();
 });

@@ -11,6 +11,8 @@ import { enquiryTone } from '../account/MyEnquiries';
 export function AdminDashboard() {
   const stats = useQuery({ queryKey: qk.stats, queryFn: () => api.adminStats() });
   const enquiries = useQuery({ queryKey: qk.allEnquiries, queryFn: () => api.listAllEnquiries() });
+  // Reading this also clears anything past its recovery window.
+  useQuery({ queryKey: qk.deleted, queryFn: () => api.listDeleted() });
   const { byId } = useCatalogue();
 
   const s = stats.data;

@@ -92,7 +92,6 @@ export function ProductDetail() {
     ['Net weight', grams(product.netWeight)],
     ['Qty', product.quantity === null ? '' : String(product.quantity)],
     ['Style', product.style],
-    ['Metal', product.metal],
     ['Weight range', product.grossWeight === null ? range : ''],
     ['Size / length', product.size],
     ['Stones', product.stone],

@@ -1,9 +1,8 @@
 // Fixed option lists used by catalogue filters and the admin product form.
-export const metals = ['Gold', 'Diamond', 'Platinum', 'Silver'];
 
 /** Trade purity marking. Stored as-is on products and used in URLs (?purity=…). */
 export const CARAT_92 = '92 Carat';
-export const purities = [CARAT_92, '14K', '18K', '22K', '24K', '925', '950'];
+export const purities = [CARAT_92, '14K', '18K', '22K', '24K'];
 
 /**
  * The two purities customers shop by most, promoted as one-tap shortcuts on Home,

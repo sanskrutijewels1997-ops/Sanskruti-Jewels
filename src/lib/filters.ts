@@ -3,7 +3,6 @@ import type { Category, Product } from '../types';
 /** Catalogue filters. They live in the URL so Back restores the exact list. */
 export interface Filters {
   categories: string[]; // category slugs
-  metals: string[];
   purities: string[];
   styles: string[];
   availability: string[];
@@ -11,13 +10,12 @@ export interface Filters {
   newOnly: boolean;
 }
 
-export type ListFacet = 'categories' | 'metals' | 'purities' | 'styles' | 'availability';
+export type ListFacet = 'categories' | 'purities' | 'styles' | 'availability';
 
 export const MAX_WEIGHT = 120;
 
 export const emptyFilters: Filters = {
   categories: [],
-  metals: [],
   purities: [],
   styles: [],
   availability: [],
@@ -27,7 +25,6 @@ export const emptyFilters: Filters = {
 
 const LIST_PARAMS: Record<ListFacet, string> = {
   categories: 'category',
-  metals: 'metal',
   purities: 'purity',
   styles: 'style',
   availability: 'avail'
@@ -84,8 +81,6 @@ export function facetValues(p: Product, facet: ListFacet, l: Lookups): string[] 
       const parent = own.parentId ? l.categories.find((c) => c.id === own.parentId) : undefined;
       return parent ? [own.slug, parent.slug] : [own.slug];
     }
-    case 'metals':
-      return [p.metal];
     case 'purities':
       return [p.purity];
     case 'styles':

@@ -1,6 +1,8 @@
 import type {
   AdminStats,
   Category,
+  DeletedItem,
+  DeletedKind,
   Enquiry,
   EnquiryInput,
   EnquiryStatus,
@@ -77,4 +79,11 @@ export interface Backend {
   listMyEnquiries(userId: string): Promise<Enquiry[]>;
   listAllEnquiries(): Promise<Enquiry[]>;
   updateEnquiry(id: string, patch: { status?: EnquiryStatus; adminNote?: string }): Promise<void>;
+  deleteEnquiry(id: string): Promise<void>;
+
+  // recently deleted (admin): deleting keeps an item here for RECOVERY_DAYS
+  /** Lists what can still be restored, removing anything past its recovery window. */
+  listDeleted(): Promise<DeletedItem[]>;
+  restoreDeleted(kind: DeletedKind, id: string): Promise<void>;
+  purgeDeleted(kind: DeletedKind, id: string): Promise<void>;
 }

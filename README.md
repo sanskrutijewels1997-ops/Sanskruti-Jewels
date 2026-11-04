@@ -10,7 +10,9 @@ Vercel today and ships to iOS and Android from the same codebase with Capacitor.
 - **Admins:** dashboard; product create/edit with multi-photo upload (auto-compressed,
   reorderable, cover image), specifications plus custom spec rows, price or "price on
   request", draft/publish; categories and sub-categories with cover images; enquiry inbox
-  with status and internal notes; customer list with admin promotion.
+  with status and internal notes; customer list with admin promotion; Recently deleted, where
+  deleted products, categories and enquiries can be restored for 30 days before they're
+  removed for good (the removal runs when an admin opens the dashboard or that screen).
 
 ### Product specifications
 
@@ -19,7 +21,7 @@ Every product must have these, and the admin form won't save without them:
 as gross − stone, editable), **Qty** and **Trending (Yes/No)**. Answering Yes to "Has
 stones?" shows **Stone weight**, which is then required; No saves it as 0 and the product
 page shows "No stones". Trending products fill the "Trending Now" row on Home. Everything
-else (metal, style, weight range, size, stone details, price, extra spec rows) is optional.
+else (style, weight range, size, stone details, price, extra spec rows) is optional.
 
 Purity includes **92 Carat** alongside 14K–24K. Home has one-tap **92 Carat** and
 **22 Carat** shortcuts, Search can be scoped to either, and the product list keeps both as
@@ -112,7 +114,7 @@ Copy the printed API URL and anon key into `.env.local` (see `.env.example`).
    - Paste it into the empty query and click **Run**. You should see `Success`.
 
    This one file creates the tables, security rules and image storage bucket, and loads the
-   27 starter products. It's safe to run again if anything goes wrong part-way.
+   26 starter products. It's safe to run again if anything goes wrong part-way.
 
    **Upgrading an existing database:** run the latest `setup.sql` again the same way. It
    adds any new columns and rules, leaves your existing products and edits untouched, and

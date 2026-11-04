@@ -10,6 +10,7 @@ import { useApp } from '../../contexts/AppContext';
 import { api } from '../../lib/api';
 import { friendlyError, slugify } from '../../lib/format';
 import { qk, useCatalogue } from '../../lib/queries';
+import { RECOVERY_DAYS } from '../../lib/recovery';
 import type { Category } from '../../types';
 
 type Item = Omit<Category, 'id'> & { id?: string };
@@ -33,13 +34,14 @@ export function AdminCategories() {
     const n = usage(item.id) + subs.reduce((sum, s) => sum + usage(s.id), 0);
     const warn =
       (subs.length ? ` Its ${subs.length} sub-categor${subs.length > 1 ? 'ies' : 'y'} will be deleted too.` : '') +
-      (n ? ` ${n} product${n > 1 ? 's' : ''} will be left without a category.` : '');
-    if (!item.id || !window.confirm(`Delete “${item.name}”?${warn}`)) return;
+      (n ? ` ${n} product${n > 1 ? 's' : ''} will be left without a category until it's restored.` : '');
+    if (!item.id || !window.confirm(`Delete “${item.name}”?${warn} You can restore it from Recently deleted for ${RECOVERY_DAYS} days.`)) return;
     try {
       await api.deleteCategory(item.id);
       queryClient.invalidateQueries({ queryKey: qk.categories });
       queryClient.invalidateQueries({ queryKey: qk.products });
-      notify(`Deleted “${item.name}”`, 'info');
+      queryClient.invalidateQueries({ queryKey: qk.deleted });
+      notify(`“${item.name}” moved to Recently deleted`, 'info');
     } catch (e) {
       notify(friendlyError(e), 'error');
     }

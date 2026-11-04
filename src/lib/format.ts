@@ -41,7 +41,7 @@ export function friendlyError(e: unknown) {
   if (/invalid login credentials/i.test(msg)) return 'Incorrect email or password.';
   if (/already registered/i.test(msg)) return 'An account with this email already exists. Try signing in.';
   if (/email not confirmed/i.test(msg)) return 'Please confirm your email address first — check your inbox.';
-  if (/duplicate key/i.test(msg)) return 'That SKU or URL slug is already used by another item.';
+  if (/duplicate key/i.test(msg)) return 'That SKU or URL slug is already used by another item, possibly one in Recently deleted.';
   if (/failed to fetch|network/i.test(msg)) return 'Network problem — check your connection and try again.';
   return msg;
 }

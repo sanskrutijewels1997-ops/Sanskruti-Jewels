@@ -79,6 +79,13 @@ describe('Supabase adapter', () => {
     await expect(adminApi.saveProduct({ ...base, slug: `other-${run}` })).rejects.toThrow(/duplicate key/);
     await adminApi.deleteProduct(created.id);
     expect((await adminApi.listProducts()).some((p) => p.id === created.id)).toBe(false);
+    // Recently deleted: recoverable, then removed for good
+    expect((await adminApi.listDeleted()).some((d) => d.kind === 'product' && d.id === created.id)).toBe(true);
+    await adminApi.restoreDeleted('product', created.id);
+    expect((await adminApi.listProducts()).some((p) => p.id === created.id)).toBe(true);
+    await adminApi.deleteProduct(created.id);
+    await adminApi.purgeDeleted('product', created.id);
+    expect((await adminApi.listDeleted()).some((d) => d.id === created.id)).toBe(false);
   });
 
   it('blocks customers from admin actions', async () => {

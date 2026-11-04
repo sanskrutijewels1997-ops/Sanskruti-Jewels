@@ -85,6 +85,20 @@ export interface SavedList {
   updatedAt: string;
 }
 
+export type DeletedKind = 'product' | 'category' | 'enquiry';
+
+/** Something in Recently deleted, awaiting restore or permanent removal. */
+export interface DeletedItem {
+  kind: DeletedKind;
+  id: string;
+  title: string;
+  detail: string;
+  imageUrl: string | null;
+  /** Products only: its SKU stays reserved until it's removed for good. */
+  sku?: string;
+  deletedAt: string;
+}
+
 export interface Enquiry {
   id: string;
   userId: string | null;

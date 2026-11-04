@@ -89,7 +89,6 @@ export function Catalogue() {
     );
   // With sub-category tabs showing, the category is already visible there.
   if (!showSubTabs) listChip('categories', (v) => categories.find((c) => c.slug === v)?.name ?? v);
-  listChip('metals', (v) => v);
   filters.purities
     .filter((v) => !purityShortcuts.some((s) => s.value === v))
     .forEach((v) => applied.push({ label: v, remove: () => update({ ...filters, purities: filters.purities.filter((x) => x !== v) }) }));
@@ -120,12 +119,6 @@ export function Catalogue() {
           availability: filters.availability.includes('Ready Stock') ? [] : ['Ready Stock']
         })
     },
-    ...['Gold', 'Diamond', 'Silver'].map((m) => ({
-      label: m,
-      on: filters.metals.includes(m),
-      toggle: () =>
-        update({ ...filters, metals: filters.metals.includes(m) ? filters.metals.filter((x) => x !== m) : [...filters.metals, m] })
-    })),
     { label: 'Under 10 g', on: filters.maxWeight === 10, toggle: () => update({ ...filters, maxWeight: filters.maxWeight === 10 ? MAX_WEIGHT : 10 }) }
   ];
 

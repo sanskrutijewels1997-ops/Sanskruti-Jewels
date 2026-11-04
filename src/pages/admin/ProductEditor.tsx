@@ -8,10 +8,11 @@ import { ImageUploader, useCleanupUnsavedUploads, type UploadedImage } from '../
 import { ProductImageFallback } from '../../components/ProductCard';
 import { ErrorNotice, Field, PageLoader, Panel, Spinner, inputClass, primaryButton, secondaryButton } from '../../components/ui';
 import { useApp } from '../../contexts/AppContext';
-import { availabilities, makes, metals, purities, styles } from '../../data/options';
+import { availabilities, makes, purities, styles } from '../../data/options';
 import { api } from '../../lib/api';
 import { formatPrice, formatWeight, friendlyError, slugify } from '../../lib/format';
 import { qk, useCatalogue } from '../../lib/queries';
+import { RECOVERY_DAYS } from '../../lib/recovery';
 import type { Availability, Product, ProductInput, Spec } from '../../types';
 
 interface FormState {
@@ -19,7 +20,6 @@ interface FormState {
   description: string;
   categoryId: string;
   style: string;
-  metal: string;
   purity: string;
   weightMin: string;
   weightMax: string;
@@ -46,7 +46,6 @@ const blank: FormState = {
   description: '',
   categoryId: '',
   style: '',
-  metal: 'Gold',
   purity: '22K',
   weightMin: '',
   weightMax: '',
@@ -74,7 +73,6 @@ function fromProduct(p: Product): FormState {
     description: p.description,
     categoryId: p.categoryId ?? '',
     style: p.style,
-    metal: p.metal,
     purity: p.purity,
     weightMin: num(p.weightMin),
     weightMax: num(p.weightMax),
@@ -97,7 +95,7 @@ function fromProduct(p: Product): FormState {
 }
 
 /** Next SKU after the highest numeric SJ-xxxx in use. */
-function suggestSku(products: Product[]) {
+function suggestSku(products: { sku: string }[]) {
   const max = products.reduce((m, p) => {
     const n = Number(p.sku.replace(/^\D+/, ''));
     return Number.isFinite(n) ? Math.max(m, n) : m;
@@ -108,7 +106,9 @@ function suggestSku(products: Product[]) {
 /** Saves a new product under the next free SKU, trying again if another admin just took it. */
 async function createWithNewSku(input: Omit<ProductInput, 'id' | 'sku' | 'slug'>) {
   for (let attempt = 1; ; attempt++) {
-    const sku = suggestSku(await api.listProducts());
+    // Deleted products still hold their SKU until they're removed for good.
+    const deleted = (await api.listDeleted()).filter((d) => d.sku);
+    const sku = suggestSku([...(await api.listProducts()), ...deleted.map((d) => ({ sku: d.sku! }))]);
     try {
       return await api.saveProduct({ ...input, sku, slug: slugify(`${input.name} ${sku.replace(/^\D+/, '')}`) });
     } catch (err) {
@@ -168,7 +168,8 @@ export function ProductEditor() {
     const errs: string[] = [];
     if (!form.name.trim()) errs.push('Name is required.');
     // Required trade specifications
-    if (!form.categoryId) errs.push('Choose a category.');
+    // A product whose category was deleted has to pick a new one.
+    if (!categories.some((c) => c.id === form.categoryId)) errs.push('Choose a category.');
     if (!form.make.trim()) errs.push('Make is required.');
     const gross = Number(form.grossWeight);
     const stoneWt = form.hasStone ? Number(form.stoneWeight) : 0;
@@ -208,7 +209,7 @@ export function ProductEditor() {
         description: form.description.trim(),
         categoryId: form.categoryId || null,
         style: form.style.trim(),
-        metal: form.metal,
+        metal: 'Gold',
         purity: form.purity,
         weightMin: form.weightMin === '' ? null : Number(form.weightMin),
         weightMax: form.weightMax === '' ? null : Number(form.weightMax),
@@ -250,13 +251,14 @@ export function ProductEditor() {
   };
 
   const remove = async () => {
-    if (!existing || !window.confirm(`Delete “${existing.name}” permanently?`)) return;
+    if (!existing || !window.confirm(`Delete “${existing.name}”? You can restore it from Recently deleted for ${RECOVERY_DAYS} days.`)) return;
     setBusy(true);
     try {
       await api.deleteProduct(existing.id);
       queryClient.invalidateQueries({ queryKey: qk.products });
       queryClient.invalidateQueries({ queryKey: qk.stats });
-      notify('Product deleted', 'info');
+      queryClient.invalidateQueries({ queryKey: qk.deleted });
+      notify('Product moved to Recently deleted', 'info');
       navigate('/admin/products');
     } catch (err) {
       setErrors([friendlyError(err)]);
@@ -404,13 +406,6 @@ export function ProductEditor() {
 
           <Panel title="More details" hint="Optional.">
             <div className="grid gap-4 sm:grid-cols-3">
-              <Field label="Metal">
-                <select value={form.metal} onChange={text('metal')} className={inputClass}>
-                  {metals.map((m) => (
-                    <option key={m}>{m}</option>
-                  ))}
-                </select>
-              </Field>
               <Field label="Style">
                 <input list="style-options" value={form.style} onChange={text('style')} className={inputClass} />
                 <datalist id="style-options">

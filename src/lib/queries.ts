@@ -10,7 +10,8 @@ export const qk = {
   myEnquiries: (userId: string) => ['enquiries', 'mine', userId] as const,
   allEnquiries: ['enquiries', 'all'] as const,
   customers: ['customers'] as const,
-  stats: ['stats'] as const
+  stats: ['stats'] as const,
+  deleted: ['deleted'] as const
 };
 
 export function useProducts() {
