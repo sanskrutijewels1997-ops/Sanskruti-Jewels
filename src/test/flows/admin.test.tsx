@@ -35,7 +35,9 @@ describe('Product editor', () => {
     expect(screen.getByText(/Gross weight is required/)).toBeInTheDocument();
 
     await user.type(name, 'Peacock Pendant');
-    expect((screen.getByLabelText('URL slug') as HTMLInputElement).value).toMatch(/^peacock-pendant-\d+$/);
+    // SKU and link are generated, not typed
+    expect(screen.queryByLabelText('SKU')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('URL slug')).not.toBeInTheDocument();
     await user.type(screen.getByLabelText('Weight from (g)'), '9');
     await user.type(screen.getByLabelText('Weight to (g)'), '4');
     await user.click(screen.getByText('Show price to customers'));
@@ -70,6 +72,8 @@ describe('Product editor', () => {
 
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/admin\/products\/[0-9a-f-]{36}$/));
     const saved = (await api.listProducts()).find((p) => p.name === 'Peacock Pendant')!;
+    expect(saved.sku).toMatch(/^SJ-\d+$/);
+    expect(saved.slug).toBe(`peacock-pendant-${saved.sku.replace('SJ-', '')}`);
     expect(saved).toMatchObject({
       isPublished: false,
       price: 45000,

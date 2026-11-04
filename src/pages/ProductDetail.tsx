@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
-import { BRAND } from '../data/brand';
+import { BRAND, productUrl } from '../data/brand';
 import { api } from '../lib/api';
 import { formatPrice, formatWeight } from '../lib/format';
 import { useCatalogue } from '../lib/queries';
@@ -91,7 +91,6 @@ export function ProductDetail() {
     ['Stone weight', stoneWeight],
     ['Net weight', grams(product.netWeight)],
     ['Qty', product.quantity === null ? '' : String(product.quantity)],
-    ['SKU', product.sku],
     ['Style', product.style],
     ['Metal', product.metal],
     ['Weight range', product.grossWeight === null ? range : ''],
@@ -102,7 +101,7 @@ export function ProductDetail() {
   ].filter(([, v]) => v);
 
   const share = async () => {
-    const url = `${BRAND.siteUrl || window.location.origin}/product/${product.slug}`;
+    const url = productUrl(product.slug);
     try {
       if (navigator.share) await navigator.share({ title: product.name, text: `${product.name} — ${BRAND.name}`, url });
       else {
@@ -151,7 +150,7 @@ export function ProductDetail() {
 
           {category && <p className="mt-3 text-[11px] font-semibold uppercase tracking-wider text-ink-3">{category}</p>}
           <h1 className="mt-1 font-display text-[28px] font-semibold leading-tight text-ink lg:text-5xl">{product.name}</h1>
-          <p className="mt-1 text-xs text-ink-3">SKU {product.sku}</p>
+          {isAdmin && <p className="mt-1 text-xs text-ink-3">SKU {product.sku}</p>}
 
           <div className="mt-4 border-b border-line pb-4">
             {price ? (
@@ -202,7 +201,7 @@ export function ProductDetail() {
             </button>
             {BRAND.whatsapp && (
               <a
-                href={`https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(`Hi, I'm interested in ${product.name} (${product.sku}) ${window.location.href}`)}`}
+                href={`https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(`Hi, I'm interested in ${product.name} ${productUrl(product.slug)}`)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="pressable flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-line text-[13px] font-semibold text-ink"

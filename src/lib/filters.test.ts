@@ -171,9 +171,13 @@ describe('sortProducts', () => {
 });
 
 describe('matchesQuery', () => {
-  it('requires every word, case-insensitively, across name/sku/stone/category', () => {
-    expect(matchesQuery(ring, 'SOLITAIRE r1', 'Rings')).toBe(true);
+  it('requires every word, case-insensitively, across name/stone/category', () => {
+    expect(matchesQuery(ring, 'SOLITAIRE rings', 'Rings')).toBe(true);
     expect(matchesQuery(ring, 'solitaire gold', 'Rings')).toBe(false);
     expect(matchesQuery(ring, 'rings', 'Rings')).toBe(true);
+  });
+
+  it('does not match the internal SKU', () => {
+    expect(matchesQuery(ring, 'r1', 'Rings')).toBe(false);
   });
 });

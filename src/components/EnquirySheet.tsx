@@ -3,7 +3,7 @@ import { CheckCircle2Icon, MessageCircleIcon } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useApp } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
-import { BRAND } from '../data/brand';
+import { BRAND, productUrl } from '../data/brand';
 import { api } from '../lib/api';
 import { friendlyError } from '../lib/format';
 import { BottomSheet } from './BottomSheet';
@@ -64,7 +64,7 @@ export function EnquirySheet() {
   };
 
   const whatsappText = encodeURIComponent(
-    product ? `Hi, I'd like to know more about ${product.name} (${product.sku}).` : 'Hi, I have a question.'
+    product ? `Hi, I'd like to know more about ${product.name} ${productUrl(product.slug)}` : 'Hi, I have a question.'
   );
 
   return (
@@ -110,10 +110,7 @@ export function EnquirySheet() {
           {product ? (
             <div className="flex items-center gap-3 rounded-xl bg-surface-2 p-2.5">
               {product.images[0] && <img src={product.images[0].url} alt="" className="h-14 w-14 rounded-lg object-cover" />}
-              <div className="min-w-0">
-                <p className="line-clamp-2 text-sm font-medium text-ink">{product.name}</p>
-                <p className="text-xs text-ink-3">{product.sku}</p>
-              </div>
+              <p className="line-clamp-2 min-w-0 text-sm font-medium text-ink">{product.name}</p>
             </div>
           ) : (
             <p className="text-sm text-ink-2">Ask about a custom design, today's gold rate, or anything else.</p>

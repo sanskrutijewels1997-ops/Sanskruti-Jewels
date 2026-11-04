@@ -12,12 +12,10 @@ import { availabilities, makes, metals, purities, styles } from '../../data/opti
 import { api } from '../../lib/api';
 import { formatPrice, formatWeight, friendlyError, slugify } from '../../lib/format';
 import { qk, useCatalogue } from '../../lib/queries';
-import type { Availability, Product, Spec } from '../../types';
+import type { Availability, Product, ProductInput, Spec } from '../../types';
 
 interface FormState {
   name: string;
-  sku: string;
-  slug: string;
   description: string;
   categoryId: string;
   style: string;
@@ -45,8 +43,6 @@ interface FormState {
 
 const blank: FormState = {
   name: '',
-  sku: '',
-  slug: '',
   description: '',
   categoryId: '',
   style: '',
@@ -75,8 +71,6 @@ function fromProduct(p: Product): FormState {
   const num = (n: number | null) => (n === null ? '' : String(n));
   return {
     name: p.name,
-    sku: p.sku,
-    slug: p.slug,
     description: p.description,
     categoryId: p.categoryId ?? '',
     style: p.style,
@@ -111,6 +105,18 @@ function suggestSku(products: Product[]) {
   return `SJ-${max + 1}`;
 }
 
+/** Saves a new product under the next free SKU, trying again if another admin just took it. */
+async function createWithNewSku(input: Omit<ProductInput, 'id' | 'sku' | 'slug'>) {
+  for (let attempt = 1; ; attempt++) {
+    const sku = suggestSku(await api.listProducts());
+    try {
+      return await api.saveProduct({ ...input, sku, slug: slugify(`${input.name} ${sku.replace(/^\D+/, '')}`) });
+    } catch (err) {
+      if (attempt === 3 || !/duplicate key/i.test(err instanceof Error ? err.message : String(err))) throw err;
+    }
+  }
+}
+
 export function ProductEditor() {
   const { id } = useParams();
   const isNew = !id;
@@ -123,7 +129,6 @@ export function ProductEditor() {
 
   const [form, setForm] = useState<FormState>(blank);
   const [images, setImages] = useState<UploadedImage[]>([]);
-  const [slugTouched, setSlugTouched] = useState(false);
   // Net weight follows gross − stone until the admin types their own value.
   const [netTouched, setNetTouched] = useState(false);
   const [ready, setReady] = useState(false);
@@ -136,14 +141,12 @@ export function ProductEditor() {
     if (existing) {
       setForm(fromProduct(existing));
       setImages(existing.images.map((i) => ({ url: i.url, storagePath: i.storagePath })));
-      setSlugTouched(true);
       setNetTouched(true);
       setReady(true);
     } else if (isNew) {
-      setForm({ ...blank, sku: suggestSku(products) });
       setReady(true);
     }
-  }, [ready, loading, existing, isNew, products]);
+  }, [ready, loading, existing, isNew]);
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));
   const text = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -161,20 +164,9 @@ export function ProductEditor() {
       return next;
     });
 
-  const onName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.value;
-    setForm((f) => ({
-      ...f,
-      name,
-      slug: slugTouched ? f.slug : slugify(`${name} ${f.sku.replace(/^\D+/, '')}`)
-    }));
-  };
-
   const validate = (): string[] => {
     const errs: string[] = [];
     if (!form.name.trim()) errs.push('Name is required.');
-    if (!form.sku.trim()) errs.push('SKU is required.');
-    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(form.slug)) errs.push('URL slug may only contain lowercase letters, numbers and dashes.');
     // Required trade specifications
     if (!form.categoryId) errs.push('Choose a category.');
     if (!form.make.trim()) errs.push('Make is required.');
@@ -211,11 +203,8 @@ export function ProductEditor() {
     }
     setBusy(true);
     try {
-      const saved = await api.saveProduct({
-        id: existing?.id,
+      const input = {
         name: form.name.trim(),
-        sku: form.sku.trim().toUpperCase(),
-        slug: form.slug,
         description: form.description.trim(),
         categoryId: form.categoryId || null,
         style: form.style.trim(),
@@ -240,7 +229,11 @@ export function ProductEditor() {
         isFeatured: form.isFeatured,
         isPublished: form.isPublished,
         images
-      });
+      };
+      // An existing product keeps its SKU and link, even if renamed, so shared links keep working.
+      const saved = existing
+        ? await api.saveProduct({ ...input, id: existing.id, sku: existing.sku, slug: existing.slug })
+        : await createWithNewSku(input);
       markSaved(images.map((i) => i.storagePath));
       // Put the saved row in the cache right away so the edit page can open it.
       queryClient.setQueryData<Product[]>(qk.products, (old = []) => [saved, ...old.filter((p) => p.id !== saved.id)]);
@@ -329,20 +322,7 @@ export function ProductEditor() {
           <Panel title="Basics">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Product name" className="sm:col-span-2">
-                <input required value={form.name} onChange={onName} className={inputClass} placeholder="Rajwadi Antique Bridal Choker" />
-              </Field>
-              <Field label="SKU">
-                <input required value={form.sku} onChange={text('sku')} className={inputClass} />
-              </Field>
-              <Field label="URL slug" hint={`/product/${form.slug || '…'}`}>
-                <input
-                  value={form.slug}
-                  onChange={(e) => {
-                    setSlugTouched(true);
-                    set('slug', slugify(e.target.value));
-                  }}
-                  className={inputClass}
-                />
+                <input required value={form.name} onChange={text('name')} className={inputClass} placeholder="Rajwadi Antique Bridal Choker" />
               </Field>
               <Field label="Description" className="sm:col-span-2">
                 <textarea rows={4} value={form.description} onChange={text('description')} className={`${inputClass} h-auto resize-y py-2.5`} />
@@ -544,8 +524,8 @@ export function ProductEditor() {
                 <ProductImageFallback className="aspect-square w-full" />
               )}
               <div className="p-4">
-                <p className="text-[11px] text-ink-3">{form.sku}</p>
-                <p className="mt-1 font-display text-lg text-ink">{form.name || 'Product name'}</p>
+                {existing && <p className="mb-1 text-[11px] text-ink-3">{existing.sku}</p>}
+                <p className="font-display text-lg text-ink">{form.name || 'Product name'}</p>
                 <p className="mt-1 text-xs text-ink-2">
                   {[categoryPath(form.categoryId || null), form.purity, formatWeight(preview)].filter(Boolean).join(' · ')}
                 </p>

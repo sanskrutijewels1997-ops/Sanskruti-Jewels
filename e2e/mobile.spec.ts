@@ -56,11 +56,11 @@ test('product list: sort/filter bar, filters in the URL and back restores positi
   check();
 });
 
-test('slogan, Since 1977 badge and purity shortcuts at the top of Home', async ({ page }) => {
+test('slogan, Since 1997 badge and purity shortcuts at the top of Home', async ({ page }) => {
   const check = failOnErrors(page);
   await page.goto('/');
   await expect(page.getByText('Sell More · Stock Less').filter({ visible: true })).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Since 1977' }).filter({ visible: true })).toBeVisible();
+  await expect(page.getByRole('img', { name: 'Since 1997' }).filter({ visible: true })).toBeVisible();
 
   const shortcuts = page.getByRole('navigation', { name: 'Shop by purity' });
   // Both shortcuts sit in the first screenful

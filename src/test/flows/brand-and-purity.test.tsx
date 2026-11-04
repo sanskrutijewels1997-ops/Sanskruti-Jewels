@@ -8,11 +8,11 @@ import { MELTING_92, purities, purityShortcuts } from '../../data/options';
 const count = (purity: string) => seedProducts.filter((p) => p.purity === purity).length;
 
 describe('Brand', () => {
-  it('shows the slogan and the Since 1977 badge at the top of Home', async () => {
+  it('shows the slogan and the Since 1997 badge at the top of Home', async () => {
     renderApp('/');
     // Phone strip + desktop strip are both in the DOM under jsdom
     expect((await screen.findAllByText('Sell More · Stock Less')).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole('img', { name: 'Since 1977' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('img', { name: 'Since 1997' }).length).toBeGreaterThan(0);
   });
 });
 

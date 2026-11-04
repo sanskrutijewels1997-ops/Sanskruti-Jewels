@@ -79,7 +79,7 @@ export function Search() {
               onChange={(e) => setQ(e.target.value)}
               type="search"
               enterKeyHint="search"
-              placeholder="Search jewellery, SKU, stone…"
+              placeholder="Search jewellery, stone…"
               aria-label="Search jewellery"
               className="h-11 w-full rounded-xl bg-surface-2 pl-10 pr-10 text-[15px] text-ink outline-none placeholder:text-ink-3 [&::-webkit-search-cancel-button]:hidden"
             />

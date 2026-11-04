@@ -140,7 +140,8 @@ describe('Product page', () => {
     renderApp(`/product/${p.slug}`);
     expect(await screen.findByRole('heading', { name: p.name, level: 1 })).toBeInTheDocument();
     expect(screen.getAllByText('Price on request').length).toBeGreaterThan(0);
-    expect(screen.getByText(`SKU ${p.sku}`)).toBeInTheDocument();
+    // The SKU is internal: customers never see it
+    expect(screen.queryByText(new RegExp(p.sku))).not.toBeInTheDocument();
     expect(screen.getByText(p.specifications[0].value)).toBeInTheDocument();
     // Core trade specs are listed
     const specs = screen.getByText('Product category').closest('dl')!;

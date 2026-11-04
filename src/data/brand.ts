@@ -2,19 +2,20 @@ export const BRAND = {
   name: 'Sanskruti Jewels',
   shortName: 'Sanskruti',
   slogan: 'Sell More. Stock Less.',
-  since: 1977,
+  since: 1997,
   logo: '/brand/logo.png',
   /** Home page introduction. Edit the words here; the layout picks them up. */
   intro: {
-    title: 'Quality you can trust. Delivery you can count on.',
+    title: 'A Legacy of Trust Since 1997.',
     paragraphs: [
-      'Since 1977, Sanskruti Jewels has been built on two promises: uncompromising quality and punctuality. Every piece is crafted with care, checked for purity and weight, and delivered on the date we commit to, because your customers’ trust depends on ours.',
-      'We don’t just take orders, we build relationships. Once your order is placed with us, you can be completely tension-free: from making and hallmarking to dispatch, we take care of every step and keep you informed along the way.'
+      'At Sanskruti Jewels, we stand by two unwavering promises: uncompromising quality and absolute punctuality. Every creation is meticulously crafted, assayed for purity and precision, and delivered right on schedule.',
+      'From ready stock to bespoke creations, we oversee every detail with utmost care, keeping you informed at every step.',
+      'More than jewellery, we build lasting relationships founded on trust, quality and commitment.'
     ],
     pillars: [
       { title: 'Quality', text: 'Hallmarked purity, accurate weights and a flawless finish.' },
       { title: 'Punctuality', text: 'Committed delivery dates, kept every time.' },
-      { title: 'Trust', text: 'Relationships built order after order since 1977.' },
+      { title: 'Trust', text: 'Relationships built order after order since 1997.' },
       { title: 'Tension-free', text: 'Place your order and relax. We handle the rest.' }
     ]
   },
@@ -24,3 +25,8 @@ export const BRAND = {
   /** Public website address, used for shared links (the native apps have no web address of their own). */
   siteUrl: (import.meta.env.VITE_SITE_URL ?? '').replace(/\/$/, '')
 };
+
+/** Public link to a product, for sharing and messages. */
+export function productUrl(slug: string) {
+  return `${BRAND.siteUrl || window.location.origin}/product/${slug}`;
+}

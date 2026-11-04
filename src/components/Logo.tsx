@@ -15,7 +15,7 @@ export function Logo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
   );
 }
 
-/** Seal-style "Since 1977" badge shown beside the logo. */
+/** Seal-style "Since 1997" badge shown beside the logo. */
 export function SinceBadge({ size = 'md' }: { size?: 'sm' | 'md' }) {
   const box = size === 'sm' ? 'h-11 w-11' : 'h-12 w-12';
   return (

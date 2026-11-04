@@ -168,18 +168,14 @@ function PurityShortcuts() {
 
 const pillarIcons = [ShieldCheckIcon, ClockIcon, HandshakeIcon, SmileIcon];
 
-/** The brand introduction: quality, punctuality, relationships, tension-free ordering. */
+/** The brand introduction, with the four promise boxes. */
 function Intro() {
   const { intro } = BRAND;
-  const years = new Date().getFullYear() - BRAND.since;
   return (
     <section aria-labelledby="intro-title" className="px-4 pt-6 lg:px-0 lg:pt-12">
       <div className="overflow-hidden rounded-2xl border border-gold-pale bg-surface shadow-card lg:grid lg:grid-cols-[1.15fr_1fr]">
         <div className="p-5 lg:p-10">
-          <p className="eyebrow flex items-center gap-2 text-gold">
-            <span className="h-px w-6 bg-gold" aria-hidden="true" /> Since {BRAND.since} · {years} years of trust
-          </p>
-          <h2 id="intro-title" className="mt-3 font-display text-[26px] font-semibold leading-tight text-ink lg:text-4xl">
+          <h2 id="intro-title" className="font-display text-[26px] font-semibold leading-tight text-ink lg:text-4xl">
             {intro.title}
           </h2>
           {intro.paragraphs.map((p) => (
@@ -227,7 +223,7 @@ function HeroCarousel() {
       key: 'hero',
       to: '/catalogue',
       image: '/images/hero.jpg',
-      eyebrow: 'Handcrafted since 1977',
+      eyebrow: 'Handcrafted since 1997',
       title: 'Heirlooms for your big day',
       cta: 'Explore designs'
     },

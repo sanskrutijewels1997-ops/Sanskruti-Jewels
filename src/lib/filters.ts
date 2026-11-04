@@ -136,7 +136,7 @@ export function sortProducts(list: Product[], sort: SortKey) {
 
 /** Every word of the query must appear somewhere in the product's text. */
 export function matchesQuery(p: Product, q: string, categoryName: string) {
-  const hay = [p.name, p.sku, p.style, p.metal, p.purity, p.stone, p.description, categoryName].join(' ').toLowerCase();
+  const hay = [p.name, p.style, p.metal, p.purity, p.stone, p.description, categoryName].join(' ').toLowerCase();
   return q
     .toLowerCase()
     .split(/\s+/)

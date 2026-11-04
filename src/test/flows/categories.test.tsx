@@ -109,11 +109,12 @@ describe('Home intro', () => {
   it('introduces the business with the quality and punctuality promise', async () => {
     renderApp('/');
     const intro = await screen.findByRole('region', { name: BRAND.intro.title });
-    expect(within(intro).getByText(/uncompromising quality and punctuality/)).toBeInTheDocument();
-    expect(within(intro).getByText(/completely tension-free/)).toBeInTheDocument();
+    expect(within(intro).getByText(/uncompromising quality and absolute punctuality/)).toBeInTheDocument();
+    expect(within(intro).getByText(/From ready stock to bespoke creations/)).toBeInTheDocument();
+    expect(within(intro).getByText(/More than jewellery/)).toBeInTheDocument();
     for (const pillar of ['Quality', 'Punctuality', 'Trust', 'Tension-free']) {
       expect(within(intro).getByText(pillar)).toBeInTheDocument();
     }
-    expect(within(intro).getByText(new RegExp(`Since 1977 · ${new Date().getFullYear() - 1977} years of trust`))).toBeInTheDocument();
+    expect(within(intro).getByText(/since 1997/)).toBeInTheDocument();
   });
 });
