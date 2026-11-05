@@ -111,7 +111,7 @@ describe('Profile', () => {
     const { router } = renderApp('/account');
     expect(await screen.findByText('Ananya Kulkarni')).toBeInTheDocument();
 
-    // Light theme only: there is no appearance switcher any more
+    // Black and gold only: there is no appearance switcher
     expect(screen.queryByRole('radiogroup', { name: 'Theme' })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('link', { name: 'Edit profile' }));

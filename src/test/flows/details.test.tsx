@@ -179,7 +179,6 @@ describe('Products created before the trade-spec fields existed', () => {
     return api.saveProduct({
       ...rest,
       id,
-      make: '',
       grossWeight: null,
       stoneWeight: null,
       netWeight: null,
@@ -205,7 +204,6 @@ describe('Products created before the trade-spec fields existed', () => {
     renderApp(`/admin/products/${p.id}`);
     await waitFor(() => expect(screen.getByLabelText('Product name')).toHaveValue(p.name));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
-    expect(await screen.findByText('Make is required.')).toBeInTheDocument();
     expect(screen.getByText(/Gross weight is required/)).toBeInTheDocument();
     expect(screen.getByText(/Quantity must be a whole number/)).toBeInTheDocument();
   });

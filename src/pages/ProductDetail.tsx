@@ -7,7 +7,6 @@ import {
   GemIcon,
   HeartIcon,
   MessageCircleIcon,
-  HammerIcon,
   PackageIcon,
   PencilIcon,
   RefreshCwIcon,
@@ -85,7 +84,6 @@ export function ProductDetail() {
   // Core trade specs first, then the optional details.
   const specs = [
     ['Product category', categoryPath(product.categoryId)],
-    ['Make', product.make],
     ['Purity', product.purity],
     ['Gross weight', grams(product.grossWeight)],
     ['Stone weight', stoneWeight],
@@ -179,7 +177,6 @@ export function ProductDetail() {
                 [ScaleIcon, 'Gross weight', grams(product.grossWeight) || formatWeight(product)],
                 [ScaleIcon, 'Net weight', grams(product.netWeight)],
                 [SparklesIcon, 'Stone weight', stoneWeight],
-                [HammerIcon, 'Make', product.make],
                 [PackageIcon, 'Qty', product.quantity === null ? '' : String(product.quantity)]
               ] as const
             )

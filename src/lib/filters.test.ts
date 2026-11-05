@@ -36,7 +36,6 @@ function product(over: Partial<Product>): Product {
     purity: '22K',
     weightMin: 5,
     weightMax: 6,
-    make: 'Handmade',
     grossWeight: null,
     stoneWeight: null,
     netWeight: null,

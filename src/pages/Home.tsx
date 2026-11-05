@@ -243,7 +243,7 @@ function HeroCarousel() {
               <span className="absolute inset-y-0 left-0 flex max-w-[70%] flex-col justify-end p-5 text-white lg:justify-center lg:p-12">
                 <span className="eyebrow text-[10px] text-[#f1d89a]">{s.eyebrow}</span>
                 <span className="mt-1.5 font-display text-[26px] font-semibold leading-[1.1] lg:text-5xl">{s.title}</span>
-                <span className="mt-3 inline-flex w-fit items-center gap-1 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-black">
+                <span className="mt-3 inline-flex w-fit items-center gap-1 rounded-full bg-brand px-3.5 py-1.5 text-xs font-semibold text-brand-on">
                   {s.cta} <ChevronRightIcon className="h-3.5 w-3.5" />
                 </span>
               </span>

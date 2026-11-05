@@ -652,12 +652,12 @@ on conflict (slug) do nothing;
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102847', 'rajwadi-antique-bridal-choker-2847', 'Rajwadi Antique Bridal Choker', 'A ceremonial choker built on hand-drawn gold wire filigree with kundan setting across the central motif. Finished in matte antique with hanging pearl drops.',
     (select id from public.categories where slug = 'short-necklace'),
     'Bridal', 'Gold', '22K', 62, 74,
-    'Handmade', 74, 5.92, 68.08, 1, 'Kundan polki with ruby & emerald accents', '16 inch adjustable',
+    74, 5.92, 68.08, 1, 'Kundan polki with ruby & emerald accents', '16 inch adjustable',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     true, true, true, 8420, now() - interval '0 days', now() - interval '0 days')
   on conflict (sku) do nothing
@@ -669,12 +669,12 @@ from p, unnest(array['/images/gold-necklace.jpg', '/images/bridal-set.jpg', '/im
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102853', 'kundan-grand-bridal-set-2853', 'Kundan Grand Bridal Set', 'Complete bridal ensemble with choker, long haar, jhumkas and maang tikka. Nizami-inspired layout with graduated polki plates.',
     (select id from public.categories where slug = 'long-necklace'),
     'Bridal', 'Gold', '92 Carat', 88, 104,
-    'Handmade', 104, 8.32, 95.68, 2, 'Uncut polki, ruby, emerald, south sea pearl', 'Necklace 15in, earrings 5.2cm, tikka included',
+    104, 8.32, 95.68, 2, 'Uncut polki, ruby, emerald, south sea pearl', 'Necklace 15in, earrings 5.2cm, tikka included',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     true, true, true, 11240, now() - interval '1 days', now() - interval '1 days')
   on conflict (sku) do nothing
@@ -686,12 +686,12 @@ from p, unnest(array['/images/bridal-set.jpg', '/images/gold-necklace.jpg', '/im
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102861', 'pearl-drop-temple-jhumkas-2861', 'Pearl Drop Temple Jhumkas', 'Classic dome jhumka with nakshi rim, laxmi motif top and a full row of pearl drops. Screw-back closure for daily comfort.',
     (select id from public.categories where slug = 'coimbatore-zumka'),
     'Temple', 'Gold', '22K', 14, 18,
-    'Handmade', 18, 1.44, 16.56, 3, 'Fresh water pearl drops', '5.4 cm drop',
+    18, 1.44, 16.56, 3, 'Fresh water pearl drops', '5.4 cm drop',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     true, true, true, 6310, now() - interval '2 days', now() - interval '2 days')
   on conflict (sku) do nothing
@@ -703,12 +703,12 @@ from p, unnest(array['/images/jhumka.jpg', '/images/temple.jpg', '/images/bridal
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102872', 'engraved-band-signet-ring-2872', 'Engraved Band Signet Ring', 'Sculptural band with hand-engraved chevron detailing and a high-polish inner shank. Sits flush with stacking rings.',
     (select id from public.categories where slug = 'gents-rings'),
     'Modern', 'Gold', '18K', 4, 6,
-    'Machine Made', 6, 0, 6, 4, 'None', 'US 5 – 14',
+    6, 0, 6, 4, 'None', 'US 5 – 14',
     'Ready Stock', 41200, true, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     false, false, true, 3980, now() - interval '3 days', now() - interval '3 days')
   on conflict (sku) do nothing
@@ -720,12 +720,12 @@ from p, unnest(array['/images/gold-ring.jpg', '/images/diamond-ring.jpg', '/imag
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102884', 'solitaire-halo-engagement-ring-2884', 'Solitaire Halo Engagement Ring', 'Four-prong solitaire mount with a micro-pave halo and split shank. Available with lab-grown or natural centre stones.',
     (select id from public.categories where slug = 'casting-ladies-rings'),
     'Modern', 'Gold', '18K', 3, 5,
-    'Casting', 5, 0.2, 4.8, 5, '0.70 ct centre, 0.34 ct pave (IGI certified)', 'US 5 – 12',
+    5, 0.2, 4.8, 5, '0.70 ct centre, 0.34 ct pave (IGI certified)', 'US 5 – 12',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, true, true, 14210, now() - interval '4 days', now() - interval '4 days')
   on conflict (sku) do nothing
@@ -737,12 +737,12 @@ from p, unnest(array['/images/diamond-ring.jpg', '/images/diamond-earrings.jpg',
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102925', 'teardrop-diamond-pendant-2925', 'Teardrop Diamond Pendant', 'A single pear-cut stone in a bezel-and-prong hybrid setting. Supplied with or without an 18 inch cable chain.',
     (select id from public.categories where slug = 'pendant'),
     'Minimal', 'Gold', '18K', 2, 4,
-    'Casting', 4, 0.16, 3.84, 4, '0.25 ct pear cut', '1.8 cm with bail',
+    4, 0.16, 3.84, 4, '0.25 ct pear cut', '1.8 cm with bail',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, false, true, 4780, now() - interval '5 days', now() - interval '5 days')
   on conflict (sku) do nothing
@@ -754,12 +754,12 @@ from p, unnest(array['/images/pendant.jpg', '/images/diamond-earrings.jpg', '/im
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102938', 'contemporary-diamond-mangalsutra-2938', 'Contemporary Diamond Mangalsutra', 'Double-line black bead mangalsutra with a compact diamond floral pendant designed for daily office wear.',
     (select id from public.categories where slug = 'rajkot-vati'),
     'Modern', 'Gold', '18K', 6, 9,
-    'Casting', 9, 0.36, 8.64, 5, '0.18 ct round brilliant cluster', '24 inch',
+    9, 0.36, 8.64, 5, '0.18 ct round brilliant cluster', '24 inch',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, true, true, 8140, now() - interval '6 days', now() - interval '6 days')
   on conflict (sku) do nothing
@@ -771,12 +771,12 @@ from p, unnest(array['/images/mangalsutra.jpg', '/images/pendant.jpg', '/images/
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102944', 'mens-textured-gold-kada-2944', 'Men''s Textured Gold Kada', 'Hinged kada with hand-chiselled chevron texture and a concealed push clasp. Heavy gauge, hollow core construction.',
     (select id from public.categories where slug = 'kada'),
     'Modern', 'Gold', '92 Carat', 34, 42,
-    'Machine Made', 42, 0, 42, 1, 'None', '2.6 / 2.8 inch',
+    42, 0, 42, 1, 'None', '2.6 / 2.8 inch',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     false, true, true, 6220, now() - interval '7 days', now() - interval '7 days')
   on conflict (sku) do nothing
@@ -788,12 +788,12 @@ from p, unnest(array['/images/mens.jpg', '/images/bracelet.jpg', '/images/chain.
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102957', 'featherlight-geometric-necklace-2957', 'Featherlight Geometric Necklace', 'Hollow-form gold necklace under 5 grams with a small geometric charm. Light enough for every day.',
     (select id from public.categories where slug = 'short-necklace'),
     'Lightweight', 'Gold', '18K', 3, 5,
-    'Machine Made', 5, 0, 5, 2, 'None', '16 inch + 2 inch extender',
+    5, 0, 5, 2, 'None', '16 inch + 2 inch extender',
     'Ready Stock', 38500, true, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, true, true, 5210, now() - interval '8 days', now() - interval '8 days')
   on conflict (sku) do nothing
@@ -805,12 +805,12 @@ from p, unnest(array['/images/lightweight.jpg', '/images/pendant.jpg', '/images/
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102968', 'lakshmi-temple-haaram-2968', 'Lakshmi Temple Haaram', 'Long temple haaram with repeating Lakshmi and peacock plates, hand-set with cabochon rubies through the frame.',
     (select id from public.categories where slug = 'laxmi-har'),
     'Temple', 'Gold', '22K', 96, 118,
-    'Handmade', 118, 9.44, 108.56, 3, 'Burmese ruby, uncut emerald', '28 inch long haaram',
+    118, 9.44, 108.56, 3, 'Burmese ruby, uncut emerald', '28 inch long haaram',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     false, true, true, 7930, now() - interval '9 days', now() - interval '9 days')
   on conflict (sku) do nothing
@@ -822,12 +822,12 @@ from p, unnest(array['/images/temple.jpg', '/images/gold-necklace.jpg', '/images
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102979', 'diamond-drop-cocktail-earrings-2979', 'Diamond Drop Cocktail Earrings', 'Detachable stud-and-drop construction giving you two looks from one pair.',
     (select id from public.categories where slug = 'earring'),
     'Modern', 'Gold', '18K', 7, 10,
-    'Casting', 10, 0.4, 9.6, 4, '1.42 ct total, VS-GH', '3.2 cm drop',
+    10, 0.4, 9.6, 4, '1.42 ct total, VS-GH', '3.2 cm drop',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, true, true, 6650, now() - interval '10 days', now() - interval '10 days')
   on conflict (sku) do nothing
@@ -839,12 +839,12 @@ from p, unnest(array['/images/diamond-earrings.jpg', '/images/diamond-ring.jpg',
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-102994', 'filigree-bridal-long-necklace-2994', 'Filigree Bridal Long Necklace', 'Jaipur filigree work across a graduated collar with a detachable central pendant that can be worn separately.',
     (select id from public.categories where slug = 'long-necklace'),
     'Bridal', 'Gold', '92 Carat', 71, 84,
-    'Handmade', 84, 6.72, 77.28, 1, 'Kundan with pearl fringe', '18 inch',
+    84, 6.72, 77.28, 1, 'Kundan with pearl fringe', '18 inch',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     false, true, true, 9010, now() - interval '11 days', now() - interval '11 days')
   on conflict (sku) do nothing
@@ -856,12 +856,12 @@ from p, unnest(array['/images/gold-necklace.jpg', '/images/editorial-bridal.jpg'
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103002', 'everyday-diamond-studs-3002', 'Everyday Diamond Studs', 'Classic four-prong diamond studs with secure screw backs. An everyday essential.',
     (select id from public.categories where slug = 'karwari-tops'),
     'Daily Wear', 'Gold', '14K', 1, 3,
-    'Casting', 3, 0.12, 2.88, 2, '0.20 ct pair', '4 mm',
+    3, 0.12, 2.88, 2, '0.20 ct pair', '4 mm',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     false, true, true, 12100, now() - interval '12 days', now() - interval '12 days')
   on conflict (sku) do nothing
@@ -873,12 +873,12 @@ from p, unnest(array['/images/diamond-earrings.jpg', '/images/pendant.jpg', '/im
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103021', 'antique-peacock-pendant-3021', 'Antique Peacock Pendant', 'Antique-finish peacock motif pendant with fine nakshi border and a single pearl drop at the base.',
     (select id from public.categories where slug = 'pendant'),
     'Antique', 'Gold', '92 Carat', 11, 15,
-    'Handmade', 15, 1.2, 13.8, 4, 'Ruby, emerald, pearl drop', '3.6 cm',
+    15, 1.2, 13.8, 4, 'Ruby, emerald, pearl drop', '3.6 cm',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     false, false, true, 4320, now() - interval '13 days', now() - interval '13 days')
   on conflict (sku) do nothing
@@ -890,12 +890,12 @@ from p, unnest(array['/images/pendant.jpg', '/images/temple.jpg', '/images/gold-
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103038', 'slim-beaded-mangalsutra-3038', 'Slim Beaded Mangalsutra', 'Single-line lightweight mangalsutra with an understated gold vati. Designed for the sub-5 gram price band.',
     (select id from public.categories where slug = 'karwari-vati'),
     'Lightweight', 'Gold', '18K', 4, 6,
-    'Machine Made', 6, 0.48, 5.52, 5, 'Black beads', '20 / 24 inch',
+    6, 0.48, 5.52, 5, 'Black beads', '20 / 24 inch',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     false, false, true, 6710, now() - interval '14 days', now() - interval '14 days')
   on conflict (sku) do nothing
@@ -907,12 +907,12 @@ from p, unnest(array['/images/mangalsutra.jpg', '/images/chain.jpg', '/images/li
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103044', 'statement-emerald-collar-3044', 'Statement Emerald Collar', 'A bold collar with graduated emerald cabochons framed in uncut diamond. Built for flagship display windows.',
     (select id from public.categories where slug = 'short-necklace'),
     'Traditional', 'Gold', '22K', 58, 70,
-    'Handmade', 70, 5.6, 64.4, 1, 'Zambian emerald, uncut diamond', '14 inch collar',
+    70, 5.6, 64.4, 1, 'Zambian emerald, uncut diamond', '14 inch collar',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, true, true, 7220, now() - interval '15 days', now() - interval '15 days')
   on conflict (sku) do nothing
@@ -924,12 +924,12 @@ from p, unnest(array['/images/editorial-statement.jpg', '/images/gold-necklace.j
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103063', 'polki-bridal-jhumka-3063', 'Polki Bridal Jhumka', 'Oversized bridal jhumka with detachable ear-chain sahara and a triple row of pearl fringe.',
     (select id from public.categories where slug = 'karwari-zumka'),
     'Bridal', 'Gold', '92 Carat', 22, 28,
-    'Handmade', 28, 2.24, 25.76, 3, 'Uncut polki, pearl', '6.8 cm drop with sahara',
+    28, 2.24, 25.76, 3, 'Uncut polki, pearl', '6.8 cm drop with sahara',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     true, true, true, 8410, now() - interval '16 days', now() - interval '16 days')
   on conflict (sku) do nothing
@@ -941,12 +941,12 @@ from p, unnest(array['/images/jhumka.jpg', '/images/bridal-set.jpg', '/images/ed
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103071', 'minimal-stacking-ring-trio-3071', 'Minimal Stacking Ring Trio', 'Three slim bands — plain, twisted and single-stone — sold as a coordinated stack or individually.',
     (select id from public.categories where slug = 'ladies-rings'),
     'Minimal', 'Gold', '14K', 2, 4,
-    'Machine Made', 4, 0.32, 3.68, 4, 'Single 0.05 ct accent', 'US 5 – 10',
+    4, 0.32, 3.68, 4, 'Single 0.05 ct accent', 'US 5 – 10',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, false, true, 3620, now() - interval '17 days', now() - interval '17 days')
   on conflict (sku) do nothing
@@ -958,12 +958,12 @@ from p, unnest(array['/images/gold-ring.jpg', '/images/diamond-ring.jpg', '/imag
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103096', 'diamond-cluster-cocktail-ring-3096', 'Diamond Cluster Cocktail Ring', 'Flower cluster head with illusion setting that reads two sizes larger than its carat weight.',
     (select id from public.categories where slug = 'ladies-rings'),
     'Modern', 'Gold', '18K', 5, 8,
-    'Casting', 8, 0.32, 7.68, 1, '0.94 ct cluster', 'US 6 – 13',
+    8, 0.32, 7.68, 1, '0.94 ct cluster', 'US 6 – 13',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     false, false, true, 4460, now() - interval '18 days', now() - interval '18 days')
   on conflict (sku) do nothing
@@ -975,12 +975,12 @@ from p, unnest(array['/images/diamond-ring.jpg', '/images/diamond-earrings.jpg',
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103117', 'bridal-maang-tikka-set-3117', 'Bridal Maang Tikka & Set', 'Coordinated tikka, passa and choker trio finished to match a bride’s primary necklace order.',
     (select id from public.categories where slug = 'tika'),
     'Bridal', 'Gold', '92 Carat', 44, 55,
-    'Handmade', 55, 4.4, 50.6, 3, 'Polki, pearl, emerald bead', 'Coordinated three-piece',
+    55, 4.4, 50.6, 3, 'Polki, pearl, emerald bead', 'Coordinated three-piece',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     true, true, true, 6890, now() - interval '19 days', now() - interval '19 days')
   on conflict (sku) do nothing
@@ -992,12 +992,12 @@ from p, unnest(array['/images/editorial-bridal.jpg', '/images/bridal-set.jpg', '
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103126', 'mens-signet-gold-ring-3126', 'Men''s Signet Gold Ring', 'Broad-face signet with a brushed top plate, available blank or with your own engraving.',
     (select id from public.categories where slug = 'casting-gents-rings'),
     'Modern', 'Gold', '22K', 9, 13,
-    'Machine Made', 13, 1.04, 11.96, 4, 'Optional black onyx', 'US 8 – 16',
+    13, 1.04, 11.96, 4, 'Optional black onyx', 'US 8 – 16',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     false, false, true, 4180, now() - interval '20 days', now() - interval '20 days')
   on conflict (sku) do nothing
@@ -1009,12 +1009,12 @@ from p, unnest(array['/images/gold-ring.jpg', '/images/mens.jpg', '/images/chain
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103139', 'delicate-layering-necklace-3139', 'Delicate Layering Necklace', 'Ultra-fine layering chain designed to be sold in threes. A strong entry price-point for younger buyers.',
     (select id from public.categories where slug = 'long-necklace'),
     'Minimal', 'Gold', '14K', 2, 4,
-    'Machine Made', 4, 0, 4, 5, 'None', '14 / 16 / 18 inch',
+    4, 0, 4, 5, 'None', '14 / 16 / 18 inch',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, true, true, 5540, now() - interval '21 days', now() - interval '21 days')
   on conflict (sku) do nothing
@@ -1026,12 +1026,12 @@ from p, unnest(array['/images/editorial-everyday.jpg', '/images/lightweight.jpg'
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103147', 'emerald-drop-temple-necklace-3147', 'Emerald Drop Temple Necklace', 'Temple plates strung with graduated emerald beads and finished with a hand-knotted silk cord back.',
     (select id from public.categories where slug = 'laxmi-har'),
     'Temple', 'Gold', '92 Carat', 54, 66,
-    'Handmade', 66, 5.28, 60.72, 1, 'Emerald bead drops', '17 inch',
+    66, 5.28, 60.72, 1, 'Emerald bead drops', '17 inch',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"Antique matte"}]'::jsonb,
     false, false, true, 4970, now() - interval '22 days', now() - interval '22 days')
   on conflict (sku) do nothing
@@ -1043,12 +1043,12 @@ from p, unnest(array['/images/temple.jpg', '/images/editorial-statement.jpg', '/
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103155', 'diamond-bezel-pendant-set-3155', 'Diamond Bezel Pendant Set', 'Bezel-set pendant with matching studs, packaged as a ready gifting set with certificate.',
     (select id from public.categories where slug = 'casting-lockets'),
     'Daily Wear', 'Gold', '18K', 5, 8,
-    'Casting', 8, 0.32, 7.68, 2, '0.32 ct total', 'Pendant + studs + 18in chain',
+    8, 0.32, 7.68, 2, '0.32 ct total', 'Pendant + studs + 18in chain',
     'Ready Stock', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Diamond certification","value":"IGI certified"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, false, true, 6120, now() - interval '23 days', now() - interval '23 days')
   on conflict (sku) do nothing
@@ -1060,12 +1060,12 @@ from p, unnest(array['/images/pendant.jpg', '/images/diamond-earrings.jpg', '/im
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103168', 'broad-gold-choker-necklace-3168', 'Broad Gold Choker Necklace', 'Wide gold choker with a dense floral field and hidden hook closure at the nape.',
     (select id from public.categories where slug = 'short-necklace'),
     'Traditional', 'Gold', '22K', 78, 92,
-    'Handmade', 92, 7.36, 84.64, 3, 'Kundan', '15 inch',
+    92, 7.36, 84.64, 3, 'Kundan', '15 inch',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     false, false, true, 5860, now() - interval '24 days', now() - interval '24 days')
   on conflict (sku) do nothing
@@ -1077,12 +1077,12 @@ from p, unnest(array['/images/gold-necklace.jpg', '/images/bangles.jpg', '/image
 
 with p as (
   insert into public.products (sku, slug, name, description, category_id, style, metal, purity,
-    weight_min, weight_max, make, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
+    weight_min, weight_max, gross_weight, stone_weight, net_weight, quantity, stone, size, availability, price, show_price, specifications, is_new, is_featured,
     is_published, views, created_at, updated_at)
   values ('SJ-103203', 'layered-pearl-gold-haar-3203', 'Layered Pearl & Gold Haar', 'Three-layer pearl haar with polki spacers and a detachable central plate.',
     (select id from public.categories where slug = 'long-necklace'),
     'Traditional', 'Gold', '92 Carat', 64, 76,
-    'Handmade', 76, 6.08, 69.92, 2, 'South sea pearl, polki', '22 inch',
+    76, 6.08, 69.92, 2, 'South sea pearl, polki', '22 inch',
     'Made to Order', null, false, '[{"label":"Hallmark","value":"BIS hallmarked (HUID)"},{"label":"Finish","value":"High polish"}]'::jsonb,
     true, true, true, 6440, now() - interval '26 days', now() - interval '26 days')
   on conflict (sku) do nothing

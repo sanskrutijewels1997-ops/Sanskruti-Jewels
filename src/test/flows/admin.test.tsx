@@ -35,7 +35,7 @@ describe('Product editor', () => {
     expect(screen.getByText(/Add at least one photo before publishing/)).toBeInTheDocument();
     // Required trade specifications
     expect(screen.getByText('Choose a category.')).toBeInTheDocument();
-    expect(screen.getByText('Make is required.')).toBeInTheDocument();
+    expect(screen.queryByText('Make is required.')).not.toBeInTheDocument();
     expect(screen.getByText(/Gross weight is required/)).toBeInTheDocument();
 
     await user.type(name, 'Peacock Pendant');
@@ -53,7 +53,6 @@ describe('Product editor', () => {
     await user.clear(screen.getByLabelText('Weight to (g)'));
     await user.type(screen.getByLabelText('Weight to (g)'), '12');
     await user.selectOptions(screen.getByLabelText('Category', { exact: false }), 'Pendant');
-    await user.type(screen.getByLabelText('Make', { exact: false }), 'Handmade');
     await user.type(screen.getByLabelText('Gross weight (g)', { exact: false }), '10.5');
     // Stone weight only appears once "Has stones?" is answered Yes
     expect(screen.getByText('Say whether the piece has stones.')).toBeInTheDocument();
@@ -85,7 +84,6 @@ describe('Product editor', () => {
       showPrice: true,
       weightMin: 9,
       weightMax: 12,
-      make: 'Handmade',
       grossWeight: 10.5,
       stoneWeight: 0.75,
       netWeight: 9.75,

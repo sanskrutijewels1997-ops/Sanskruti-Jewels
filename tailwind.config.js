@@ -1,5 +1,4 @@
-// Colours are CSS variables (see src/index.css) so the app can follow the phone's
-// light/dark setting. Names describe the role, not the colour.
+// Colours are CSS variables (see src/index.css). Names describe the role, not the colour.
 const v = (name) => `rgb(var(--${name}) / <alpha-value>)`;
 
 export default {

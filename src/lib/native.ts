@@ -26,8 +26,8 @@ export function pushBackHandler(fn: () => void) {
 
 export function initNative() {
   if (!isNative) return;
-  // Dark status-bar icons on the light app background.
-  void StatusBar.setStyle({ style: Style.Light }).catch(() => undefined);
+  // Light status-bar icons on the black app background.
+  void StatusBar.setStyle({ style: Style.Dark }).catch(() => undefined);
   if (Capacitor.getPlatform() === 'android') {
     void StatusBar.setOverlaysWebView({ overlay: true }).catch(() => undefined);
   }

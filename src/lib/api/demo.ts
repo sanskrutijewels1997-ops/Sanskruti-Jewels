@@ -75,7 +75,6 @@ function seed(): DB {
       purity: p.purity,
       weightMin: p.weightMin,
       weightMax: p.weightMax,
-      make: p.make,
       grossWeight: p.grossWeight,
       stoneWeight: p.stoneWeight,
       netWeight: p.netWeight,

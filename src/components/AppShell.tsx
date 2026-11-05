@@ -14,7 +14,7 @@ export function AppShell() {
 
   return (
     <div className="flex min-h-[100dvh] w-full flex-col bg-bg">
-      {/* Home pins its own maroon strip; every other screen gets a solid status bar cover */}
+      {/* Home pins its own gold strip; every other screen gets a solid status bar cover */}
       {pathname !== '/' && <div aria-hidden className="status-bar-cover fixed inset-x-0 top-0 z-50 bg-surface lg:hidden" />}
       <BrandStrip className="hidden lg:block" />
       <DesktopNav />

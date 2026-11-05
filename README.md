@@ -17,7 +17,7 @@ Vercel today and ships to iOS and Android from the same codebase with Capacitor.
 ### Product specifications
 
 Every product must have these, and the admin form won't save without them:
-**Category, Make, Purity, Gross weight, Has stones (Yes/No), Net weight** (auto-filled
+**Category, Purity, Gross weight, Has stones (Yes/No), Net weight** (auto-filled
 as gross − stone, editable), **Qty** and **Trending (Yes/No)**. Answering Yes to "Has
 stones?" shows **Stone weight**, which is then required; No saves it as 0 and the product
 page shows "No stones". Trending products fill the "Trending Now" row on Home. Everything
@@ -57,7 +57,7 @@ Baymard's product-list research:
   sheet with facets on the left and live result counts, plus removable applied-filter chips.
   Filters live in the URL, so Back returns to the same filtered list and scroll position.
 - Product page: edge-to-edge swipe gallery, collapsible details, sticky Wishlist / Enquire bar.
-- Bottom sheets (drag to close), snackbars with actions, and an off-white light theme.
+- Bottom sheets (drag to close), snackbars with actions, and a single black and gold theme.
 - Native touches through Capacitor: Android back button closes sheets first, haptic tap on
   wishlist, status bar matched to the theme. Desktop gets a top nav and wider grids.
 

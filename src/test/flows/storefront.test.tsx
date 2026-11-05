@@ -147,8 +147,8 @@ describe('Product page', () => {
     expect(screen.getByText(p.specifications[0].value)).toBeInTheDocument();
     // Core trade specs are listed
     const specs = screen.getByText('Product category').closest('dl')!;
+    expect(within(specs).queryByText('Make')).not.toBeInTheDocument();
     for (const [label, value] of [
-      ['Make', p.make],
       ['Purity', p.purity],
       ['Gross weight', `${p.grossWeight} g`],
       ['Stone weight', `${p.stoneWeight} g`],

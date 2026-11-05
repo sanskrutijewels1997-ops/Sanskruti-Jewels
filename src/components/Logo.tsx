@@ -30,7 +30,7 @@ export function SinceBadge({ size = 'md' }: { size?: 'sm' | 'md' }) {
   );
 }
 
-/** Slim maroon strip carrying the slogan. */
+/** Slim gold strip carrying the slogan. */
 export function BrandStrip({ className = '' }: { className?: string }) {
   return (
     <div className={`bg-brand text-brand-on ${className}`}>

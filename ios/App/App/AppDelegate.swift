@@ -59,10 +59,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             guard captureCover == nil else { return }
             let cover = UIView(frame: window.bounds)
             cover.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            cover.backgroundColor = UIColor(red: 0.98, green: 0.97, blue: 0.95, alpha: 1)
+            cover.backgroundColor = UIColor(red: 0.04, green: 0.04, blue: 0.03, alpha: 1)
             let label = UILabel()
             label.text = "Screen recording isn't allowed in Sanskruti Jewels"
-            label.textColor = UIColor(red: 0.48, green: 0.12, blue: 0.17, alpha: 1)
+            label.textColor = UIColor(red: 0.89, green: 0.76, blue: 0.46, alpha: 1)
             label.numberOfLines = 0
             label.textAlignment = .center
             label.translatesAutoresizingMaskIntoConstraints = false

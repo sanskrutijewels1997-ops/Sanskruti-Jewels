@@ -8,7 +8,7 @@ import { ImageUploader, useCleanupUnsavedUploads, type UploadedImage } from '../
 import { ProductImageFallback } from '../../components/ProductCard';
 import { ErrorNotice, Field, PageLoader, Panel, Spinner, inputClass, primaryButton, secondaryButton } from '../../components/ui';
 import { useApp } from '../../contexts/AppContext';
-import { availabilities, makes, purities, styles } from '../../data/options';
+import { availabilities, purities, styles } from '../../data/options';
 import { api } from '../../lib/api';
 import { formatPrice, formatWeight, friendlyError, slugify } from '../../lib/format';
 import { qk, useCatalogue } from '../../lib/queries';
@@ -23,7 +23,6 @@ interface FormState {
   purity: string;
   weightMin: string;
   weightMax: string;
-  make: string;
   grossWeight: string;
   /** Unanswered (null) until the admin picks Yes or No. */
   hasStone: boolean | null;
@@ -49,7 +48,6 @@ const blank: FormState = {
   purity: '22K',
   weightMin: '',
   weightMax: '',
-  make: '',
   grossWeight: '',
   hasStone: null,
   stoneWeight: '',
@@ -76,7 +74,6 @@ function fromProduct(p: Product): FormState {
     purity: p.purity,
     weightMin: num(p.weightMin),
     weightMax: num(p.weightMax),
-    make: p.make,
     grossWeight: num(p.grossWeight),
     hasStone: p.stoneWeight === null ? null : p.stoneWeight > 0,
     stoneWeight: p.stoneWeight ? String(p.stoneWeight) : '',
@@ -170,7 +167,6 @@ export function ProductEditor() {
     // Required trade specifications
     // A product whose category was deleted has to pick a new one.
     if (!categories.some((c) => c.id === form.categoryId)) errs.push('Choose a category.');
-    if (!form.make.trim()) errs.push('Make is required.');
     const gross = Number(form.grossWeight);
     const stoneWt = form.hasStone ? Number(form.stoneWeight) : 0;
     const net = Number(form.netWeight);
@@ -213,7 +209,6 @@ export function ProductEditor() {
         purity: form.purity,
         weightMin: form.weightMin === '' ? null : Number(form.weightMin),
         weightMax: form.weightMax === '' ? null : Number(form.weightMax),
-        make: form.make.trim(),
         grossWeight: Number(form.grossWeight),
         stoneWeight: form.hasStone ? Number(form.stoneWeight) : 0,
         netWeight: Number(form.netWeight),
@@ -339,14 +334,6 @@ export function ProductEditor() {
                   <option value="">Choose…</option>
                   <CategoryOptions categories={categories} />
                 </select>
-              </Field>
-              <Field label="Make" required>
-                <input required list="make-options" value={form.make} onChange={text('make')} className={inputClass} placeholder="Handmade" />
-                <datalist id="make-options">
-                  {makes.map((m) => (
-                    <option key={m} value={m} />
-                  ))}
-                </datalist>
               </Field>
               <Field label="Purity" required>
                 <select required value={form.purity} onChange={text('purity')} className={inputClass}>

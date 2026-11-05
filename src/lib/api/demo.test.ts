@@ -19,7 +19,6 @@ function input(over: Partial<ProductInput> = {}): ProductInput {
     purity: '22K',
     weightMin: 2,
     weightMax: 3,
-    make: 'Handmade',
     grossWeight: 3,
     stoneWeight: 0,
     netWeight: 3,

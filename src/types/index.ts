@@ -37,8 +37,6 @@ export interface Product {
   purity: string;
   weightMin: number | null;
   weightMax: number | null;
-  /** How it's made, e.g. Handmade, Machine Made, Casting. */
-  make: string;
   grossWeight: number | null;
   stoneWeight: number | null;
   netWeight: number | null;
